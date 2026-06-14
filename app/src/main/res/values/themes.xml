@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Lumeire" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/gold_light</item>
+        <item name="colorPrimaryVariant">@color/gold_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/gold_dark</item>
+        <item name="colorSecondaryVariant">@color/gold_darker</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:colorBackground">@color/cream_bg</item>
+        <item name="android:statusBarColor">@color/gold_dark</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:windowBackground">@color/cream_bg</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <!-- Splash theme with gradient background -->
+    <style name="Theme.Lumeire.Splash" parent="Theme.Lumeire">
+        <item name="android:windowBackground">@drawable/bg_splash</item>
+        <item name="android:statusBarColor">@color/cream_medium</item>
+    </style>
+
+    <!-- BottomNavigationView style -->
+    <style name="Widget.Lumeire.BottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:background">@color/white</item>
+        <item name="itemIconTint">@drawable/bottom_nav_item_color</item>
+        <item name="itemTextColor">@drawable/bottom_nav_item_color</item>
+        <item name="itemRippleColor">@color/cream_bg</item>
+    </style>
+
+    <!-- Card style -->
+    <style name="Widget.Lumeire.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardBackgroundColor">@color/white</item>
+    </style>
+
+    <!-- Gold Button style -->
+    <style name="Widget.Lumeire.Button.Gold" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/gold_light</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+
+    <!-- Text styles -->
+    <style name="TextStyle.Lumeire.Title" parent="">
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textColor">@color/text_dark</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextStyle.Lumeire.Subtitle" parent="">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_light</item>
+    </style>
+
+    <style name="TextStyle.Lumeire.Label" parent="">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/text_muted</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+</resources>

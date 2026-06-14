@@ -1,0 +1,310 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,margin=0.75in]{geometry}
+\usepackage[dvipsnames,table]{xcolor}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{colortbl}
+\usepackage{hyperref}
+
+\definecolor{LumiereGold}{HTML}{C9A26D}
+\definecolor{LumiereDark}{HTML}{2C1A0A}
+\definecolor{LumiereMuted}{HTML}{7A6045}
+\definecolor{LumiereCream}{HTML}{FAF5EF}
+\definecolor{LumiereLine}{HTML}{EAD8C0}
+\definecolor{LumiereGreen}{HTML}{40A070}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=LumiereDark,
+  urlcolor=LumiereDark
+}
+
+\setlength{\parindent}{0pt}
+\setstretch{1.08}
+\renewcommand{\arraystretch}{1.28}
+\setlist[itemize]{leftmargin=18pt,itemsep=3pt,topsep=4pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\textcolor{LumiereMuted}{\footnotesize Lumiere Portfolio \textbar{} Mobile Application Development \textbar{} \thepage}}
+\renewcommand{\headrulewidth}{0pt}
+
+\titleformat{\section}
+  {\Large\bfseries\color{LumiereDark}}
+  {}{0pt}{}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\PageTitle}[1]{\section*{#1}\vspace{2pt}\textcolor{LumiereGold}{\rule{\textwidth}{1.1pt}}\vspace{6pt}}
+\newcommand{\SmallSpace}{\vspace{4pt}}
+
+\begin{document}
+\pagecolor{white}
+\thispagestyle{empty}
+
+\vspace*{1.0cm}
+\begin{center}
+{\fontsize{20}{24}\selectfont\bfseries\textcolor{LumiereGold}{Mobile Application Development}}\\[1.2cm]
+{\fontsize{24}{28}\selectfont\bfseries\textcolor{LumiereDark}{Lumiere: A Salon Booking And Gifting Experience App}}\\[0.45cm]
+{\large\textcolor{LumiereMuted}{Portfolio of Plug-ins, Tools, Add-ons, AI Services, Backend Components, and Deployment Stack}}\\[1.0cm]
+\end{center}
+
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm,left=5mm,right=5mm,top=4mm,bottom=4mm]
+\centering
+\textbf{\textcolor{LumiereDark}{Assumption used in this report:}} The Lumiere application is treated as a fully implemented, Firebase-backed, tested, and deployed production-ready mobile app rather than only a prototype or dummy build.
+\end{tcolorbox}
+
+\vfill
+\begin{center}
+{\large\bfseries\textcolor{LumiereGold}{Group Members}}\\[0.35cm]
+{\large\textcolor{LumiereDark}{Hammad Ahmad \textbar{} BSEF24M502}}\\[0.15cm]
+{\large\textcolor{LumiereDark}{Muhammad Ans \textbar{} BSEF24M511}}\\[0.15cm]
+{\large\textcolor{LumiereDark}{Eden Nadeem Bhatti \textbar{} BSEF24M549}}\\[1.2cm]
+{\normalsize\textit{\textcolor{LumiereMuted}{Prepared as a portfolio report for the Lumiere mobile application project.}}}
+\end{center}
+
+\newpage
+\PageTitle{1. Project Overview and Portfolio Scope}
+
+Lumiere is a premium salon booking and gifting application designed to help users discover salons, reserve appointments, send beauty experiences as gifts, manage profiles, and interact with a modern mobile platform built for convenience and elegance.
+
+This portfolio does not describe only the user interface. It documents the full assumed production ecosystem used to complete the project: design generation, Android development, Firebase backend services, deployment tools, QA systems, and AI-supported development assistants.
+
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm,left=4mm,right=4mm,top=3mm,bottom=3mm]
+\textbf{\textcolor{LumiereDark}{Portfolio Objective}}
+\begin{itemize}
+\item Identify which plug-ins, tools, add-ons, and AI services were used to complete Lumiere.
+\item Present the assumed production backend and deployment stack clearly.
+\item Show how design, frontend, backend, QA, and release operations were connected.
+\end{itemize}
+\end{tcolorbox}
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{2.0cm} Y p{2.7cm}}
+\rowcolor{LumiereGold}
+\color{white}Area & \color{white}What It Covered in Lumiere & \color{white}Outcome \\
+Frontend & Android screens, navigation, forms, bookings, gifting, maps, and profile management & User-facing mobile experience \\
+Backend & Authentication, data storage, media storage, notification flow, cloud logic, and security rules & Operational Firebase-powered backend \\
+Deployment & Release testing, publishing, analytics, crash monitoring, and maintenance workflow & Live, maintainable application \\
+AI Support & Design guidance, coding help, debugging assistance, and portfolio drafting support & Faster delivery and clearer execution \\
+\end{tabularx}
+
+\SmallSpace
+The following pages explain each layer in detail so that Lumiere can be presented as a complete academic and technical portfolio rather than a single-screen application artifact.
+
+\newpage
+\PageTitle{2. Frontend Mobile Application Development Stack}
+
+The Lumiere client application was developed as a native Android app. Kotlin was used for application logic, while XML layouts were used to structure visual screens such as splash, onboarding, login, home, bookings, maps, gifting, and profile.
+
+This frontend layer handled all user-facing interaction, including navigation, form input, account access, appointment browsing, gifting actions, and profile controls. It also translated the premium salon theme into a polished mobile interface.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{2.4cm} p{2.1cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Component & \color{white}Type & \color{white}Use in Lumiere \\
+Android Studio & IDE & Main workspace for coding, emulation, debugging, build management, and project organization \\
+Kotlin & Language & Implemented activities, fragments, navigation logic, validation, and app behavior \\
+XML Layouts & UI Definition & Built page structure, cards, forms, buttons, and navigation containers \\
+Material Components & UI Library & Supplied polished buttons, text fields, cards, switches, and navigation widgets \\
+Glide & Image Library & Loaded salon images, profile visuals, and promotional content efficiently \\
+View Binding & Android Feature & Connected Kotlin logic safely with XML views \\
+\end{tabularx}
+
+\SmallSpace
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm]
+\textbf{\textcolor{LumiereDark}{Why this stack was effective}}
+\begin{itemize}
+\item It stayed fully native to Android and easy to demonstrate inside Android Studio.
+\item It matched the Figma-inspired visual design with accurate XML-level layout control.
+\item It supported a dummy-first workflow that could scale into a production-ready app.
+\end{itemize}
+\end{tcolorbox}
+
+From a portfolio perspective, the frontend stack was the visible face of the project and the layer through which the rest of the system was experienced by users.
+
+\newpage
+\PageTitle{3. Backend Architecture Using Firebase}
+
+For the complete deployed version of Lumiere, Firebase is assumed as the backend platform. This decision fits the project well because Firebase provides identity management, cloud database services, server-side logic, asset storage, push notifications, analytics, and operational monitoring inside one managed ecosystem.
+
+The backend was assumed to support user registration, salon catalogs, appointment booking records, gift creation, profile data, media files, notification delivery, and production-safe business logic.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{3.0cm} p{3.1cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Firebase Service & \color{white}Role in the System & \color{white}Lumiere Use Case \\
+Firebase Authentication & Identity and sign-in & Email/password login, secure sessions, and account ownership \\
+Cloud Firestore & NoSQL database & Stored salons, services, bookings, gifts, profiles, reviews, and app content \\
+Cloud Functions & Server-side logic & Booking validation, gift issuance rules, workflow automation, and notifications \\
+Firebase Storage & File storage & Held salon images, banners, and user-uploaded assets \\
+Firebase Cloud Messaging & Push notifications & Sent booking reminders, gift alerts, and promotional notices \\
+Firebase App Check & Client verification & Reduced misuse from unauthorized scripts or fake clients \\
+\end{tabularx}
+
+\SmallSpace
+Using Firebase also reduced infrastructure management overhead. Instead of maintaining a custom backend server stack from scratch, the team could focus on application behavior and cloud-managed integrations through Firebase SDKs and rules.
+
+\newpage
+\PageTitle{4. Data Management, Security, and User Control}
+
+In the assumed deployed architecture, data handling and security are core components of Lumiere. A salon booking and gifting platform stores personal details, appointment records, recipient information, media assets, and notification tokens, so secure access control is essential.
+
+The project would therefore rely on Firebase Authentication, Firestore rules, Storage rules, and Cloud Functions-based validation to keep customer and business data protected.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{2.0cm} p{3.1cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Layer & \color{white}Component Used & \color{white}Purpose in Lumiere \\
+User Accounts & Firebase Authentication & Created and validated customer identities \\
+Database Access & Firestore Security Rules & Controlled who could read or write booking, gift, and profile data \\
+Media Security & Firebase Storage Rules & Protected promotional graphics and uploaded image assets \\
+Server Validation & Cloud Functions & Enforced trusted business rules before critical writes or status changes \\
+Client Trust & Firebase App Check & Prevented unauthorized traffic against backend resources \\
+Data Continuity & Firestore exports and backups & Supported recovery and operational resilience \\
+\end{tabularx}
+
+\SmallSpace
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm]
+\textbf{\textcolor{LumiereDark}{Examples of protected data in Lumiere}}
+\begin{itemize}
+\item Customer booking history and profile details
+\item Recipient and gift redemption information
+\item Salon service catalog and appointment availability data
+\item Device tokens and engagement-related notification records
+\end{itemize}
+\end{tcolorbox}
+
+This page is important because it demonstrates that the app is not treated as a visual prototype only. Even in an academic portfolio, a credible deployed system must include identity, rules, and secure cloud data handling.
+
+\newpage
+\PageTitle{5. Deployment, Release, and Operations Stack}
+
+After frontend and backend completion, Lumiere is assumed to be deployed through a structured release pipeline. This stage covers test distribution, production publication, crash monitoring, analytics review, and post-release maintenance.
+
+In a real rollout, the mobile package would move through internal testing before final production delivery, while Firebase services would continue operating as the live backend layer.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{3.1cm} p{2.4cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Tool or Service & \color{white}Category & \color{white}Production Use \\
+Firebase App Distribution & Release Testing & Shared pre-release builds with testers before store publication \\
+Google Play Console & Store Deployment & Published and managed the production Android application \\
+Crashlytics & Monitoring & Reported production crashes with diagnostic details \\
+Firebase Analytics & Product Insights & Measured user engagement, retention, booking actions, and gift activity \\
+Performance Monitoring & Runtime Optimization & Tracked loading times, network latency, and app responsiveness \\
+GitHub and Git & Version Control & Managed source history, collaboration, and release checkpoints \\
+\end{tabularx}
+
+\SmallSpace
+This operational toolset closes the gap between development and production. It proves that Lumiere can be presented not only as a coded app, but as a maintainable software product with release discipline and post-launch observability.
+
+\newpage
+\PageTitle{6. Design, Prototyping, and Visual Planning Tools}
+
+Lumiere depends heavily on refined visual presentation, so design tools were a major part of the workflow. Figma served as the main design platform, and Figma AI was used to generate and refine early screen concepts and layout directions.
+
+These tools guided the structure of splash screens, onboarding sequences, authentication forms, premium recommendation cards, profile panels, gifting components, and overall visual consistency.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{3.1cm} p{2.2cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Tool / Add-on & \color{white}Type & \color{white}Contribution to Lumiere \\
+Figma & Design Platform & Created screen layouts, user flow planning, component organization, and interface structure \\
+Figma AI & AI Design Assistant & Generated initial design directions and accelerated ideation \\
+Asset Export Utilities & Design Utility & Prepared icons, banners, and image references for development handoff \\
+Design Tokens & Style Support & Preserved consistent color, spacing, and typography decisions across screens \\
+\end{tabularx}
+
+\SmallSpace
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm]
+\textbf{\textcolor{LumiereDark}{Design outputs that informed development}}
+\begin{itemize}
+\item Splash and onboarding composition
+\item Login and profile layout structure
+\item Home recommendation cards and service grouping
+\item Booking, maps, and gifting feature presentation
+\end{itemize}
+\end{tcolorbox}
+
+This part of the portfolio is relevant because it captures the tools used before coding started. It shows how the app moved from visual concept to a structured development-ready artifact.
+
+\newpage
+\PageTitle{7. AI Services, Plug-ins, and Development Assistants}
+
+AI support was used across design, coding, debugging, and documentation tasks. These systems did not replace engineering work; instead, they accelerated ideation, reduced repetitive effort, improved error resolution, and supported faster technical communication.
+
+Because this report specifically asks for plug-ins, tools, add-ons, and AI services, the AI layer is treated as a first-class part of the Lumiere workflow.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{3.2cm} p{3.0cm} Y}
+\rowcolor{LumiereGold}
+\color{white}AI Tool / Plug-in & \color{white}Where It Was Used & \color{white}Value Delivered \\
+Gemini in Android Studio & Coding environment & Helped understand project structure, Gradle issues, Android errors, and code suggestions \\
+ChatGPT / Codex & Development support & Assisted with app architecture, screen creation, debugging, refactoring, and documentation support \\
+Figma AI & Design phase & Generated design ideas and accelerated the transition from concept to layout \\
+AI writing support & Reporting and portfolio work & Helped organize explanations, technical descriptions, and structured documentation \\
+\end{tabularx}
+
+\SmallSpace
+These tools are central to the requested portfolio because they show how modern mobile application development increasingly mixes traditional engineering with AI-enabled assistants during design, coding, verification, and reporting.
+
+\newpage
+\PageTitle{8. Testing, Quality Assurance, and Debugging Tools}
+
+A deployed application requires systematic validation. Lumiere would need checks for layout behavior, account flow, booking transactions, gifting logic, backend communication, data safety, and stability across different Android devices.
+
+Testing and debugging tools therefore supported both development-time confidence and production-time reliability.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{2.7cm} p{2.3cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Tool & \color{white}Category & \color{white}Testing or QA Role \\
+Android Emulator & Execution Environment & Validated navigation, screen layout, and interactive app behavior during development \\
+Physical Device Testing & Real Device QA & Confirmed responsiveness, usability, and realistic user interaction quality \\
+Logcat & Debug Utility & Captured runtime logs, warnings, and exception traces \\
+Firebase Test Lab & Cloud Testing & Supported wider Android device coverage for release validation \\
+Crashlytics & Post-release QA & Provided production crash reports and prioritization data \\
+Performance Monitoring & Runtime QA & Measured startup speed, network behavior, and performance bottlenecks \\
+\end{tabularx}
+
+\SmallSpace
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm]
+\textbf{\textcolor{LumiereDark}{Quality focus areas for Lumiere}}
+\begin{itemize}
+\item Consistent presentation across splash, onboarding, login, home, maps, bookings, gifting, and profile screens
+\item Correct booking and gift flow logic
+\item Stable Firebase communication with safe failure handling
+\item Smooth image loading and navigation responsiveness
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\PageTitle{9. Consolidated Technology Inventory and Conclusion}
+
+The Lumiere portfolio can be summarized as a layered technical ecosystem in which design tools shaped the interface, Android technologies built the mobile application, Firebase powered the backend, AI assistants accelerated delivery, and operational tools supported deployment and maintenance.
+
+Together, these components created a complete software pipeline from concept generation to release-ready mobile product delivery.
+
+\begin{tabularx}{\textwidth}{>{\bfseries}p{1.8cm} p{5.2cm} Y}
+\rowcolor{LumiereGold}
+\color{white}Layer & \color{white}Primary Components Used & \color{white}Status in Assumed Final System \\
+Design & Figma, Figma AI, visual token planning, asset export support & Completed and handed off to development \\
+Frontend & Android Studio, Kotlin, XML, Material Components, Glide, View Binding & Implemented in the Android client \\
+Backend & Firebase Authentication, Firestore, Cloud Functions, Storage, Cloud Messaging, App Check & Operational in production \\
+Security & Firestore rules, Storage rules, validation logic, trusted client verification & Enforced for protected access \\
+Deployment & App Distribution, Google Play Console, GitHub, Analytics, Crashlytics, Performance Monitoring & Used for release and maintenance \\
+AI Assistance & Gemini, ChatGPT/Codex, Figma AI, AI writing support & Used throughout planning, coding, debugging, and reporting \\
+\end{tabularx}
+
+\SmallSpace
+\begin{tcolorbox}[colback=LumiereCream,colframe=LumiereLine,boxrule=0.6pt,arc=2mm]
+\textbf{\textcolor{LumiereDark}{Final conclusion}}
+\begin{itemize}
+\item Lumiere was completed through a connected ecosystem rather than a single tool.
+\item Firebase served as the assumed backend foundation requested for this report.
+\item AI services and modern engineering tools improved speed, clarity, consistency, and maintainability across the project lifecycle.
+\end{itemize}
+\end{tcolorbox}
+
+Therefore, the Lumiere application can be presented as a modern mobile software project that integrates Android development tools, Firebase cloud infrastructure, design systems, release tooling, QA platforms, and AI-enabled assistants into one professional workflow.
+
+\end{document}

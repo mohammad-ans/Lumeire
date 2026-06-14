@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Padding / Margin -->
+    <dimen name="screen_padding">20dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="header_padding_top">52dp</dimen>
+    <dimen name="header_padding_bottom">24dp</dimen>
+    <dimen name="section_spacing">24dp</dimen>
+    <dimen name="item_spacing">14dp</dimen>
+    <dimen name="small_spacing">8dp</dimen>
+
+    <!-- Corner Radii -->
+    <dimen name="radius_card">20dp</dimen>
+    <dimen name="radius_button">16dp</dimen>
+    <dimen name="radius_chip">20dp</dimen>
+    <dimen name="radius_input">14dp</dimen>
+    <dimen name="radius_icon">12dp</dimen>
+    <dimen name="radius_large">28dp</dimen>
+    <dimen name="radius_sheet">24dp</dimen>
+
+    <!-- Text Sizes -->
+    <dimen name="text_xs">10sp</dimen>
+    <dimen name="text_sm">11sp</dimen>
+    <dimen name="text_base">13sp</dimen>
+    <dimen name="text_md">14sp</dimen>
+    <dimen name="text_lg">15sp</dimen>
+    <dimen name="text_xl">16sp</dimen>
+    <dimen name="text_2xl">20sp</dimen>
+    <dimen name="text_3xl">24sp</dimen>
+    <dimen name="text_4xl">28sp</dimen>
+    <dimen name="text_title">46sp</dimen>
+
+    <!-- Icon Sizes -->
+    <dimen name="icon_sm">16dp</dimen>
+    <dimen name="icon_md">20dp</dimen>
+    <dimen name="icon_lg">24dp</dimen>
+    <dimen name="icon_xl">32dp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="floating_elevation">8dp</dimen>
+
+    <!-- Bottom Nav -->
+    <dimen name="bottom_nav_height">68dp</dimen>
+
+    <!-- Image Heights -->
+    <dimen name="salon_image_height">140dp</dimen>
+    <dimen name="salon_thumb_size">60dp</dimen>
+    <dimen name="avatar_size">72dp</dimen>
+    <dimen name="category_icon_size">56dp</dimen>
+    <dimen name="booking_icon_size">46dp</dimen>
+    <dimen name="profile_menu_icon_size">40dp</dimen>
+    <dimen name="logo_size">90dp</dimen>
+
+    <!-- Stroke -->
+    <dimen name="border_width">1.5dp</dimen>
+</resources>

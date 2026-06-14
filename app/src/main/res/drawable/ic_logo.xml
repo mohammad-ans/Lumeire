@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background: Deep Premium Brown with a subtle gradient effect -->
+    <path
+        android:pathData="M20,0 L88,0 A20,20 0,0 1 108,20 L108,88 A20,20 0,0 1 88,108 L20,108 A20,20 0,0 1 0,88 L0,20 A20,20 0,0 1 20,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="54"
+                android:centerY="54"
+                android:gradientRadius="70"
+                android:type="radial">
+                <item android:color="#6D3D18" android:offset="0.0" />
+                <item android:color="#4A260B" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Decorative Gold Ring -->
+    <path
+        android:pathData="M54,15 A39,39 0,1,0 54,93 A39,39 0,1,0 54,15 Z"
+        android:strokeColor="#33C9A26D"
+        android:strokeWidth="1" />
+
+    <!-- Elegant Serif 'L' in Gold -->
+    <path
+        android:fillColor="#C9A26D"
+        android:pathData="M40,30 L40,78 L72,78 L72,72 L47,72 L47,30 Z" />
+
+    <!-- Accent Line on L for depth -->
+    <path
+        android:pathData="M40,30 L40,78"
+        android:strokeColor="#40FFFFFF"
+        android:strokeWidth="1" />
+
+    <!-- Lumiere 'Light' Sparkles -->
+    <!-- Top Right Sparkle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M78,25 L80,31 L86,33 L80,35 L78,41 L76,35 L70,33 L76,31 Z" />
+
+    <!-- Subtle Bottom Left Sparkle -->
+    <path
+        android:fillColor="#B3C9A26D"
+        android:pathData="M28,65 L29,68 L32,69 L29,70 L28,73 L27,70 L24,69 L27,68 Z" />
+
+    <!-- Soft Inner Glow -->
+    <path
+        android:pathData="M22,2 L86,2 A18,18 0,0 1 104,20 L104,84 A18,18 0,0 1 86,102 L22,102 A18,18 0,0 1 4,84 L4,20 A18,18 0,0 1 22,2 Z"
+        android:strokeColor="#1AFFFFFF"
+        android:strokeWidth="2" />
+
+</vector>

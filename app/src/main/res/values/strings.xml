@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lumeire</string>
+    <string name="tagline">Glow Beyond Beauty</string>
+
+    <string name="onboarding_title_1">Discover Top Salons\nNear You</string>
+    <string name="onboarding_subtitle_1">Explore top-rated salons, spas, and beauty studios in your area in one elegant app.</string>
+    <string name="onboarding_title_2">Book Appointments\nIn Minutes</string>
+    <string name="onboarding_subtitle_2">Browse services, choose a time slot, and confirm a booking in just a few taps.</string>
+    <string name="onboarding_title_3">Gift Beauty Moments\nTo Loved Ones</string>
+    <string name="onboarding_subtitle_3">Send salon experiences as a thoughtful gift, from hair appointments to spa rituals.</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_skip">Skip</string>
+    <string name="btn_get_started">Get Started</string>
+
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="email_address">Email Address</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="no_account">Don\'t have an account?</string>
+    <string name="login_subtitle">Sign in to continue your beauty journey.</string>
+    <string name="login_missing_fields">Please enter email and password.</string>
+    <string name="signup_coming_soon">Sign up is part of the dummy flow for now.</string>
+    <string name="forgot_password_coming_soon">Password reset is not connected in this dummy app.</string>
+
+    <string name="good_morning">Good Morning</string>
+    <string name="user_name">Hammad Ahmad</string>
+    <string name="search_hint">Search salons, services...</string>
+    <string name="filter">Filter</string>
+    <string name="services">Services</string>
+    <string name="recommended">Recommended</string>
+    <string name="see_all">See All</string>
+    <string name="limited_offer">LIMITED OFFER</string>
+    <string name="book_now">Book Now</string>
+
+    <string name="my_bookings">My Bookings</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="past">Past</string>
+    <string name="upcoming_appointments_count">%1$d upcoming appointments</string>
+    <string name="cancel">Cancel</string>
+    <string name="reschedule">Reschedule</string>
+    <string name="view_on_map">View on Map</string>
+    <string name="book_again">Book Again</string>
+    <string name="review">Review</string>
+    <string name="confirmed">Confirmed</string>
+    <string name="completed">Completed</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="booking_cancelled_message">Appointment marked as cancelled.</string>
+    <string name="booking_reschedule_message">Rescheduling is part of the dummy flow.</string>
+    <string name="booking_again_message">Booking repeated in the dummy flow.</string>
+
+    <string name="salons_nearby">Salons Nearby</string>
+    <string name="based_on_location">Based on your location</string>
+    <string name="search_nearby">Search nearby salons...</string>
+    <string name="open_until">Open until %1$s</string>
+    <string name="map_navigate_message">Navigation is not connected in this dummy app.</string>
+
+    <string name="gift_experiences">Gift Experiences</string>
+    <string name="gift_subtitle">Send luxury salon moments to loved ones</string>
+    <string name="choose_experience">Choose Experience</string>
+    <string name="occasion">Occasion</string>
+    <string name="recipient_details">Recipient Details</string>
+    <string name="recipient_name_hint">Recipient\'s name</string>
+    <string name="message_hint">Add a personal message... (optional)</string>
+    <string name="gift_wrapping">Gift wrapping</string>
+    <string name="gift_wrapping_free">Free</string>
+    <string name="total">Total</string>
+    <string name="send_gift">Send Gift</string>
+    <string name="gift_sent">Gift Sent Successfully!</string>
+    <string name="gift_card_label">Gift Card</string>
+    <string name="lumeire_gift_experience">Lumeire Gift Experience</string>
+    <string name="experience_value">Experience Value</string>
+    <string name="gift_ready_message">Gift prepared for %1$s</string>
+
+    <string name="profile_name">Hammad Ahmad</string>
+    <string name="profile_email">hammad@gmail.com</string>
+    <string name="premium_member">Premium Member</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="payment_methods">Payment Methods</string>
+    <string name="notifications">Notifications</string>
+    <string name="rewards_points">Rewards and Points</string>
+    <string name="my_gift_cards">My Gift Cards</string>
+    <string name="privacy_security">Privacy and Security</string>
+    <string name="settings">Settings</string>
+    <string name="help_support">Help and Support</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_confirm">Sign Out?</string>
+    <string name="sign_out_message">You will need to sign in again to access your account.</string>
+    <string name="loyalty_points">Loyalty Points</string>
+    <string name="points_to_gold">420 more points to reach Gold status</string>
+    <string name="account_section">Account</string>
+    <string name="preferences_section">Preferences</string>
+    <string name="support_section">Support</string>
+    <string name="section_placeholder_message">%1$s is shown as a dummy section.</string>
+
+    <string name="stat_bookings">Bookings</string>
+    <string name="stat_reviews">Reviews</string>
+    <string name="stat_points">Points</string>
+</resources>
