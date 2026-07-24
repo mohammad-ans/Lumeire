@@ -13,8 +13,13 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="340dp"
-            android:background="@drawable/bg_map_surface">
+            android:layout_height="340dp">
+            
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -37,7 +42,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@android:drawable/ic_menu_search"
-                        android:tint="@color/gold_main" />
+                        app:tint="@color/gold_main" />
 
                     <EditText
                         android:id="@+id/et_map_search"
@@ -58,63 +63,9 @@
                         android:contentDescription="Locate"
                         android:padding="8dp"
                         android:src="@android:drawable/ic_menu_mylocation"
-                        android:tint="@color/white" />
+                        app:tint="@color/white" />
                 </LinearLayout>
             </LinearLayout>
-
-            <View
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:layout_gravity="center"
-                android:background="@drawable/shape_circle_gold" />
-
-            <Button
-                android:id="@+id/btn_pin_1"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="start|top"
-                android:layout_marginStart="72dp"
-                android:layout_marginTop="140dp"
-                android:background="@drawable/bg_map_pin_selected"
-                android:text="0.8 km"
-                android:textAllCaps="false"
-                android:textColor="@color/white" />
-
-            <Button
-                android:id="@+id/btn_pin_2"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="end|top"
-                android:layout_marginTop="118dp"
-                android:layout_marginEnd="72dp"
-                android:background="@drawable/bg_map_pin_default"
-                android:text="1.2 km"
-                android:textAllCaps="false"
-                android:textColor="@color/text_dark" />
-
-            <Button
-                android:id="@+id/btn_pin_3"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="end|bottom"
-                android:layout_marginEnd="54dp"
-                android:layout_marginBottom="108dp"
-                android:background="@drawable/bg_map_pin_default"
-                android:text="2.1 km"
-                android:textAllCaps="false"
-                android:textColor="@color/text_dark" />
-
-            <Button
-                android:id="@+id/btn_pin_4"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:layout_gravity="start|bottom"
-                android:layout_marginStart="114dp"
-                android:layout_marginBottom="80dp"
-                android:background="@drawable/bg_map_pin_default"
-                android:text="0.5 km"
-                android:textAllCaps="false"
-                android:textColor="@color/text_dark" />
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_map_highlight"
@@ -176,7 +127,7 @@
                             android:contentDescription="Call"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_menu_call"
-                            android:tint="@color/gold_main" />
+                            app:tint="@color/gold_main" />
 
                         <ImageButton
                             android:id="@+id/btn_map_navigate"
@@ -187,7 +138,7 @@
                             android:contentDescription="Navigate"
                             android:padding="8dp"
                             android:src="@android:drawable/ic_menu_mylocation"
-                            android:tint="@color/white" />
+                            app:tint="@color/white" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

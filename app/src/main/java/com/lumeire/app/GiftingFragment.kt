@@ -1,26 +1,43 @@
 package com.lumeire.app
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.lumeire.app.data.model.Salon
+import com.lumeire.app.data.model.Service
 import com.lumeire.app.databinding.FragmentGiftingBinding
-
+import com.lumeire.app.di.SupabaseModule
+import com.lumeire.app.ui.home.HomeViewModel
+import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.launch
 class GiftingFragment : Fragment() {
 
     private var _binding: FragmentGiftingBinding? = null
     private val binding get() = _binding!!
-    private var selectedGiftIndex = 0
-    private var selectedOccasionIndex = 0
+    private val viewModel: HomeViewModel by viewModels()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private var selectedOccasionIndex = 0
+    private var salons: List<Salon> = emptyList()
+    private var services: List<Service> = emptyList()
+    private var selectedSalonIndex = 0
+    private var selectedServiceIndex = 0
+
+    // Dummy registered users for sandbox validation
+    private val registeredEmails = setOf(
+        "alice@lumeire.com",
+        "bob@lumeire.com",
+        "sara@lumeire.com",
+        "test@lumeire.com"
+    )
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGiftingBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -28,67 +45,214 @@ class GiftingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val serviceChips = listOf(
-            binding.btnGiftService1,
-            binding.btnGiftService2,
-            binding.btnGiftService3,
-            binding.btnGiftService4
-        )
         val occasionChips = listOf(
-            binding.chipOccasion1,
-            binding.chipOccasion2,
-            binding.chipOccasion3,
-            binding.chipOccasion4,
-            binding.chipOccasion5
+            binding.chipOccasion1, binding.chipOccasion2, binding.chipOccasion3,
+            binding.chipOccasion4, binding.chipOccasion5
         )
 
-        serviceChips.forEachIndexed { index, textView ->
-            textView.setOnClickListener {
-                selectedGiftIndex = index
-                updateGiftSelection(serviceChips)
-            }
-        }
-
-        occasionChips.forEachIndexed { index, textView ->
-            textView.setOnClickListener {
+        occasionChips.forEachIndexed { index, chip ->
+            chip.setOnClickListener {
                 selectedOccasionIndex = index
                 updateOccasionSelection(occasionChips)
             }
         }
+        updateOccasionSelection(occasionChips)
 
-        binding.btnSendGift.setOnClickListener {
-            val recipient = binding.etRecipientName.text?.toString()?.trim().orEmpty().ifBlank { "your loved one" }
-            binding.btnSendGift.text = getString(R.string.gift_sent)
-            binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_green)
-            Toast.makeText(requireContext(), getString(R.string.gift_ready_message, recipient), Toast.LENGTH_SHORT).show()
-            binding.btnSendGift.postDelayed({
-                if (_binding != null) {
-                    binding.btnSendGift.text = buildSendLabel()
-                    binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_gold)
+        // Generate a unique payment reference
+        binding.tvPaymentReference.text = "LUM-${System.currentTimeMillis().toString().takeLast(6)}"
+
+        lifecycleScope.launch {
+            viewModel.salons.collect { salonList ->
+                if (salonList.isNotEmpty()) {
+                    salons = salonList
+                    buildSalonChips()
                 }
-            }, 2200L)
+            }
         }
 
-        updateGiftSelection(serviceChips)
-        updateOccasionSelection(occasionChips)
+        binding.btnSendGift.setOnClickListener { handleSendGift() }
     }
 
-    private fun updateGiftSelection(chips: List<TextView>) {
-        chips.forEachIndexed { index, chip ->
-            val selected = index == selectedGiftIndex
+    private fun buildSalonChips() {
+        val container = binding.llSalonChips
+        container.removeAllViews()
+
+        salons.forEachIndexed { index, salon ->
+            val chip = makeChip(salon.name, index == selectedSalonIndex)
+            chip.setOnClickListener {
+                selectedSalonIndex = index
+                refreshSalonChips()
+                fetchServicesForSalon(salon.id)
+            }
+            container.addView(chip)
+        }
+
+        // Fetch services for the default selected salon
+        if (salons.isNotEmpty()) fetchServicesForSalon(salons[selectedSalonIndex].id)
+    }
+
+    private fun refreshSalonChips() {
+        binding.llSalonChips.forEachIndexed { index, view ->
+            val chip = view as? TextView ?: return@forEachIndexed
+            val selected = index == selectedSalonIndex
             chip.setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
             chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
         }
+    }
 
-        val gift = DummyContent.giftExperiences[selectedGiftIndex]
-        binding.tvGiftPreviewTitle.text = gift.name
-        binding.tvGiftPreviewDesc.text = gift.description
-        binding.tvGiftPreviewValue.text = "$${gift.price}"
-        binding.tvGiftPreviewDuration.text = gift.duration
-        binding.tvGiftServiceName.text = gift.name
-        binding.tvGiftServicePrice.text = "$${gift.price}"
-        binding.tvGiftTotal.text = "$${gift.price}"
-        binding.btnSendGift.text = buildSendLabel()
+    private fun fetchServicesForSalon(salonId: String) {
+        lifecycleScope.launch {
+            try {
+                val result = SupabaseModule.client.postgrest["services"]
+                    .select { filter { eq("salon_id", salonId) } }
+                    .decodeList<Service>()
+                services = result
+                selectedServiceIndex = 0
+                buildServiceChips()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun buildServiceChips() {
+        val container = binding.llServiceChips
+        container.removeAllViews()
+
+        if (services.isEmpty()) {
+            val empty = makeChip("No services available", false)
+            container.addView(empty)
+            return
+        }
+
+        services.forEachIndexed { index, service ->
+            val chip = makeChip(service.name, index == selectedServiceIndex)
+            chip.setOnClickListener {
+                selectedServiceIndex = index
+                refreshServiceChips()
+                updatePreview()
+            }
+            container.addView(chip)
+        }
+        updatePreview()
+    }
+
+    private fun refreshServiceChips() {
+        binding.llServiceChips.forEachIndexed { index, view ->
+            val chip = view as? TextView ?: return@forEachIndexed
+            val selected = index == selectedServiceIndex
+            chip.setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
+            chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
+        }
+    }
+
+    private fun updatePreview() {
+        if (services.isEmpty()) return
+        val service = services[selectedServiceIndex]
+        val salon = salons.getOrNull(selectedSalonIndex)
+
+        binding.tvGiftPreviewTitle.text = service.name
+        binding.tvGiftPreviewDesc.text = salon?.name ?: ""
+        binding.tvGiftPreviewValue.text = "$${service.price}"
+        binding.tvGiftPreviewDuration.text = "${service.duration_minutes} min"
+        binding.tvGiftServiceName.text = service.name
+        binding.tvGiftServicePrice.text = "$${service.price}"
+        binding.tvGiftTotal.text = "$${service.price}"
+        binding.btnSendGift.text = "Send Gift · $${service.price}"
+    }
+
+    private fun buildSendLabel(): String {
+        if (services.isEmpty()) return getString(R.string.send_gift)
+        val service = services[selectedServiceIndex]
+        return "Send Gift · $${service.price}"
+    }
+
+    private fun handleSendGift() {
+        val email = binding.etRecipientName.text?.toString()?.trim().orEmpty()
+        val currentUserEmail = viewModel.getCurrentUserEmail()
+
+        if (email.isBlank()) {
+            Toast.makeText(requireContext(), "Please enter recipient's email.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(requireContext(), "Please enter a valid email address.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (email.lowercase() == currentUserEmail?.lowercase()) {
+            Toast.makeText(requireContext(), "You cannot send a gift to yourself.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (services.isEmpty()) {
+            Toast.makeText(requireContext(), "Please select a service first.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        binding.btnSendGift.isEnabled = false
+        binding.btnSendGift.text = "Verifying..."
+
+        viewModel.checkUserExistsByEmail(email) { exists ->
+            requireActivity().runOnUiThread {
+                if (!exists) {
+                    binding.btnSendGift.isEnabled = true
+                    binding.btnSendGift.text = buildSendLabel()
+                    Toast.makeText(requireContext(), "No Lumeire account found for $email.", Toast.LENGTH_SHORT).show()
+                    return@runOnUiThread
+                }
+
+                val service = services[selectedServiceIndex]
+                val salon = salons.getOrNull(selectedSalonIndex)
+
+                DummyContent.myGiftCards.add(
+                    GiftCard(
+                        id = DummyContent.myGiftCards.size + 1,
+                        salonId = 1,
+                        salonName = salon?.name ?: "Lumeire Salon",
+                        amount = service.price.toInt(),
+                        isUsed = false
+                    )
+                )
+
+                binding.btnSendGift.text = "✓ Gift Sent!"
+                binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_green)
+                Toast.makeText(requireContext(), "Gift card sent to $email!", Toast.LENGTH_SHORT).show()
+
+                binding.btnSendGift.postDelayed({
+                    if (_binding != null) {
+                        updatePreview()
+                        binding.btnSendGift.isEnabled = true
+                        binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_gold)
+                    }
+                }, 2200L)
+            }
+        }
+    }
+
+
+
+    private fun makeChip(label: String, selected: Boolean): TextView {
+        return TextView(requireContext()).apply {
+            text = label
+            setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
+            setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
+            textSize = 14f
+            setPadding(
+                (16 * resources.displayMetrics.density).toInt(),
+                (12 * resources.displayMetrics.density).toInt(),
+                (16 * resources.displayMetrics.density).toInt(),
+                (12 * resources.displayMetrics.density).toInt()
+            )
+            val params = ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.marginEnd = (10 * resources.displayMetrics.density).toInt()
+            layoutParams = params
+        }
+    }
+
+    private fun ViewGroup.forEachIndexed(action: (Int, View) -> Unit) {
+        for (i in 0 until childCount) action(i, getChildAt(i))
     }
 
     private fun updateOccasionSelection(chips: List<TextView>) {
@@ -97,11 +261,6 @@ class GiftingFragment : Fragment() {
             chip.setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
             chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
         }
-    }
-
-    private fun buildSendLabel(): String {
-        val gift = DummyContent.giftExperiences[selectedGiftIndex]
-        return "${getString(R.string.send_gift)} · $${gift.price}"
     }
 
     override fun onDestroyView() {

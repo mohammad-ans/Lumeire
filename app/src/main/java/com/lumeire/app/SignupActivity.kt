@@ -9,44 +9,37 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.lumeire.app.databinding.ActivityLoginBinding
+import com.lumeire.app.databinding.ActivitySignupBinding
 import com.lumeire.app.ui.login.LoginState
 import com.lumeire.app.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
+import com.lumeire.app.data.model.Profile
 import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
-import com.lumeire.app.BuildConfig
+import io.github.jan.supabase.postgrest.postgrest
 
-class LoginActivity : AppCompatActivity() {
+class SignupActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var binding: ActivitySignupBinding
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val session = SupabaseModule.client.auth.currentSessionOrNull()
-        if (session != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return
-        }
-
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.btnLogin.setOnClickListener {
+        binding.btnSignup.setOnClickListener {
+            val fullname = binding.etFullname.text.toString()
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
 
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.login(email, password)
+            Log.d("User name: ", "$fullname")
+            if (fullname.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+                if (password == binding.etConfirmPassword.text.toString()) { viewModel.register(email, password, fullname) } else { Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show() }
             } else {
                 Toast.makeText(this, getString(R.string.login_missing_fields), Toast.LENGTH_SHORT).show()
             }
@@ -56,21 +49,22 @@ class LoginActivity : AppCompatActivity() {
             viewModel.loginState.collect { state ->
                 when (state) {
                     is LoginState.Loading -> {
-                        binding.btnLogin.isEnabled = false
-                        binding.btnLogin.text = "Loading..."
+                        binding.btnSignup.isEnabled = false
+                        binding.btnSignup.text = "Loading..."
                     }
                     is LoginState.Success -> {
-                        startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+
+                        startActivity(Intent(this@SignupActivity, MainActivity::class.java))
                         finish()
                     }
                     is LoginState.Error -> {
-                        binding.btnLogin.isEnabled = true
-                        binding.btnLogin.text = getString(R.string.sign_in)
-                        Toast.makeText(this@LoginActivity, state.message, Toast.LENGTH_SHORT).show()
+                        binding.btnSignup.isEnabled = true
+                        binding.btnSignup.text = getString(R.string.sign_in)
+                        Toast.makeText(this@SignupActivity, state.message, Toast.LENGTH_SHORT).show()
                     }
                     is LoginState.Idle -> {
-                        binding.btnLogin.isEnabled = true
-                        binding.btnLogin.text = getString(R.string.sign_in)
+                        binding.btnSignup.isEnabled = true
+                        binding.btnSignup.text = getString(R.string.sign_in)
                     }
                 }
             }
@@ -85,15 +79,11 @@ class LoginActivity : AppCompatActivity() {
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
-        binding.tvSignup.setOnClickListener {
-            startActivity(Intent(this, SignupActivity::class.java))
+        binding.tvSignin.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
-
-    
     }
-
-    private lateinit var googleSignInClient: GoogleSignInClient
 
     private val googleSignInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -112,12 +102,12 @@ class LoginActivity : AppCompatActivity() {
                                     idToken = idTok
                                 }
 
-                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                                startActivity(Intent(this@SignupActivity, MainActivity::class.java))
                                 finish()
                             } catch (e: Exception) {
                                 Log.e("GoogleLogin", "Supabase sign-in failed", e)
                                 Toast.makeText(
-                                    this@LoginActivity,
+                                    this@SignupActivity,
                                     e.message ?: "Login failed",
                                     Toast.LENGTH_LONG
                                 ).show()
@@ -130,12 +120,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-
 }
-
-
-
-
 
 
 

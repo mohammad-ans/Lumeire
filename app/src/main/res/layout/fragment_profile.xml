@@ -41,19 +41,21 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_profile_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/profile_name"
+                        android:text=""
                         android:textColor="@color/white"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:fontFamily="serif" />
 
                     <TextView
+                        android:id="@+id/tv_profile_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/profile_email"
+                        android:text=""
                         android:textColor="#CCFFFFFF" />
 
                     <TextView
@@ -91,7 +93,6 @@
                         android:id="@+id/tv_profile_stat_bookings"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="24"
                         android:textColor="@color/white"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -115,7 +116,6 @@
                         android:id="@+id/tv_profile_stat_reviews"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="12"
                         android:textColor="@color/white"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -139,7 +139,6 @@
                         android:id="@+id/tv_profile_stat_points"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="580"
                         android:textColor="@color/white"
                         android:textSize="20sp"
                         android:textStyle="bold" />
@@ -296,27 +295,29 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_loyalty_points_value"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="580"
                     android:textColor="@color/white"
                     android:textSize="28sp"
                     android:textStyle="bold" />
 
                 <ProgressBar
+                    android:id="@+id/pb_loyalty"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:max="100"
-                    android:progress="58"
-                    android:progressTint="@color/white" />
+                    android:progressTint="@color/white"
+                    style="@android:style/Widget.ProgressBar.Horizontal" />
 
                 <TextView
+                    android:id="@+id/tv_points_to_gold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="@string/points_to_gold"
+                    android:text=""
                     android:textColor="#CCFFFFFF"
                     android:textSize="11sp" />
             </LinearLayout>

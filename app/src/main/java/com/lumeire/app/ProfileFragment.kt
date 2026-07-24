@@ -2,17 +2,25 @@ package com.lumeire.app
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.lumeire.app.di.SupabaseModule
+import io.github.jan.supabase.gotrue.auth
 import com.lumeire.app.databinding.FragmentProfileBinding
+import com.lumeire.app.ui.profile.ProfileViewModel
 
 class ProfileFragment : Fragment() {
+
+    private val viewModel: ProfileViewModel by viewModels()
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
@@ -29,8 +37,27 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        lifecycleScope.launch {
+            viewModel.profile.collect { profile ->
+                Log.d("Profile", "Received: $profile")
+                if (profile != null) {
+                    binding.tvProfileName.text = profile.full_name ?: "User"
+                    binding.tvProfileEmail.text = SupabaseModule.client.auth.currentUserOrNull()?.email ?: ""
+                    binding.tvProfileStatPoints.text = profile.rewards_points.toString()
+                    binding.tvPointsToGold.text = "${1000 - profile.rewards_points} more points to reach Gold status"
+                    binding.pbLoyalty.progress = (profile.rewards_points / 10).coerceAtMost(100)
+                }
+            }
+        }
+        
+        lifecycleScope.launch {
+            viewModel.totalBookings.collect { total ->
+                binding.tvProfileStatBookings.text = total.toString()
+            }
+        }
+        
         Glide.with(this)
-            .load(R.drawable.p1)
+            .load(DummyContent.profileAvatarUrl)
             .centerCrop()
             .into(binding.ivProfileAvatar)
 
@@ -38,7 +65,6 @@ class ProfileFragment : Fragment() {
             binding.rowProfileEdit to getString(R.string.edit_profile),
             binding.rowProfilePayment to getString(R.string.payment_methods),
             binding.rowProfileRewards to getString(R.string.rewards_points),
-            binding.rowProfileGifts to getString(R.string.my_gift_cards),
             binding.rowProfilePrivacy to getString(R.string.privacy_security),
             binding.rowProfileSettings to getString(R.string.settings),
             binding.rowProfileHelp to getString(R.string.help_support)
@@ -49,6 +75,20 @@ class ProfileFragment : Fragment() {
                     getString(R.string.section_placeholder_message, label),
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+        }
+        
+        binding.rowProfileGifts.setOnClickListener {
+            val myCards = DummyContent.myGiftCards.filter { !it.isUsed }
+            if (myCards.isEmpty()) {
+                Toast.makeText(requireContext(), "You have no active gift cards.", Toast.LENGTH_SHORT).show()
+            } else {
+                val cardStrings = myCards.map { "PKR ${it.amount} at ${it.salonName}" }.toTypedArray()
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.my_gift_cards)
+                    .setItems(cardStrings, null)
+                    .setPositiveButton("OK", null)
+                    .show()
             }
         }
 
@@ -63,8 +103,13 @@ class ProfileFragment : Fragment() {
                 .setMessage(R.string.sign_out_message)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.sign_out) { _, _ ->
-                    startActivity(Intent(requireContext(), LoginActivity::class.java))
-                    activity?.finish()
+                    lifecycleScope.launch {
+                        try {
+                            SupabaseModule.client.auth.signOut()
+                        } catch (e: Exception) {}
+                        startActivity(Intent(requireContext(), LoginActivity::class.java))
+                        activity?.finish()
+                    }
                 }
                 .show()
         }

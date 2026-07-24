@@ -5,27 +5,58 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.lumeire.app.databinding.FragmentMapsBinding
+import com.lumeire.app.ui.home.HomeViewModel
+import kotlinx.coroutines.launch
+import kotlin.getValue
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Location
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.LocationServices
 
-class MapsFragment : Fragment() {
+class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
-    private var selectedSalonId: Int = 1
+    private val viewModel: HomeViewModel by viewModels()
+    private var selectedSalonId: String = ""
     private lateinit var rows: List<SalonRow>
+    private var googleMap: GoogleMap? = null
+    private var userLocation: LatLng? = null
+
+    // Add this launcher at the top with other fields
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) fetchUserLocation()
+        else Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        selectedSalonId = arguments?.getInt(ARG_SELECTED_SALON_ID) ?: 1
+        selectedSalonId = arguments?.getString(ARG_SELECTED_SALON_ID) ?: ""
     }
 
     override fun onCreateView(
@@ -40,18 +71,34 @@ class MapsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        rows = listOf(
-            SalonRow(DummyContent.salons[0], binding.rowSalon1, binding.btnPin1, binding.ivSalon1, binding.tvSalon1Name, binding.tvSalon1Category, binding.tvSalon1Meta, binding.tvSalon1Price),
-            SalonRow(DummyContent.salons[1], binding.rowSalon2, binding.btnPin2, binding.ivSalon2, binding.tvSalon2Name, binding.tvSalon2Category, binding.tvSalon2Meta, binding.tvSalon2Price),
-            SalonRow(DummyContent.salons[2], binding.rowSalon3, binding.btnPin3, binding.ivSalon3, binding.tvSalon3Name, binding.tvSalon3Category, binding.tvSalon3Meta, binding.tvSalon3Price),
-            SalonRow(DummyContent.salons[3], binding.rowSalon4, binding.btnPin4, binding.ivSalon4, binding.tvSalon4Name, binding.tvSalon4Category, binding.tvSalon4Meta, binding.tvSalon4Price)
-        )
-
-        rows.forEach { row ->
-            bindRow(row)
-            row.card.setOnClickListener { updateSelection(row.salon.id) }
-            row.pinButton.setOnClickListener { updateSelection(row.salon.id) }
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fetchUserLocation()
+        } else {
+            locationPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
+
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        mapFragment?.getMapAsync(this)
+
+//        rows = listOf(
+//            SalonRow(DummyContent.salons[0], binding.rowSalon1, null, binding.ivSalon1, binding.tvSalon1Name, binding.tvSalon1Category, binding.tvSalon1Meta, binding.tvSalon1Price),
+//            SalonRow(DummyContent.salons[1], binding.rowSalon2, null, binding.ivSalon2, binding.tvSalon2Name, binding.tvSalon2Category, binding.tvSalon2Meta, binding.tvSalon2Price),
+//            SalonRow(DummyContent.salons[2], binding.rowSalon3, null, binding.ivSalon3, binding.tvSalon3Name, binding.tvSalon3Category, binding.tvSalon3Meta, binding.tvSalon3Price),
+//            SalonRow(DummyContent.salons[3], binding.rowSalon4, null, binding.ivSalon4, binding.tvSalon4Name, binding.tvSalon4Category, binding.tvSalon4Meta, binding.tvSalon4Price)
+//        )
+
+        lifecycleScope.launch {
+            viewModel.salons.collect { salonList ->
+                if (salonList.isEmpty()) return@collect
+                applyRows(buildRows(salonList))
+            }
+        }
+
 
         binding.btnMapLocate.setOnClickListener {
             Toast.makeText(requireContext(), "Location is mocked around the city center.", Toast.LENGTH_SHORT).show()
@@ -60,12 +107,205 @@ class MapsFragment : Fragment() {
             Toast.makeText(requireContext(), "Calling is not connected in this dummy app.", Toast.LENGTH_SHORT).show()
         }
         binding.btnMapNavigate.setOnClickListener {
-            Toast.makeText(requireContext(), getString(R.string.map_navigate_message), Toast.LENGTH_SHORT).show()
+            binding.btnMapNavigate.setOnClickListener {
+                val selected = rows.firstOrNull { it.salon.id == selectedSalonId }
+
+                when {
+                    selected == null -> {
+                        Toast.makeText(requireContext(), "No salon selected.", Toast.LENGTH_SHORT).show()
+                    }
+                    selected.salon.latitude == null || selected.salon.longitude == null -> {
+                        Toast.makeText(requireContext(), "Location not available for ${selected.salon.name}.", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        val gmmIntentUri = android.net.Uri.parse(
+                            "geo:${selected.salon.latitude},${selected.salon.longitude}?q=${android.net.Uri.encode(selected.salon.name)}"
+                        )
+                        val mapIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, gmmIntentUri)
+                        mapIntent.setPackage("com.google.android.apps.maps")
+                        if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
+                            startActivity(mapIntent)
+                        } else {
+                            Toast.makeText(requireContext(), "Google Maps is not installed.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
         }
         binding.etMapSearch.doAfterTextChanged { filterSalons(it?.toString().orEmpty()) }
 
-        updateSelection(selectedSalonId)
+    }
+
+    private fun buildRows(salonList: List<com.lumeire.app.data.model.Salon>): List<SalonRow> {
+        val binding = _binding ?: return emptyList()
+        val imageViews = listOf(binding.ivSalon1, binding.ivSalon2, binding.ivSalon3, binding.ivSalon4)
+        val rowBindings = listOf(
+            Triple(binding.rowSalon1, binding.tvSalon1Name, Triple(binding.tvSalon1Category, binding.tvSalon1Meta, binding.tvSalon1Price)),
+            Triple(binding.rowSalon2, binding.tvSalon2Name, Triple(binding.tvSalon2Category, binding.tvSalon2Meta, binding.tvSalon2Price)),
+            Triple(binding.rowSalon3, binding.tvSalon3Name, Triple(binding.tvSalon3Category, binding.tvSalon3Meta, binding.tvSalon3Price)),
+            Triple(binding.rowSalon4, binding.tvSalon4Name, Triple(binding.tvSalon4Category, binding.tvSalon4Meta, binding.tvSalon4Price))
+        )
+        val sorted = userLocation?.let { origin ->
+            salonList.sortedWith(compareBy(
+                // nulls go to the end
+                { s -> if (s.latitude == null || s.longitude == null) Double.MAX_VALUE
+                else calculateDistance(origin.latitude, origin.longitude, s.latitude, s.longitude) }
+            ))
+        } ?: salonList
+
+        sorted.take(4).forEach { s ->
+            Log.d("MapsFragment", "Sorted salon: ${s.name} | lat=${s.latitude} lng=${s.longitude} | dist=${
+                userLocation?.let { o ->
+                    "%.1f km".format(calculateDistance(o.latitude, o.longitude, s.latitude ?: 0.0, s.longitude ?: 0.0))
+                } ?: "no location"
+            }")
+        }
+
+        return sorted.take(4).mapIndexed { index, salonTemp ->
+            val row = rowBindings[index % rowBindings.size]
+            val distanceStr = userLocation?.let { origin ->
+                val lat = salonTemp.latitude ?: return@let "Distance unavailable"
+                val lng = salonTemp.longitude ?: return@let "Distance unavailable"
+                "${"%.1f".format(calculateDistance(origin.latitude, origin.longitude, lat, lng))} km"
+            } ?: "Distance unavailable"
+
+            val salon = Salon(
+                id = salonTemp.id,
+                name = salonTemp.name,
+                category = "Hair and Makeup",
+                rating = salonTemp.rating,
+                reviews = salonTemp.review_count,
+                distance = distanceStr,
+                price = "",
+                address = salonTemp.address,
+                openUntil = "8 PM",
+                imageUrl = "...",
+                latitude = salonTemp.latitude,
+                longitude = salonTemp.longitude
+            )
+            SalonRow(salon, row.first, null, imageViews[index % imageViews.size],
+                row.second, row.third.first, row.third.second, row.third.third)
+        }
+    }
+
+    private fun applyRows(newRows: List<SalonRow>) {
+        if (newRows.isEmpty()) return  // guard against empty list
+
+        rows = newRows
+        rows.forEach { row ->
+            bindRow(row)
+            row.card.setOnClickListener { updateSelection(row.salon.id) }
+        }
+        val initialId = if (selectedSalonId.isNotEmpty() && rows.any { it.salon.id == selectedSalonId })
+            selectedSalonId
+        else
+            rows.first().salon.id
+        updateSelection(initialId)
         filterSalons("")
+    }
+
+    private fun fetchUserLocation() {
+        Log.d("MapsFragment", "fetchUserLocation called")
+
+        val fusedClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("MapsFragment", "Permission NOT granted — returning early")
+            return
+        }
+
+        Log.d("MapsFragment", "Permission granted — fetching current location")
+
+        val locationRequest = com.google.android.gms.location.CurrentLocationRequest.Builder()
+            .setPriority(com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY)
+            .build()
+
+        fusedClient.getCurrentLocation(locationRequest, null)
+            .addOnSuccessListener { location ->
+                if (location != null && _binding != null) {
+                    Log.d("MapsFragment", "Location fetched: lat=${location.latitude}, lng=${location.longitude}")
+                    userLocation = LatLng(location.latitude, location.longitude)
+                    val salonList = viewModel.salons.value
+                    if (_binding != null && salonList.isNotEmpty()) {
+                        applyRows(buildRows(salonList))
+                    }
+                    updateMapMarkers()
+                } else {
+                    Log.d("MapsFragment", "getCurrentLocation returned null")
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("MapsFragment", "getCurrentLocation failed: ${e.message}")
+            }
+    }
+
+    private fun refreshRowDistances() {
+        val origin = userLocation ?: return
+        if (!::rows.isInitialized || rows.isEmpty()) return  // add this
+
+        rows.forEach { row ->
+            val salonLat = row.salon.latitude ?: return@forEach
+            val salonLng = row.salon.longitude ?: return@forEach
+            val distanceKm = calculateDistance(origin.latitude, origin.longitude, salonLat, salonLng)
+            row.meta.text = "${"%.1f".format(distanceKm)} km · ${getString(R.string.open_until, row.salon.openUntil)}"
+        }
+    }
+
+    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val results = FloatArray(1)
+        Location.distanceBetween(lat1, lon1, lat2, lon2, results)
+        return (results[0] / 1000.0) // convert meters to km
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+        if (::rows.isInitialized && rows.isNotEmpty()) {
+            updateMapMarkers()
+        }
+    }
+
+    private fun updateMapMarkers() {
+        val map = googleMap ?: return
+        if (!::rows.isInitialized || rows.isEmpty()) return
+        map.clear()
+
+        userLocation?.let {
+            map.addMarker(
+                MarkerOptions()
+                    .position(it)
+                    .title("You are here")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+            )
+        }
+
+        var selectedLocation: LatLng? = null
+        
+        rows.forEach { row ->
+            if (row.card.visibility == View.VISIBLE) {
+                val salon = row.salon
+                val lat = salon.latitude ?: 0.0
+                val lng = salon.longitude ?: 0.0
+                val location = LatLng(lat, lng)
+                val isSelected = salon.id == selectedSalonId
+                val icon = if (isSelected) BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE) else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+                
+                map.addMarker(MarkerOptions()
+                    .position(location)
+                    .title(salon.name)
+                    .snippet(salon.category)
+                    .icon(icon))
+
+                    
+                if (salon.id == selectedSalonId) {
+                    selectedLocation = location
+                }
+            }
+        }
+        
+        selectedLocation?.let {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 14f))
+        }
     }
 
     private fun bindRow(row: SalonRow) {
@@ -80,7 +320,7 @@ class MapsFragment : Fragment() {
     private fun filterSalons(query: String) {
         val normalized = query.trim().lowercase()
         var visibleCount = 0
-        var firstVisibleId: Int? = null
+        var firstVisibleId: String? = null
 
         rows.forEach { row ->
             val visible = normalized.isBlank() ||
@@ -88,7 +328,7 @@ class MapsFragment : Fragment() {
                 row.salon.category.lowercase().contains(normalized)
 
             row.card.visibility = if (visible) View.VISIBLE else View.GONE
-            row.pinButton.visibility = if (visible) View.VISIBLE else View.GONE
+            
 
             if (visible) {
                 visibleCount++
@@ -100,20 +340,22 @@ class MapsFragment : Fragment() {
 
         if (rows.none { it.salon.id == selectedSalonId && it.card.visibility == View.VISIBLE } && firstVisibleId != null) {
             updateSelection(firstVisibleId!!)
+        } else {
+            updateMapMarkers()
         }
     }
 
-    private fun updateSelection(salonId: Int) {
+    private fun updateSelection(salonId: String) {
+        if (salonId.isEmpty() || !::rows.isInitialized || rows.isEmpty()) return
+
+        val selected = rows.firstOrNull { it.salon.id == salonId } ?: return
         selectedSalonId = salonId
-        val selected = rows.first { it.salon.id == salonId }
 
         rows.forEach { row ->
             val active = row.salon.id == salonId
             row.card.strokeWidth = if (active) 2.dp else 1.dp
             row.card.strokeColor = resources.getColor(if (active) R.color.gold_main else R.color.divider, null)
             row.card.setCardBackgroundColor(resources.getColor(if (active) R.color.cream_bg else R.color.white, null))
-            row.pinButton.setBackgroundResource(if (active) R.drawable.bg_map_pin_selected else R.drawable.bg_map_pin_default)
-            row.pinButton.setTextColor(resources.getColor(if (active) R.color.white else R.color.text_dark, null))
         }
 
         Glide.with(this)
@@ -123,6 +365,8 @@ class MapsFragment : Fragment() {
         binding.tvMapHighlightName.text = selected.salon.name
         binding.tvMapHighlightMeta.text =
             "${selected.salon.address} · ${selected.salon.rating} (${selected.salon.reviews})"
+
+        updateMapMarkers()
     }
 
     override fun onDestroyView() {
@@ -136,7 +380,7 @@ class MapsFragment : Fragment() {
     data class SalonRow(
         val salon: Salon,
         val card: MaterialCardView,
-        val pinButton: Button,
+        val pinButton: Button?,
         val image: ImageView,
         val name: TextView,
         val category: TextView,
@@ -147,10 +391,11 @@ class MapsFragment : Fragment() {
     companion object {
         private const val ARG_SELECTED_SALON_ID = "selected_salon_id"
 
-        fun newInstance(selectedSalonId: Int? = null): MapsFragment {
+        fun newInstance(selectedSalonId: String? = null): MapsFragment {
             return MapsFragment().apply {
-                arguments = bundleOf(ARG_SELECTED_SALON_ID to (selectedSalonId ?: 1))
+                arguments = bundleOf(ARG_SELECTED_SALON_ID to (selectedSalonId ?: ""))
             }
         }
     }
+
 }

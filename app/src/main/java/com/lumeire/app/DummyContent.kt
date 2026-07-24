@@ -1,16 +1,18 @@
 package com.lumeire.app
 
 data class Salon(
-    val id: Int,
+    val id: String,
     val name: String,
     val category: String,
-    val rating: Double,
+    val rating: Double?,
     val reviews: Int,
     val distance: String,
     val price: String,
-    val address: String,
+    val address: String?,
     val openUntil: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val latitude: Double? = null,
+    val longitude: Double? = null
 )
 
 data class Booking(
@@ -30,7 +32,17 @@ data class GiftExperience(
     val duration: String
 )
 
+data class GiftCard(
+    val id: Int,
+    val salonId: Int,
+    val salonName: String,
+    var amount: Int,
+    var isUsed: Boolean
+)
+
 object DummyContent {
+    val myGiftCards = mutableListOf<GiftCard>()
+
     // Updated to a high-quality male portrait matching the new username "Hammad Ahmad"
     const val homeAvatarUrl =
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=400&q=80"
@@ -38,9 +50,9 @@ object DummyContent {
     const val profileAvatarUrl =
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=400&q=80"
 
-    val salons = listOf(
+    val salons = listOf<Salon>(
         Salon(
-            id = 1,
+            id = "",
             name = "Glow Beauty Studio",
             category = "Hair and Makeup",
             rating = 4.9,
@@ -52,7 +64,7 @@ object DummyContent {
             imageUrl = "https://images.unsplash.com/photo-1760862652442-e8ff7ebdd2f8?auto=format&fit=crop&w=900&q=80"
         ),
         Salon(
-            id = 2,
+            id = "",
             name = "Luxe Hair Lounge",
             category = "Haircut and Color",
             rating = 4.8,
@@ -64,7 +76,7 @@ object DummyContent {
             imageUrl = "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?auto=format&fit=crop&w=900&q=80"
         ),
         Salon(
-            id = 3,
+            id = "",
             name = "Serenity Spa",
             category = "Spa and Massage",
             rating = 4.7,
@@ -76,7 +88,7 @@ object DummyContent {
             imageUrl = "https://images.unsplash.com/photo-1672015521020-ab4f86d5cc00?auto=format&fit=crop&w=900&q=80"
         ),
         Salon(
-            id = 4,
+            id = "",
             name = "Velvet Nails",
             category = "Manicure and Pedicure",
             rating = 4.9,
