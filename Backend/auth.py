@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-from models import User
+from models import User, Profile
 from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth
 import os
 from jose import jwt, JWTError
@@ -9,11 +9,16 @@ from dotenv import load_dotenv
 from typing import Optional
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
+from google.oauth2 import id_token as google_id_token
+from google.auth.transport import requests as google_requests
 
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
 EXPIRE_MINUTES = 10080
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
 router = APIRouter(prefix="/auth")
 
 
@@ -30,6 +35,22 @@ def create_access_token(user : str, expires_delta: Optional[timedelta] = None) -
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=EXPIRE_MINUTES))
     to_encode = {"sub" : user, "exp" : expire}
     return jwt.encode(to_encode, SECRET_KEY, algorithm="HS256")
+
+def decode_access_token(token: str) -> Optional[str]:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return payload.get("sub")
+    except:
+        return None
+
+def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+    user_id = decode_access_token(token)
+    if user_id is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid pr expired token")
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+    return user
 
 @router.post("/signup", response_model=TokenResponse)
 def signup(data: SignUp, db: Session = Depends(get_db)):
@@ -95,3 +116,6 @@ def g_auth(data: GoogleAuth, db : Session = Depends(get_db)):
 
     return TokenResponse(access_token=create_access_token(user.id))
 
+@router.get("/me", response_model=UserResponse)
+def get_me(current_user: User = Depends(get_current_user)):
+    return current_user
