@@ -31,7 +31,7 @@ class UserResponse(BaseMode):
     id: str
     email: str
     name: Optional[str]  = None
-    auth_provide: str
+    auth_provider: str
     is_verified: str
 
     model_config = ConfigDict(from_attributes=True)
