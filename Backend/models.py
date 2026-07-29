@@ -1,19 +1,34 @@
 from sqlalchemy import Column, Integer, DateTime, String, Float, ForeignKey
-from sqlalchemy.orm import declarative_base
+import uuid
+from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID
+from database import Base
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+
+def gen_uuid() -> str:
+    return str(uuid.uuid4())
+
 class User(Base):
     __tablename__ = "users"
-    email = Column(String, primary_key=True, index=True)
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String)
-    password = Column(String)
+
+    hashed_password = Column(String)
+    auth_provider = Column(String, default="local")
+    google_id = Column(String, unique=True)
+    verified = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 class Pending_user(Base):
     __tablename__ = "pending_users"
 
     email = Column(String, primary_key=True, index=True)
     name = Column(String)
-    password = Column(String)
+    hashed_password = Column(String)
+    otp_code = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 class Salon(Base):
     __tablename__ = "salons"
