@@ -12,6 +12,7 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
+import secrets
 
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
@@ -53,13 +54,20 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
 
+def generate_otp(length: int = 6) -> str:
+    return "".join(secrets.choice("0123456789") for _ in range(length))
+
 @router.post("/signup", response_model=MessageResponse)
 def signup(data: SignUp, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
-    otp_code = ""
+    otp_code = generate_otp()
     expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
+    try:
+        response = await send_otp(data.email, otp_code)
+    except:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
     pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
     if pending:
         pending.name = data.full_name
@@ -77,7 +85,6 @@ def signup(data: SignUp, db: Session = Depends(get_db)):
         )
         db.add(user)
     db.commit()
-    #send otp
     return MessageResponse(message="Verification code sent to your email")
 
 @router.post("/verify", response_model=TokenResponse)
@@ -115,14 +122,15 @@ def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
     pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
     if not pending:
         raise HTTPException(status_code=404, detail="No pending signup found for this email")
-
-    #generate otp
-    otp_code = ""
+    otp_code = generate_otp()
+    try:
+        response = await send_otp(data.email, otp_code)
+    except:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
     pending.otp_code = otp_code
     pending.expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
     db.commit()
 
-    #send otp email
     return MessageResponse(message="Verification code resent")
 
 @router.post("/signin", response_model=TokenResponse)
