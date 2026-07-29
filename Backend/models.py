@@ -20,14 +20,17 @@ class User(Base):
     google_id = Column(String, unique=True)
     verified = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    bookings = relationship("Booking", back_populates="user", cascade="all, delete-orphan")
 
-class Pending_user(Base):
+class PendingUser(Base):
     __tablename__ = "pending_users"
 
     email = Column(String, primary_key=True, index=True)
     name = Column(String)
     hashed_password = Column(String)
     otp_code = Column(String)
+    otp_expires_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class Salon(Base):

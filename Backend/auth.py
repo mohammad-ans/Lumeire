@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-from models import User, Profile
-from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth
+from models import User, Profile, PendingUser
+from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth, MessageResponse, Otp, ResendOtp
 import os
 from jose import jwt, JWTError
 from dotenv import load_dotenv
@@ -17,6 +17,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
 EXPIRE_MINUTES = 10080
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+OTP_EXPIRE_MINUTES = 2
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 router = APIRouter(prefix="/auth")
@@ -52,24 +53,77 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
 
-@router.post("/signup", response_model=TokenResponse)
+@router.post("/signup", response_model=MessageResponse)
 def signup(data: SignUp, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
+    otp_code = ""
+    expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
+    pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
+    if pending:
+        pending.name = data.full_name
+        pending.hashed_password = hash_password(data.password)
+        pending.otp_code = otp_code
+        pending.otp_expires_at = expires_at
+        pending.created_at = datetime.utcnow()
+    else:
+        pending = PendingUser(
+        email = data.email,
+        name = data.name,
+        hashed_password = hash_password(data.password),
+        otp_code = otp_code,
+        otp_expires_at = expires_at
+        )
+        db.add(user)
+    db.commit()
+    #send otp
+    return MessageResponse(message="Verification code sent to your email")
+
+@router.post("/verify", response_model=TokenResponse)
+def verify_otp(data: Otp, db : Session = Depends(get_db)):
+    pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
+    if not pending or pending.otp_code != data.otp_code:
+        raise HTTPException(status_code=400, detail="Invalid verification code")
+
+    if pending.otp_expires_at is None or pending.otp_expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Verification code expired, please request a new one")
+
+    if db.query(User).filter(User.email == pending.email).first():
+        db.delete(pending)
+        db.commit()
+        raise HTTPException(status_code=400, detail="Email already registered")
 
     user = User(
-    email = data.email,
-    name = data.name,
-    hashed_password = hash_password(data.password),
-    auth_provide = "local"
+    email=pending.email,
+    name=pending.name,
+    hashed_password=pending.hashed_password,
+    auth_provider="local",
+    verified=True
     )
     db.add(user)
     db.flush()
-    db.add(Profile(id=user.id, full_name=data.name))
+    db.add(Profile(id=user.id, full_name=pending.name))
+    db.delete(pending)
     db.commit()
+    db.refresh(user)
 
     return TokenResponse(access_token=create_access_token(user.id))
+
+@router.post("/resend-otp", response_model=MessageResponse)
+def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
+    pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
+    if not pending:
+        raise HTTPException(status_code=404, detail="No pending signup found for this email")
+
+    #generate otp
+    otp_code = ""
+    pending.otp_code = otp_code
+    pending.expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
+    db.commit()
+
+    #send otp email
+    return MessageResponse(message="Verification code resent")
 
 @router.post("/signin", response_model=TokenResponse)
 def login(data: SignIn, db : Session = Depends(get_db)):
@@ -111,7 +165,7 @@ def g_auth(data: GoogleAuth, db : Session = Depends(get_db)):
             )
             db.add(user)
             db.flush()
-            db.add(Profile(id=user.id, full_name=name)
+            db.add(Profile(id=user.id, full_name=name))
         db.commit()
 
     return TokenResponse(access_token=create_access_token(user.id))
