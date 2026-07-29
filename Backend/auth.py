@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
-from schemas import UserResponse, SignIn, SignUp, TokenResponse
+from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth
 import os
 from jose import jwt, JWTError
 from dotenv import load_dotenv
@@ -13,7 +13,7 @@ from passlib.context import CryptContext
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
 EXPIRE_MINUTES = 10080
-
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 router = APIRouter(prefix="/auth")
 
 
@@ -55,6 +55,43 @@ def login(data: SignIn, db : Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
     if not user or not user.hashed or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
+
+    return TokenResponse(access_token=create_access_token(user.id))
+
+@router.post("/google", response_model=TokenResponse)
+def g_auth(data: GoogleAuth, db : Session = Depends(get_db)):
+    if not GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=500, detail="Google client id not configured")
+
+    try:
+        id_info = google_id_token.verify_oauth2_token(data.id_token, google_requests.Request(), GOOGLE_CLIENT_ID)
+    except:
+        raise HTTPException(status_code=401, detail="Invalid Google ID token")
+
+    google_sub = id_info["sub"]
+    email = id_info.get("email")
+    name = id_info.get("name")
+
+    user = db.query(User).filter(User.google_id == google_sub).first()
+
+    if not user:
+        user = db.query(User).filter(User.email == email).first()
+        if user:
+            user.google_id = google_sub
+            if not user.name:
+                user.name = name
+        else:
+            user = User(
+                email=email,
+                name=name,
+                google_id=google_sub,
+                auth_provider="google",
+                verified=True
+            )
+            db.add(user)
+            db.flush()
+            db.add(Profile(id=user.id, full_name=name)
+        db.commit()
 
     return TokenResponse(access_token=create_access_token(user.id))
 
