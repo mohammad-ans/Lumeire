@@ -4,7 +4,7 @@ from database import engine, Base
 import models
 import auth
 from profile import router
-
+import bookings
 
 Base.metadata.create_all(bind=engine)
 
@@ -19,3 +19,4 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(router)
+app.include_router(bookings.router)
