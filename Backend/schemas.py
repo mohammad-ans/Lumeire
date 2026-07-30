@@ -45,7 +45,12 @@ class ProfileResponse(BaseModel):
     date_of_birth: Optional[str] = None
     reward_points: int = 0
     fcm_token: Optional[str] = None
+    avatar_url: Optional[str] = None
     total_bookings: int = 0
+    loyalty_tier: str = "Bronze"
+    next_tier: Optional[str] = None
+    points_next_tier: Optional[int] = None
+    tier_progress: float = 0.0
 
     model_config = ConfigDict(from_attributes=True)
 

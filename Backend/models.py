@@ -41,6 +41,7 @@ class Profile(Base):
     dob = Column(String)
     reward_points = Column(Integer, default=0)
     fcm_token = Column(String)
+    avatar_url = Column(String)
     user = relationship("User", back_populates="profile")
 
 class Salon(Base):

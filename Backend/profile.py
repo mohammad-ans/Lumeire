@@ -1,5 +1,7 @@
+import os
+import uuid
 from typing import Optional
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Profile, Booking, User
@@ -7,17 +9,59 @@ from schemas import ProfileResponse, ProfileUpdateRequest
 from auth import get_current_user
 
 router = APIRouter(prefix="/profile")
+AVATAR_DIR = "static/avatars"
+os.makedirs(AVATAR_DIR, exist_ok=True)
+TIERS = [
+    ("Bronze", 0),
+    ("Silver", 500),
+    ("Gold", 1000),
+    ("Platinum", 2500)
+]
+
+def compute_tier(points: int):
+    curr_t = TIERS[0][0]
+    curr_p = TIERS[0][1]
+    next_t = None
+    next_p = None
+
+    for i, (name, threshold) in enumerate(TIERS):
+        if points >= threshold:
+            curr_t = name
+            curr_p = threshold
+            if i + 1 < len(TIERS):
+                next_t, next_p = TIERS[i + 1]
+            else:
+                next_t = None
+                next_p = None
+
+    if next_p is None:
+        points_next = None
+        progress = 100.0
+    else:
+        points_next = next_p - points
+        span = next_p - curr_p
+        progress = ((points - curr_p) / span) * 100 if span > 0 else 100.0
+        progress = max(0.0, min(100.0, progress))
+
+    return curr_t, next_t, points_next, progress
 
 def to_response(user: User, profile: Optional[Profile], total_bookings: int) -> ProfileResponse:
+    points = profile.reward_points if profile else 0
+    tier, next_tier, points_next, progress = compute_tier(points)
     return ProfileResponse(
     id = user.id,
     email = user.email,
     full_name = profile.full_name if profile else None,
     phone = profile.phone if profile else None,
     date_of_birth = profile.dob if profile else None,
-    reward_points = profile.reward_points,
+    reward_points = points,
     fcm_token = profile.fcm_token if profile else None,
-    total_bookings = total_bookings
+    avatar_url = profile.avatar_url if profile else None,
+    total_bookings = total_bookings,
+    loyalty_tier = tier,
+    next_tier = next_tier,
+    points_next_tier = points_next,
+    tier_progress = progress
     )
 
 @router.get("/me", response_model=ProfileResponse)
