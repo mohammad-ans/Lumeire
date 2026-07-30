@@ -2,6 +2,7 @@ package com.lumeire.app
 
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class SignUp(
     val email: String,
