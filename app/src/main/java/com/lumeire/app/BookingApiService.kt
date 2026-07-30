@@ -1,5 +1,7 @@
 package com.lumeire.app
 
+import com.lumeire.app.data.model.Booking
+import com.lumeire.app.data.model.Salon
 import com.lumeire.app.data.model.Service
 import kotlinx.serialization.Serializable
 import retrofit2.http.Body

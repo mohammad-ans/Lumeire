@@ -8,11 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.common.api.Api
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lumeire.app.data.model.Booking
 import com.lumeire.app.data.model.Service
 import com.lumeire.app.data.model.Salon
 import kotlinx.coroutines.launch
+import okio.IOException
+import retrofit2.HttpException
 import java.util.*
 
 class BookingBottomSheet : BottomSheetDialogFragment() {
@@ -46,14 +49,11 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_booking)
 
         tvSalonName.text = salon.name
+        btnConfirm.isEnabled = false
 
-        // Fetch services for this salon
         lifecycleScope.launch {
             try {
-                services = SupabaseModule.client.postgrest["services"]
-                    .select {
-                        filter { eq("salon_id", salon.id) }
-                    }.decodeList<Service>()
+                services = ApiClient.bookingApiService.getServices(salon.id)
 
                 if (services.isEmpty()) {
                     Toast.makeText(requireContext(), "No services available for this salon", Toast.LENGTH_SHORT).show()
@@ -67,6 +67,8 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
                     android.R.layout.simple_spinner_dropdown_item,
                     serviceNames
                 )
+                selectedService = services.first()
+                btnConfirm.isEnabled = true
                 spinnerServices.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>, v: View?, pos: Int, id: Long) {
                         selectedService = services[pos]
@@ -74,7 +76,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
                     override fun onNothingSelected(parent: AdapterView<*>) {}
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Failed to load services", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Failed to load services: ${toUserMessage(e)}", Toast.LENGTH_SHORT).show()
                 dismiss()
             }
         }
@@ -110,28 +112,43 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
 
             lifecycleScope.launch {
                 try {
-                    val userId = SupabaseModule.client.auth.currentSessionOrNull()?.user?.id
-                        ?: throw Exception("Not logged in")
-
-                    val booking = mapOf(
-                        "user_id" to userId,
-                        "salon_id" to salon.id,
-                        "appointment_time" to dateTime,
-                        "status" to "Upcoming",
-                        "total_amount" to service.price
+                    val request = BookingCreateRequest(
+                        salon_id = salon.id,
+                        service_id = service.id,
+                        appointment_time = dateTime
                     )
-
-                    SupabaseModule.client.postgrest["bookings"].insert(booking)
+                    ApiClient.bookingApiService.createBooking(request)
 
                     Toast.makeText(requireContext(), "Booking confirmed!", Toast.LENGTH_SHORT).show()
                     onBookingConfirmed?.invoke()
                     dismiss()
                 } catch (e: Exception) {
-                    Toast.makeText(requireContext(), "Booking failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "Booking failed: ${toUserMessage(e)}", Toast.LENGTH_LONG).show()
                     progressBar.visibility = View.GONE
                     btnConfirm.isEnabled = true
                 }
             }
         }
+    }
+    private fun toUserMessage(e: Exception): String {
+        var message = ""
+        when(e) {
+            is HttpException -> {
+                val code = e.code()
+                message = when (code) {
+                    401 -> "Please log in again"
+                    404 -> "Not Found"
+                    in 500..599 -> "Something went wrong on our end. Please try again."
+                    else -> "Something went wrong (${code})"
+                }
+            }
+            is IOException -> {
+                message = "Couldn't connect. Check your internet connection."
+            }
+            else -> {
+                message = "Something went wrong. Please try again."
+            }
+        }
+        return message
     }
 }
