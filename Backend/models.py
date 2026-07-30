@@ -1,0 +1,117 @@
+from sqlalchemy import Column, Integer, DateTime, String, Float, ForeignKey
+import uuid
+from datetime import datetime
+from sqlalchemy.dialects.postgresql import UUID
+from database import Base
+from sqlalchemy.orm import relationship
+
+
+def gen_uuid() -> str:
+    return str(uuid.uuid4())
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    email = Column(String, unique=True, index=True, nullable=False)
+    name = Column(String)
+
+    hashed_password = Column(String)
+    auth_provider = Column(String, default="local")
+    google_id = Column(String, unique=True)
+    verified = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    bookings = relationship("Booking", back_populates="user", cascade="all, delete-orphan")
+
+class PendingUser(Base):
+    __tablename__ = "pending_users"
+
+    email = Column(String, primary_key=True, index=True)
+    name = Column(String)
+    hashed_password = Column(String)
+    otp_code = Column(String)
+    otp_expires_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Salon(Base):
+    __tablename__ = "salons"
+    id = Column(Integer, autoincrement=True, primary_key=True)
+    name = Column(String)
+    category = Column(String)
+    rating = Column(Float)
+    address = Column(String)
+    longitude = Column(String)
+    latitude = Column(String)
+    openTime = Column(String)
+    closeTime = Column(String)
+
+class Profile(Base):
+    __tablename__ = "profiles"
+    id = Column(UUID(as_uuid=False), primary_key=True, ForeignKey("users.id"))
+    full_name = Column(String)
+    phone = Column(String)
+    dob = Column(String)
+    reward_points = Column(Integer, default = 0)
+    fcm_token = Column(String)
+    user = relationship("User", back_populates="profile")
+
+class Salon(Base):
+    __tablename__ = "salons"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    name = Column(String)
+    address = Column(String)
+    latitude = Column(Float)
+    longitude = Column(Float)
+    rating = Column(Float, default=0.0)
+    review_count = Column(Integer, default=0)
+    phone = Column(String)
+    website = Column(String)
+
+    services = relationship("Service", back_populates"salon", cascade="all, delete-orphan")
+    services = relationship("Stylist", back_populates"salon", cascade="all, delete-orphan")
+    services = relationship("Booking", back_populates"salon")
+
+class Service(Base):
+    __tablename__ = "services"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    name = Column(String)
+    category = Column(String)
+    duration_minutes = Column(Integer)
+    price = Column(Float)
+    salon_id = Column(UUID(as_uuid), ForeignKey("salons.id"), nullable=False)
+    salon = relationship("Salon", back_populates="services")
+
+class Stylist(Base):
+    __tablename__ = "stylists"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    name = Column(String, nullable=False)
+    speciality = Column(String)
+    salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
+    salon = relationship("Salon", back_populates="stylists")
+    bookings = relationship("Booking", back_populates="stylist")
+
+class Booking(Base):
+    __tablename__ = "bookings"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    user_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
+    stylist_id = Column(UUID(as_uuid=False), ForeignKey("stylists.id"), nullable=True)
+    appointment_time = Column(DateTime, nullable=False)
+    status = Column(String, default="pending")
+    total_amount = Column(Float, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="bookings")
+    salon = relationship("Salon", back_populates="bookings")
+    stylist = relationship("Stylist", back_populates="bookings")
+
+class GiftCard(Base):
+    __tablename__ = "gifts"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    amount = Column(Integer, nullable=False)
+    currency = Column(String, default="USD")
+    sender = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    receiver = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
