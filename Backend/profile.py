@@ -13,6 +13,9 @@ router = APIRouter(prefix="/profile")
 AVATAR_DIR = "static/avatars"
 os.makedirs(AVATAR_DIR, exist_ok=True)
 
+ALLOWED_CONTENT_TYPES = {"image/jpeg": "jpg", "image/png" : "png", "image/webp": "webp"}
+MAX_AVATAR_SIZE_BYTES = 5120 * 1024
+
 TIERS = [
     ("Bronze", 0),
     ("Silver", 500),
@@ -98,8 +101,13 @@ def update_my_profile(data: ProfileUpdateRequest, current_user: user = Depends(g
 
 @router.post("/me/avatar", response_model=ProfileResponse)
 def upload_avatar(file : UploadFile = File(...), current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(status_code=400, detail="Only JPEG, PNG, and WEBP are allowed")
     content = file.file.read()
-    ext = file.content_type
+    if len(content) > MAX_AVATAR_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="Image must be under 5MB")
+
+    ext = ALLOWED_CONTENT_TYPES[file.content_type]
     filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}.{ext}"
     filepath = os.path.join(AVATAR_DIR, filename)
 
