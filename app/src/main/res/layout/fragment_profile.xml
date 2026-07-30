@@ -59,6 +59,7 @@
                         android:textColor="#CCFFFFFF" />
 
                     <TextView
+                        android:id="@+id/tv_profile_tier_badge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
@@ -67,7 +68,7 @@
                         android:paddingTop="4dp"
                         android:paddingEnd="10dp"
                         android:paddingBottom="4dp"
-                        android:text="@string/premium_member"
+                        android:text=""
                         android:textColor="@color/white"
                         android:textStyle="bold" />
                 </LinearLayout>

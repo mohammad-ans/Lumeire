@@ -70,7 +70,6 @@ data class ProfileResponse(
     val total_bookings: Int = 0
 )
 
-@Serializable
 data class ProfileUpdateRequest(
     val full_name: String? = null,
     val phone: String? = null,
