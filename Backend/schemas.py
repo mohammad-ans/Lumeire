@@ -35,3 +35,21 @@ class UserResponse(BaseMode):
     is_verified: str
 
     model_config = ConfigDict(from_attributes=True)
+
+class ProfileResponse(BaseModel):
+    id: str
+    email: str
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    reward_points: int = 0
+    fcm_token: Optional[str] = None
+    total_bookings: int = 0
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    fcm_token: Optional[str] = None
