@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -28,7 +27,7 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { viewModel }
+        uri?.let { viewModel.uploadAvatar(requireContext(), it) }
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,8 +48,19 @@ class ProfileFragment : Fragment() {
                     binding.tvProfileName.text = profile.full_name ?: "User"
                     binding.tvProfileEmail.text = profile.email
                     binding.tvProfileStatPoints.text = profile.reward_points.toString()
-                    binding.tvPointsToGold.text = "${1000 - profile.reward_points} more points to reach Gold status"
-                    binding.pbLoyalty.progress = (profile.reward_points / 10).coerceAtMost(100)
+                    binding.tvLoyaltyPointsValue.text = profile.reward_points.toString()
+                    binding.tvProfileTierBadge.text = "${profile.loyalty_tier} Member"
+                    if (profile.next_tier != null)
+                        binding.tvPointsToGold.text = "${profile.points_next_tier} more points to reach ${profile.next_tier}"
+                    else
+                        binding.tvPointsToGold.text = "You have reached ${profile.loyalty_tier}, max"
+
+                    binding.pbLoyalty.progress = profile.tier_progress.toInt().coerceAtMost(100)
+                    val avatar = profile.avatar_url?.let { ApiClient.resolve(profile.avatar_url) }
+                    Glide.with(this@ProfileFragment).load(avatar ?: R.drawable.ic_nav_profile)
+                        .placeholder(R.drawable.ic_nav_profile)
+                        .error(R.drawable.ic_nav_profile)
+                        .centerCrop().into(binding.ivProfileAvatar)
                 }
             }
         }
@@ -60,14 +70,8 @@ class ProfileFragment : Fragment() {
                 binding.tvProfileStatBookings.text = total.toString()
             }
         }
-        
-        Glide.with(this)
-            .load(DummyContent.profileAvatarUrl)
-            .centerCrop()
-            .into(binding.ivProfileAvatar)
-
+        binding.ivProfileAvatar.setOnClickListener { pickImageLauncher.launch("image/*") }
         listOf(
-            binding.rowProfileEdit to getString(R.string.edit_profile),
             binding.rowProfilePayment to getString(R.string.payment_methods),
             binding.rowProfileRewards to getString(R.string.rewards_points),
             binding.rowProfilePrivacy to getString(R.string.privacy_security),
@@ -82,7 +86,9 @@ class ProfileFragment : Fragment() {
                 ).show()
             }
         }
-        
+        binding.rowProfileEdit.setOnClickListener {
+            //edit user details
+        }
         binding.rowProfileGifts.setOnClickListener {
             val myCards = DummyContent.myGiftCards.filter { !it.isUsed }
             if (myCards.isEmpty()) {

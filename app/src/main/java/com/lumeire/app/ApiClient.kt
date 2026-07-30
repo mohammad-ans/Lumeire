@@ -41,4 +41,10 @@ object ApiClient {
     suspend fun saveToken(token: String) = tokenManager.saveToken(token)
     suspend fun clearToken() = tokenManager.clearToken()
     suspend fun isLoggedIn(): Boolean = tokenManager.isLoggedIn()
+
+    fun resolve(path: String): String{
+        if(path.startsWith("https://"))
+            return path
+        return BASE_URL.trimEnd('/') + path
+    }
 }

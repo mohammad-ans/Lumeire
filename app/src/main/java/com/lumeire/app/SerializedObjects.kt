@@ -67,7 +67,12 @@ data class ProfileResponse(
     val data_of_birth: String? = null
     val reward_points: Int = 0,
     val fcm_token: String? = null,
+    val avatar_url: String? = null,
     val total_bookings: Int = 0
+    val loyalty_tier: String = "Bronze"
+    val next_tier: String? = null
+    val points_next_tier: Int? = null
+    val tier_progress: Double = 0.0
 )
 
 data class ProfileUpdateRequest(
