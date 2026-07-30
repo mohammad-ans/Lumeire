@@ -9,8 +9,10 @@ from schemas import ProfileResponse, ProfileUpdateRequest
 from auth import get_current_user
 
 router = APIRouter(prefix="/profile")
+
 AVATAR_DIR = "static/avatars"
 os.makedirs(AVATAR_DIR, exist_ok=True)
+
 TIERS = [
     ("Bronze", 0),
     ("Silver", 500),
@@ -88,6 +90,26 @@ def update_my_profile(data: ProfileUpdateRequest, current_user: user = Depends(g
     if data.fcm_token is not None:
         profile.fcm_token = data.fcm_token
 
+    db.commit()
+    db.refresh(profile)
+
+    total_bookings = db.query(Booking).filter(Booking.user_id == current_user.id).count()
+    return to_response(current_user, profile, total_bookings)
+
+@router.post("/me/avatar", response_model=ProfileResponse)
+def upload_avatar(file : UploadFile = File(...), current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    content = file.file.read()
+    ext = file.content_type
+    filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}.{ext}"
+    filepath = os.path.join(AVATAR_DIR, filename)
+
+    with open(filepath, "wb") as f:
+        f.write(content)
+    profile = db.query(Profile).filter(Profile.id == current_user.id).count()
+    if not profile:
+        profile = Profile(id=current_user.id)
+        db.add(profile)
+    profile.avatar_url = f"/{AVATAR_DIR}/{filename}"
     db.commit()
     db.refresh(profile)
 
