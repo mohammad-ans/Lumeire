@@ -12,9 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.common.api.Api
 import kotlinx.coroutines.launch
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
 import com.lumeire.app.databinding.FragmentProfileBinding
 import com.lumeire.app.ui.profile.ProfileViewModel
 
@@ -42,10 +41,10 @@ class ProfileFragment : Fragment() {
                 Log.d("Profile", "Received: $profile")
                 if (profile != null) {
                     binding.tvProfileName.text = profile.full_name ?: "User"
-                    binding.tvProfileEmail.text = SupabaseModule.client.auth.currentUserOrNull()?.email ?: ""
-                    binding.tvProfileStatPoints.text = profile.rewards_points.toString()
-                    binding.tvPointsToGold.text = "${1000 - profile.rewards_points} more points to reach Gold status"
-                    binding.pbLoyalty.progress = (profile.rewards_points / 10).coerceAtMost(100)
+                    binding.tvProfileEmail.text = profile.email
+                    binding.tvProfileStatPoints.text = profile.reward_points.toString()
+                    binding.tvPointsToGold.text = "${1000 - profile.reward_points} more points to reach Gold status"
+                    binding.pbLoyalty.progress = (profile.reward_points / 10).coerceAtMost(100)
                 }
             }
         }
@@ -104,9 +103,7 @@ class ProfileFragment : Fragment() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(R.string.sign_out) { _, _ ->
                     lifecycleScope.launch {
-                        try {
-                            SupabaseModule.client.auth.signOut()
-                        } catch (e: Exception) {}
+                        ApiClient.clearToken()
                         startActivity(Intent(requireContext(), LoginActivity::class.java))
                         activity?.finish()
                     }

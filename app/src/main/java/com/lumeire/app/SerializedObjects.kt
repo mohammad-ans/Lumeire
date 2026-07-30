@@ -56,3 +56,24 @@ data class UserResponse(
 data class ErrorResponse(
     val detail: String
 )
+
+
+@Serializable
+data class ProfileResponse(
+    val id: String,
+    val email: String,
+    val full_name: String? = null,
+    val phone: String? = null,
+    val data_of_birth: String? = null
+    val reward_points: Int = 0,
+    val fcm_token: String? = null,
+    val total_bookings: Int = 0
+)
+
+@Serializable
+data class ProfileUpdateRequest(
+    val full_name: String? = null,
+    val phone: String? = null,
+    val date_of_birth: String? = null,
+    val fcm_token: String? = null
+)

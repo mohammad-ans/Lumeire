@@ -36,6 +36,7 @@ object ApiClient {
     private val retrofit = Retrofit.Builder().baseUrl(BASE_URL).client(okHttpClient).addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build()
 
     val authService: AuthApiService by lazy { retrofit.create(AuthApiService::class.java) }
+    val apiService: ApiService by lazy {retrofit.create(ApiService::class.java)}
     suspend fun saveToken(token: String) = tokenManager.saveToken(token)
     suspend fun clearToken() = tokenManager.clearToken()
     suspend fun isLoggedIn(): Boolean = tokenManager.isLoggedIn()
