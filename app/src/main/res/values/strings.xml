@@ -99,4 +99,6 @@
     <string name="stat_bookings">Bookings</string>
     <string name="stat_reviews">Reviews</string>
     <string name="stat_points">Points</string>
+    <string name="otp_sent_to">Otp Sent To %1$s</string>
+    <string name="verify">Verify</string>
 </resources>
