@@ -1,28 +1,6 @@
 package com.lumeire.app
 
-data class Salon(
-    val id: String,
-    val name: String,
-    val category: String,
-    val rating: Double?,
-    val reviews: Int,
-    val distance: String,
-    val price: String,
-    val address: String?,
-    val openUntil: String,
-    val imageUrl: String,
-    val latitude: Double? = null,
-    val longitude: Double? = null
-)
 
-data class Booking(
-    val id: Int,
-    val salonId: Int,
-    val service: String,
-    val salon: String,
-    val schedule: String,
-    val details: String
-)
 
 data class GiftExperience(
     val id: Int,

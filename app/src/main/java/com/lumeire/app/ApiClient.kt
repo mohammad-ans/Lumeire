@@ -37,6 +37,7 @@ object ApiClient {
 
     val authService: AuthApiService by lazy { retrofit.create(AuthApiService::class.java) }
     val apiService: ApiService by lazy {retrofit.create(ApiService::class.java)}
+    val bookingApiService: BookingApiService by lazy { retrofit.create(BookingApiService::class.java) }
     suspend fun saveToken(token: String) = tokenManager.saveToken(token)
     suspend fun clearToken() = tokenManager.clearToken()
     suspend fun isLoggedIn(): Boolean = tokenManager.isLoggedIn()
