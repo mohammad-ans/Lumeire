@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, DateTime, String, Float, Boolean, ForeignKey
 import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID
@@ -33,25 +33,13 @@ class PendingUser(Base):
     otp_expires_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-class Salon(Base):
-    __tablename__ = "salons"
-    id = Column(Integer, autoincrement=True, primary_key=True)
-    name = Column(String)
-    category = Column(String)
-    rating = Column(Float)
-    address = Column(String)
-    longitude = Column(String)
-    latitude = Column(String)
-    openTime = Column(String)
-    closeTime = Column(String)
-
 class Profile(Base):
     __tablename__ = "profiles"
     id = Column(UUID(as_uuid=False), primary_key=True, ForeignKey("users.id"))
     full_name = Column(String)
     phone = Column(String)
     dob = Column(String)
-    reward_points = Column(Integer, default = 0)
+    reward_points = Column(Integer, default=0)
     fcm_token = Column(String)
     user = relationship("User", back_populates="profile")
 
@@ -59,6 +47,7 @@ class Salon(Base):
     __tablename__ = "salons"
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
     name = Column(String)
+    category = Column(String)
     address = Column(String)
     latitude = Column(Float)
     longitude = Column(Float)
@@ -66,10 +55,12 @@ class Salon(Base):
     review_count = Column(Integer, default=0)
     phone = Column(String)
     website = Column(String)
+    openTime = Column(String)
+    closeTime = Column(String)
 
-    services = relationship("Service", back_populates"salon", cascade="all, delete-orphan")
-    services = relationship("Stylist", back_populates"salon", cascade="all, delete-orphan")
-    services = relationship("Booking", back_populates"salon")
+    services = relationship("Service", back_populates="salon", cascade="all, delete-orphan")
+    stylists = relationship("Stylist", back_populates="salon", cascade="all, delete-orphan")
+    bookings = relationship("Booking", back_populates="salon")
 
 class Service(Base):
     __tablename__ = "services"
@@ -78,7 +69,7 @@ class Service(Base):
     category = Column(String)
     duration_minutes = Column(Integer)
     price = Column(Float)
-    salon_id = Column(UUID(as_uuid), ForeignKey("salons.id"), nullable=False)
+    salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
     salon = relationship("Salon", back_populates="services")
 
 class Stylist(Base):
@@ -98,7 +89,7 @@ class Booking(Base):
     salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
     stylist_id = Column(UUID(as_uuid=False), ForeignKey("stylists.id"), nullable=True)
     appointment_time = Column(DateTime, nullable=False)
-    status = Column(String, default="pending")
+    status = Column(String, default="Upcoming")
     total_amount = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 

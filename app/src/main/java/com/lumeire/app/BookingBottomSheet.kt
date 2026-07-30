@@ -12,9 +12,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lumeire.app.data.model.Booking
 import com.lumeire.app.data.model.Service
 import com.lumeire.app.data.model.Salon
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
 import java.util.*
 
