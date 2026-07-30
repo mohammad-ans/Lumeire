@@ -15,13 +15,8 @@ import com.lumeire.app.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.builtin.IDToken
-import com.lumeire.app.BuildConfig
 
 class LoginActivity : AppCompatActivity() {
 
@@ -31,15 +26,16 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val session = SupabaseModule.client.auth.currentSessionOrNull()
-        if (session != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return
-        }
-
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        lifecycleScope.launch {
+            if(ApiClient.isLoggedIn()) {
+                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                finish()
+                return@launch
+            }
+        }
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString()
@@ -77,11 +73,11 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.btnGoogleLogin.setOnClickListener {
-            val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
+            val gso = GoogleSignInOptions.Builder(com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(BuildConfig.CLIENT_ID)
                 .requestEmail()
                 .build()
-            val googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this, gso)
+            val googleSignInClient = GoogleSignIn.getClient(this, gso)
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
@@ -90,10 +86,7 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
 
-    
     }
-
-    private lateinit var googleSignInClient: GoogleSignInClient
 
     private val googleSignInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -105,31 +98,14 @@ class LoginActivity : AppCompatActivity() {
                     val idTok = account.idToken
 
                     if (idTok != null) {
-                        lifecycleScope.launch {
-                            try {
-                                SupabaseModule.client.auth.signInWith(IDToken) {
-                                    provider = Google
-                                    idToken = idTok
-                                }
-
-                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                                finish()
-                            } catch (e: Exception) {
-                                Log.e("GoogleLogin", "Supabase sign-in failed", e)
-                                Toast.makeText(
-                                    this@LoginActivity,
-                                    e.message ?: "Login failed",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
+                        viewModel.googleAuth(idTok)
                     }
                 } catch (e: ApiException) {
-                    e.printStackTrace()
+                    Log.e("Google Login", "Google sign-in failed", e)
+                    Toast.makeText(this, "Google sign-in failed", Toast.LENGTH_LONG).show()
                 }
             }
         }
-
 
 }
 

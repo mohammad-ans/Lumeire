@@ -20,8 +20,8 @@ class LoginViewModel : ViewModel() {
 
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
     val loginState: StateFlow<LoginState> = _loginState
-    private val _optState = MutableStateFlow<OptState>(OptState.Idle)
-    val optState: StateFlow<OptState> = _optState
+    private val _otpState = MutableStateFlow<OtpState>(OtpState.Idle)
+    val otpState: StateFlow<OtpState> = _otpState
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -38,12 +38,12 @@ class LoginViewModel : ViewModel() {
     
     fun register(email: String, password: String, fullname: String) {
         viewModelScope.launch {
-            _optState.value = OptState.Loading
+            _otpState.value = OtpState.Loading
             try {
                 ApiClient.authService.register(SignUp(email, password, fullname))
-                _optState.value = OptState.CodeSent(email)
+                _otpState.value = OtpState.CodeSent(email)
             } catch (e: Exception) {
-                _optState.value = OptState.Error(parseError(e))
+                _otpState.value = OtpState.Error(parseError(e))
             }
         }
     }
@@ -116,9 +116,9 @@ sealed class LoginState {
     object Success : LoginState()
     data class Error(val message: String) : LoginState()
 }
-sealed class OptState {
-    object Idle : OptState()
-    object Loading : OptState()
-    data class CodeSent(val email: String) : OptState()
-    data class Error(val message: String) : OptState()
+sealed class OtpState {
+    object Idle : OtpState()
+    object Loading : OtpState()
+    data class CodeSent(val email: String) : OtpState()
+    data class Error(val message: String) : OtpState()
 }
