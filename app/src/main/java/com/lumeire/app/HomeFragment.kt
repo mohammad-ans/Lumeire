@@ -16,13 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import com.lumeire.app.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
 import android.util.Log
-import com.lumeire.app.data.model.Salon
 import android.widget.LinearLayout
 import android.view.Gravity
-import android.widget.FrameLayout
 import androidx.core.widget.doAfterTextChanged
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
+import com.google.android.gms.common.api.Api
 import kotlinx.serialization.json.jsonPrimitive
 
 class HomeFragment : Fragment() {
@@ -44,16 +41,14 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             try {
-                val user = SupabaseModule.client.auth.currentUserOrNull()
-                val fullName = user?.userMetadata
-                    ?.get("full_name")?.jsonPrimitive?.content
-                    ?: "there"
+                val user = ApiClient.authService.getMe()
+                val fullName = user.name ?: "there"
                 binding.homeUsername.text = "Hi, $fullName"
             } catch (e: Exception) {
                 binding.homeUsername.text = "Hi there 👋"
             }
         }
-        // Using the user-provided profile picture p1 from drawables
+
         Glide.with(this)
             .load(R.drawable.p1)
             .centerCrop()
@@ -117,8 +112,7 @@ class HomeFragment : Fragment() {
         val tvMeta = cardView.findViewById<TextView>(R.id.tv_salon_2_meta)
         val tvPrice = cardView.findViewById<TextView>(R.id.tv_salon_2_price)
 
-        val dummyImage = DummyContent.salons.random().imageUrl
-        Glide.with(this).load(dummyImage).centerCrop().into(ivSalon)
+        Glide.with(this).load(ApiClient.resolve(salon.image_url)).placeholder(R.drawable.ic_nav_map).error(R.drawable.ic_nav_map).centerCrop().into(ivSalon)
         tvName.text = salon.name
         tvCategory.text = salon.address ?: "Salon"
         tvMeta.text = "${salon.rating ?: 0.0} (${salon.review_count})"

@@ -73,6 +73,7 @@ class SalonResponse(BaseModel):
     website: Optional[str] = None
     openTime: Optional[str] = None
     closeTime: Optional[str] = None
+    image_url: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

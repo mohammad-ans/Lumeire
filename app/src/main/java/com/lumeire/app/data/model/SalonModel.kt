@@ -12,5 +12,8 @@ data class Salon(
     val rating: Double? = null,
     val review_count: Int = 0,
     val phone: String? = null,
-    val website: String? = null
+    val website: String? = null,
+    val openTime: String? = null,
+    val closeTime: String? = null,
+    val image_url: String? = null
 )

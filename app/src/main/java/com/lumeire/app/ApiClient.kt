@@ -42,9 +42,11 @@ object ApiClient {
     suspend fun clearToken() = tokenManager.clearToken()
     suspend fun isLoggedIn(): Boolean = tokenManager.isLoggedIn()
 
-    fun resolve(path: String): String{
+    fun resolve(path: String?): String?{
+        if(path == null)
+            return path
         if(path.startsWith("https://"))
             return path
-        return BASE_URL.trimEnd('/') + path
+        return BASE_URL.trimEnd('/') + '/' + path.trimStart('/')
     }
 }

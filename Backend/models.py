@@ -58,6 +58,7 @@ class Salon(Base):
     website = Column(String)
     openTime = Column(String)
     closeTime = Column(String)
+    image_url = Column(String)
 
     services = relationship("Service", back_populates="salon", cascade="all, delete-orphan")
     stylists = relationship("Stylist", back_populates="salon", cascade="all, delete-orphan")
