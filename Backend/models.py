@@ -103,8 +103,20 @@ class GiftCard(Base):
     __tablename__ = "gifts"
 
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
-    amount = Column(Integer, nullable=False)
+    salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
+    service_id = Column(UUID(as_uuid=False), ForeignKey("services.id"), nullable=False)
+    amount = Column(Float, nullable=False)
     currency = Column(String, default="USD")
-    sender = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
-    receiver = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    occasion = Column(String)
+    message = Column(String)
+    sender_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    receiver_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    is_used = Column(Boolean, default=False)
+
+    redeemed_booking_id = Column(UUID(as_uuid=False), ForeignKey("bookings.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    salon = relationship("Salon")
+    service = relationship("Service")
+    sender = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])

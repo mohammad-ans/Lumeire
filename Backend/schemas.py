@@ -85,20 +85,49 @@ class ServiceResponse(BaseModel):
     price: float
     salon_id: str
 
+    model_config = ConfigDict(from_attributes=True)
+
 class BookingCreateRequest(BaseModel):
     salon_id: str
     service_id: str
     stylist_id: Optional[str] = None
     appointment_time: datetime
+    gift_card_id: Optional[str] = None
 
 class BookingResponse(BaseModel):
     id: str
-    user-id: str
+    user_id: str
     salon_id: str
     stylist_id: Optional[str] = None
     appointment_time: datetime
     status: str
     total_amount: float
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class EmailExistResponse(BaseModel):
+    exists: bool
+
+class GiftCardCreateRequest(BaseModel):
+    receiver_email: EmailStr
+    salon_id: str
+    service_id: Optional[str] = None
+    amount: Optional[str] = None
+    occasion: Optional[str] = None
+    message: Optional[str] = None
+
+class GiftCardResponse(BaseModel):
+    id: str
+    salon_id: str
+    service_id: Optional[str] = None
+    amount: float
+    currency: str = "USD"
+    occasion: Optional[str] = None
+    message: Optional[str] = None
+    sender_id: str
+    receiver_id: str
+    is_used: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
