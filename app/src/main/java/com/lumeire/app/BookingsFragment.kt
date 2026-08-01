@@ -89,40 +89,6 @@ class BookingsFragment : Fragment() {
         }
     }
 
-    private fun processPayment(salon: Salon, amount: Int) {
-        // Note: Using salon.id (String) to match against DummyContent if still needed
-        val availableCards = DummyContent.myGiftCards.filter { !it.isUsed && it.salonId.toString() == salon.id }
-
-        if (availableCards.isNotEmpty()) {
-            val card = availableCards.first()
-            AlertDialog.Builder(requireContext())
-                .setTitle("Use Gift Card?")
-                .setMessage("You have a gift card for ${salon.name} worth PKR ${card.amount}. Would you like to use it for this PKR $amount payment?")
-                .setPositiveButton("Yes") { _, _ ->
-                    card.isUsed = true
-                    if (card.amount >= amount) {
-                        Toast.makeText(requireContext(), "Payment successful using Gift Card!", Toast.LENGTH_LONG).show()
-                    } else {
-                        val remaining = amount - card.amount
-                        showBankTransferDialog(salon, remaining)
-                    }
-                }
-                .setNegativeButton("No") { _, _ ->
-                    showBankTransferDialog(salon, amount)
-                }
-                .show()
-        } else {
-            showBankTransferDialog(salon, amount)
-        }
-    }
-
-    private fun showBankTransferDialog(salon: Salon, amount: Int) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Bank Transfer")
-            .setMessage("Please transfer PKR $amount to the following account:\n\nAccount Title: ${salon.name}\nAccount Number: PK34MEZN00001234567890\nBank: Meezan Bank")
-            .setPositiveButton("OK", null)
-            .show()
-    }
 
     private fun createBookingCard(booking: Booking, isUpcoming: Boolean): View {
         val inflater = LayoutInflater.from(requireContext())

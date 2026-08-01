@@ -9,9 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.common.api.Api
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.lumeire.app.data.model.Booking
 import com.lumeire.app.data.model.Service
 import com.lumeire.app.data.model.Salon
 import kotlinx.coroutines.launch
