@@ -101,4 +101,12 @@
     <string name="stat_points">Points</string>
     <string name="otp_sent_to">Otp Sent To %1$s</string>
     <string name="verify">Verify</string>
+    <string name="back_arrow">←</string>
+    <string name="update_profile">Update your personal details</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="name_hint">Full name</string>
+    <string name="phone_hint">Phone number</string>
+    <string name="dob_hint">Data of birth</string>
+    <string name="save">Save</string>
+    <string name="saving">Saving…</string>
 </resources>
