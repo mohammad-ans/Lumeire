@@ -9,15 +9,6 @@ data class GiftExperience(
     val price: Int,
     val duration: String
 )
-
-data class GiftCard(
-    val id: Int,
-    val salonId: Int,
-    val salonName: String,
-    var amount: Int,
-    var isUsed: Boolean
-)
-
 object DummyContent {
     val myGiftCards = mutableListOf<GiftCard>()
 

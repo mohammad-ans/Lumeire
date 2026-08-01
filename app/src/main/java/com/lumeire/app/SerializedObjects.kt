@@ -75,9 +75,47 @@ data class ProfileResponse(
     val tier_progress: Double = 0.0
 )
 
+@Serializable
 data class ProfileUpdateRequest(
     val full_name: String? = null,
     val phone: String? = null,
     val date_of_birth: String? = null,
     val fcm_token: String? = null
 )
+
+@Serializable
+data class GiftCard(
+    val id: String,
+    val salon_id: String,
+    val service_id: String? = null,
+    val amount: Double,
+    val currency: String = "USD",
+    val occasion: String? = null,
+    val message: String? = null,
+    val sender_id: String,
+    val receiver_id: String,
+    val is_used: Boolean,
+    val created_at, String
+)
+
+@Serializable
+data class BookingCreateRequest(
+    val salon_id: String,
+    val service_id: String,
+    val stylist_id: String? = null,
+    val appointment_time: String,
+    val gift_card_id: String? = null
+)
+
+@Serializable
+data class GiftCardCreateRequest(
+    val receiver_email: String,
+    val salon_id: String,
+    val service_id: String? = null,
+    val amount: Double? = null,
+    val occasion: String? = null,
+    val message = String? = null
+)
+
+@Serializable
+data class EmailExistsResponse(val exists: Boolean)

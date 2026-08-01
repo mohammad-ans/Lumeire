@@ -9,14 +9,8 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
-@Serializable
-data class BookingCreateRequest(
-    val salon_id: String,
-    val service_id: String,
-    val stylist_id: String? = null,
-    val appointment_time: String
-)
 
 interface BookingApiService {
     @GET("salons")
@@ -33,4 +27,16 @@ interface BookingApiService {
 
     @DELETE("bookings/{bookingId}")
     suspend fun cancelBooking(@Path("bookingId") bookingId: String): Booking
+
+    @GET("users/exists")
+    suspend fun checkUser(@Query("email") email: String): EmailExistsResponse
+
+    @POST("gifts")
+    suspend fun sendGift(@Body request: GiftCardCreateRequest): GiftCard
+
+    @GET("gifts/received")
+    suspend fun getReceivedGifts(@Query("unused_only") unusedOnly: Boolean = true): List<GiftCard>
+
+    @GET("gifts/sent")
+    suspend fun getSendGifts(): List<GiftCard>
 }

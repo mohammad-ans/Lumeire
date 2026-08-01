@@ -1,5 +1,6 @@
 package com.lumeire.app
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
@@ -14,6 +15,7 @@ import com.lumeire.app.data.model.Booking
 import com.lumeire.app.data.model.Service
 import com.lumeire.app.data.model.Salon
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okio.IOException
 import retrofit2.HttpException
 import java.util.*
@@ -112,12 +114,21 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
 
             lifecycleScope.launch {
                 try {
+                    val applicableGift = try{
+                        ApiClient.bookingApiService.getReceivedGifts(unusedOnly = true).firstOrNull { it.salon_id == salon.id }
+                    }
+                    catch (e: Exception){
+                        null
+                    }
+                    val giftCard = if(applicableGift != null) { askToUseGift(applicableGift, service.price) } else null
                     val request = BookingCreateRequest(
                         salon_id = salon.id,
                         service_id = service.id,
-                        appointment_time = dateTime
+                        appointment_time = dateTime,
+                        gift_card_id = giftCard
                     )
-                    ApiClient.bookingApiService.createBooking(request)
+                    val booking = ApiClient.bookingApiService.createBooking(request)
+                    val message = if (giftCard != null) "Booking confirmed! Gift card applied - PKR ${booking.total_amount.toInt()} remaining" else "Booking confirmed"
 
                     Toast.makeText(requireContext(), "Booking confirmed!", Toast.LENGTH_SHORT).show()
                     onBookingConfirmed?.invoke()
@@ -130,6 +141,24 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
             }
         }
     }
+
+    private suspend fun askToUseGift(gift: GiftCard, servicePrice: Double): String? {
+        val rt = suspendCancellableCoroutine {cont ->
+            if(!isAdded) {
+                cont.resume(null) {}
+                return@suspendCancellableCoroutine
+            }
+            AlertDialog.Builder(requireContext())
+                .setTitle("Use Gift Card?")
+                .setMessage("You have gift card for this salon worth PKR ${gift.amount.toInt()}. Apply it to this PKR ${servicePrice.toInt()} booking?")
+                .setPositiveButton("Yes") {_, _, -> cont.resume(gift.id) {} }
+                .setNegativeButton("No"){_, _, -> cont.resume(null) {} }
+                .setOnCancelListener { cont.resume(null) {} }
+                .show()
+        }
+        return rt
+    }
+
     private fun toUserMessage(e: Exception): String {
         var message = ""
         when(e) {
