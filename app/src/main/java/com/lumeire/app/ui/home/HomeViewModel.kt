@@ -64,23 +64,4 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
-    fun checkUserExistsByEmail(email: String, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val result = SupabaseModule.client.postgrest["profiles"]
-                    .select(columns = Columns.ALL) {
-                        filter { eq("phone", email) }
-                    }
-                    .decodeList<Profile>()
-                onResult(result.isNotEmpty())
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onResult(false)
-            }
-        }
-    }
-
-    fun getCurrentUserEmail(): String? {
-        return SupabaseModule.client.auth.currentUserOrNull()?.email
-    }
 }

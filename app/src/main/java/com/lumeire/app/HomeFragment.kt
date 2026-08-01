@@ -41,18 +41,20 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             try {
-                val user = ApiClient.authService.getMe()
-                val fullName = user.name ?: "there"
+                val user = ApiClient.apiService.getMyProfile()
+                val fullName = user.full_name ?: "there"
                 binding.homeUsername.text = "Hi, $fullName"
+                Glide.with(this@HomeFragment)
+                    .load(ApiClient.resolve(user.avatar_url))
+                    .placeholder(R.drawable.ic_nav_profile)
+                    .error(R.drawable.ic_nav_profile)
+                    .centerCrop()
+                    .into(binding.ivHomeAvatar)
             } catch (e: Exception) {
                 binding.homeUsername.text = "Hi there 👋"
             }
         }
 
-        Glide.with(this)
-            .load(R.drawable.p1)
-            .centerCrop()
-            .into(binding.ivHomeAvatar)
 
         
 
