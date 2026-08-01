@@ -112,7 +112,6 @@ data class GiftCardCreateRequest(
     val receiver_email: String,
     val salon_id: String,
     val service_id: String? = null,
-    val amount: Double? = null,
     val occasion: String? = null,
     val message = String? = null
 )

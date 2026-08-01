@@ -13,10 +13,11 @@ import androidx.lifecycle.lifecycleScope
 import com.lumeire.app.data.model.Salon
 import com.lumeire.app.data.model.Service
 import com.lumeire.app.databinding.FragmentGiftingBinding
-import com.lumeire.app.di.SupabaseModule
 import com.lumeire.app.ui.home.HomeViewModel
-import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.launch
+import okio.IOException
+import retrofit2.HttpException
+
 class GiftingFragment : Fragment() {
 
     private var _binding: FragmentGiftingBinding? = null
@@ -24,18 +25,11 @@ class GiftingFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
 
     private var selectedOccasionIndex = 0
+    private lateinit var occasionChips: List<TextView>
     private var salons: List<Salon> = emptyList()
     private var services: List<Service> = emptyList()
     private var selectedSalonIndex = 0
     private var selectedServiceIndex = 0
-
-    // Dummy registered users for sandbox validation
-    private val registeredEmails = setOf(
-        "alice@lumeire.com",
-        "bob@lumeire.com",
-        "sara@lumeire.com",
-        "test@lumeire.com"
-    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGiftingBinding.inflate(inflater, container, false)
@@ -45,7 +39,7 @@ class GiftingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val occasionChips = listOf(
+        occasionChips = listOf(
             binding.chipOccasion1, binding.chipOccasion2, binding.chipOccasion3,
             binding.chipOccasion4, binding.chipOccasion5
         )
@@ -58,7 +52,6 @@ class GiftingFragment : Fragment() {
         }
         updateOccasionSelection(occasionChips)
 
-        // Generate a unique payment reference
         binding.tvPaymentReference.text = "LUM-${System.currentTimeMillis().toString().takeLast(6)}"
 
         lifecycleScope.launch {
@@ -87,7 +80,6 @@ class GiftingFragment : Fragment() {
             container.addView(chip)
         }
 
-        // Fetch services for the default selected salon
         if (salons.isNotEmpty()) fetchServicesForSalon(salons[selectedSalonIndex].id)
     }
 
@@ -103,14 +95,12 @@ class GiftingFragment : Fragment() {
     private fun fetchServicesForSalon(salonId: String) {
         lifecycleScope.launch {
             try {
-                val result = SupabaseModule.client.postgrest["services"]
-                    .select { filter { eq("salon_id", salonId) } }
-                    .decodeList<Service>()
-                services = result
+                services = ApiClient.bookingApiService.getServices(salonId)
                 selectedServiceIndex = 0
                 buildServiceChips()
             } catch (e: Exception) {
-                e.printStackTrace()
+                android.util.Log.e("Gifting Fragment", "Error fetching services", e)
+                Toast.makeText(requireContext(), "Could not load services: ", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -153,12 +143,12 @@ class GiftingFragment : Fragment() {
 
         binding.tvGiftPreviewTitle.text = service.name
         binding.tvGiftPreviewDesc.text = salon?.name ?: ""
-        binding.tvGiftPreviewValue.text = "$${service.price}"
+        binding.tvGiftPreviewValue.text = "PKR ${service.price.toInt()}"
         binding.tvGiftPreviewDuration.text = "${service.duration_minutes} min"
         binding.tvGiftServiceName.text = service.name
-        binding.tvGiftServicePrice.text = "$${service.price}"
-        binding.tvGiftTotal.text = "$${service.price}"
-        binding.btnSendGift.text = "Send Gift · $${service.price}"
+        binding.tvGiftServicePrice.text = "PKR ${service.price.toInt()}"
+        binding.tvGiftTotal.text = "PKR ${service.price.toInt()}"
+        binding.btnSendGift.text = buildSendLabel()
     }
 
     private fun buildSendLabel(): String {
@@ -169,54 +159,70 @@ class GiftingFragment : Fragment() {
 
     private fun handleSendGift() {
         val email = binding.etRecipientName.text?.toString()?.trim().orEmpty()
-        val currentUserEmail = viewModel.getCurrentUserEmail()
+        val message = binding.etGiftMessage.text?.toString()?.trim().orEmpty()
+        val salon = salons.getOrNull(selectedSalonIndex)
+        val service = services.getOrNull(selectedServiceIndex)
 
         if (email.isBlank()) {
-            Toast.makeText(requireContext(), "Please enter recipient's email.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Please enter recipient's email.", Toast.LENGTH_SHORT)
+                .show()
             return
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(requireContext(), "Please enter a valid email address.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Please enter a valid email address.",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
-        if (email.lowercase() == currentUserEmail?.lowercase()) {
-            Toast.makeText(requireContext(), "You cannot send a gift to yourself.", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (services.isEmpty()) {
-            Toast.makeText(requireContext(), "Please select a service first.", Toast.LENGTH_SHORT).show()
+        if (salon == null || service == null) {
+            Toast.makeText(
+                requireContext(),
+                "Please select a salon and service first.",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
         binding.btnSendGift.isEnabled = false
         binding.btnSendGift.text = "Verifying..."
 
-        viewModel.checkUserExistsByEmail(email) { exists ->
-            requireActivity().runOnUiThread {
-                if (!exists) {
-                    binding.btnSendGift.isEnabled = true
-                    binding.btnSendGift.text = buildSendLabel()
-                    Toast.makeText(requireContext(), "No Lumeire account found for $email.", Toast.LENGTH_SHORT).show()
-                    return@runOnUiThread
+        lifecycleScope.launch {
+            try {
+                val currentUserEmail = ApiClient.authService.getMe().email
+                if (email.equals(currentUserEmail, ignoreCase = true)) {
+                    Toast.makeText(
+                        requireContext(),
+                        "You cannot send a gift to yourself",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    resetSend()
+                    return@launch
                 }
-
-                val service = services[selectedServiceIndex]
-                val salon = salons.getOrNull(selectedSalonIndex)
-
-                DummyContent.myGiftCards.add(
-                    GiftCard(
-                        id = DummyContent.myGiftCards.size + 1,
-                        salonId = 1,
-                        salonName = salon?.name ?: "Lumeire Salon",
-                        amount = service.price.toInt(),
-                        isUsed = false
-                    )
+                val exists = ApiClient.bookingApiService.checkUser(email).exists
+                if (!exists) {
+                    Toast.makeText(
+                        requireContext(),
+                        "No Lumeire account found for $email.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    resetSend()
+                    return@launch
+                }
+                val occasionLabel = occasionChips.getOrNull(selectedOccasionIndex)?.text?.toString()
+                ApiClient.bookingApiService.sendGift(
+                    GiftCardCreateRequest(
+                        email,
+                        salon.id,
+                        service.id,
+                        occasionLabel,
+                        message.ifBlank { null })
                 )
-
                 binding.btnSendGift.text = "✓ Gift Sent!"
                 binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_green)
-                Toast.makeText(requireContext(), "Gift card sent to $email!", Toast.LENGTH_SHORT).show()
-
+                Toast.makeText(requireContext(), "Gift card sent to $email!", Toast.LENGTH_SHORT)
+                    .show()
                 binding.btnSendGift.postDelayed({
                     if (_binding != null) {
                         updatePreview()
@@ -224,12 +230,22 @@ class GiftingFragment : Fragment() {
                         binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_gold)
                     }
                 }, 2200L)
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    "Failed tp send gift: ${toMessage(e)}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                resetSend()
             }
         }
     }
 
 
-
+    private fun resetSend() {
+        binding.btnSendGift.isEnabled = true
+        binding.btnSendGift.text = buildSendLabel()
+    }
     private fun makeChip(label: String, selected: Boolean): TextView {
         return TextView(requireContext()).apply {
             text = label
@@ -262,7 +278,24 @@ class GiftingFragment : Fragment() {
             chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
         }
     }
+private fun toMessage(e: Exception) : String {
+    var message = "Something went wrong. Please try again"
+    when(e) {
 
+        is HttpException -> {
+            val code =e.code()
+            when(code) {
+                401 -> message = "Please login again"
+                404 -> message = "Not found"
+                in 500..599 -> "Server is down. Try again in a while"
+                else -> message = "Something went wrong. $code"
+            }
+        }
+
+        is IOException -> message = "Could not connect. Check your internet conenction."
+    }
+    return message
+}
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
