@@ -1,5 +1,6 @@
 package com.lumeire.app
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -28,6 +29,10 @@ class ProfileFragment : Fragment() {
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { viewModel.uploadAvatar(requireContext(), it) }
+    }
+    private val editProfileLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result->
+        if(result.resultCode == Activity.RESULT_OK)
+            viewModel.refresh()
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -87,7 +92,12 @@ class ProfileFragment : Fragment() {
             }
         }
         binding.rowProfileEdit.setOnClickListener {
-            //edit user details
+            val current = viewModel.profile.value
+            val intent = Intent(requireContext(), EditProfileActivity::class.java)
+            intent.putExtra(EditProfileActivity.FULL_NAME, current?.full_name ?: "")
+            intent.putExtra(EditProfileActivity.PHONE, current?.phone ?: "")
+            intent.putExtra(EditProfileActivity.DOB, current?.data_of_birth ?: "")
+            editProfileLauncher.launch(intent)
         }
         binding.rowProfileGifts.setOnClickListener {
             val myCards = DummyContent.myGiftCards.filter { !it.isUsed }
