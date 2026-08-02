@@ -7,7 +7,7 @@ from schemas import BookingCreateRequest, BookingResponse, SalonResponse, Servic
 
 from auth import get_current_user
 
-router = APIRouter(prefix="/bookings")
+router = APIRouter()
 
 @router.get("/salons", response_model=List[SalonResponse])
 def list_salons(db: Session = Depends(get_db)):
@@ -52,7 +52,11 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
     total_amount = amount_due
     )
     db.add(booking)
-    db.commit()
+    db.flush()
+    if gift_card:
+        gift_card.is_used = True
+        gift.redeemed_booking_id = booking.id
+
     db.refresh(booking)
     return booking
 
@@ -67,6 +71,10 @@ def cancel_booking(booking_id: str, db: Session = Depends(get_db), current_user:
         raise HTTPException(status_code=404, detail="Booking Not found")
     if booking.status == "Cancelled":
         raise HTTPException(status_code=400, detail="Booking is already cancelled")
+    redeemed_gift = db.query(GiftCard).filter(GiftCard.redeemed_booking_id == booking.id).first()
+    if redeemed_gift:
+        redeemed_gift.is_used = False
+        redeemed_gift.redeemed_booking_id = None
 
     booking.status = "Cancelled"
     db.commit()
