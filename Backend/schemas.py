@@ -120,6 +120,7 @@ class GiftCardCreateRequest(BaseModel):
 class GiftCardResponse(BaseModel):
     id: str
     salon_id: str
+    salon_name: str
     service_id: Optional[str] = None
     amount: float
     currency: str = "USD"

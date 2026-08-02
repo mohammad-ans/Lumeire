@@ -100,16 +100,22 @@ class ProfileFragment : Fragment() {
             editProfileLauncher.launch(intent)
         }
         binding.rowProfileGifts.setOnClickListener {
-            val myCards = DummyContent.myGiftCards.filter { !it.isUsed }
-            if (myCards.isEmpty()) {
-                Toast.makeText(requireContext(), "You have no active gift cards.", Toast.LENGTH_SHORT).show()
-            } else {
-                val cardStrings = myCards.map { "PKR ${it.amount} at ${it.salonName}" }.toTypedArray()
-                AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.my_gift_cards)
-                    .setItems(cardStrings, null)
-                    .setPositiveButton("OK", null)
-                    .show()
+            viewModel.fetchGiftCards {giftCards ->
+                if(!isAdded)
+                    return@fetchGiftCards
+                if(giftCards.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "You have no active gift cards",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                else {
+                    val cardStrings = giftCards.map {"PKR ${it.amount.toInt()}" }.toTypedArray()
+                    AlertDialog.Builder(requireContext()).setTitle(R.string.my_gift_cards)
+                        .setItems(cardStrings, null)
+                        .setPositiveButton("OK", null).show()
+                }
             }
         }
 

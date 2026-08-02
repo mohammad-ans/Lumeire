@@ -64,14 +64,14 @@ data class ProfileResponse(
     val email: String,
     val full_name: String? = null,
     val phone: String? = null,
-    val data_of_birth: String? = null
+    val data_of_birth: String? = null,
     val reward_points: Int = 0,
     val fcm_token: String? = null,
     val avatar_url: String? = null,
-    val total_bookings: Int = 0
-    val loyalty_tier: String = "Bronze"
-    val next_tier: String? = null
-    val points_next_tier: Int? = null
+    val total_bookings: Int = 0,
+    val loyalty_tier: String = "Bronze",
+    val next_tier: String? = null,
+    val points_next_tier: Int? = null,
     val tier_progress: Double = 0.0
 )
 
@@ -95,7 +95,7 @@ data class GiftCard(
     val sender_id: String,
     val receiver_id: String,
     val is_used: Boolean,
-    val created_at, String
+    val created_at: String
 )
 
 @Serializable
@@ -113,7 +113,7 @@ data class GiftCardCreateRequest(
     val salon_id: String,
     val service_id: String? = null,
     val occasion: String? = null,
-    val message = String? = null
+    val message: String? = null
 )
 
 @Serializable
