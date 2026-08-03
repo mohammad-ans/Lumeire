@@ -102,6 +102,7 @@ class BookingResponse(BaseModel):
     appointment_time: datetime
     status: str
     total_amount: float
+    payment_status: str
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

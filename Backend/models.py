@@ -94,6 +94,7 @@ class Booking(Base):
     status = Column(String, default="Upcoming")
     total_amount = Column(Float, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    payment_status = Column(String, default="unpaid")
 
     user = relationship("User", back_populates="bookings")
     salon = relationship("Salon", back_populates="bookings")

@@ -13,5 +13,6 @@ data class Booking(
     val appointment_time: String,
     val status: String,
     val total_amount: Double,
+    val payment_status: String,
     val created_at: String
 )

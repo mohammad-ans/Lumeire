@@ -1,48 +1,55 @@
 package com.lumeire.app
 
+import android.annotation.SuppressLint
 import kotlinx.serialization.Serializable
 
-
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class SignUp(
     val email: String,
     val password: String,
     val full_name: String
 )
-
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class SignIn(
     val email: String,
     val password: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class GoogleAuth(
     val id_token: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class Otp(
     val email: String,
     val otp_code: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ResendOtp(
     val email: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class TokenResponse(
     val access_token: String,
     val token_type: String = "bearer"
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class MessageResponse(
     val message: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class UserResponse(
     val id: String,
@@ -52,12 +59,13 @@ data class UserResponse(
     val is_verified: Boolean
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ErrorResponse(
     val detail: String
 )
 
-
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ProfileResponse(
     val id: String,
@@ -75,6 +83,7 @@ data class ProfileResponse(
     val tier_progress: Double = 0.0
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class ProfileUpdateRequest(
     val full_name: String? = null,
@@ -83,6 +92,7 @@ data class ProfileUpdateRequest(
     val fcm_token: String? = null
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class GiftCard(
     val id: String,
@@ -98,6 +108,7 @@ data class GiftCard(
     val created_at: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class BookingCreateRequest(
     val salon_id: String,
@@ -107,14 +118,17 @@ data class BookingCreateRequest(
     val gift_card_id: String? = null
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class GiftCardCreateRequest(
     val receiver_email: String,
     val salon_id: String,
     val service_id: String? = null,
+    val amount: Double? = null,
     val occasion: String? = null,
     val message: String? = null
 )
 
+@SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class EmailExistsResponse(val exists: Boolean)

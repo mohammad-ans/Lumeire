@@ -100,7 +100,7 @@ class BookingsFragment : Fragment() {
 
         tvName.text = "Booking #${booking.id.takeLast(4)}"
         tvCategory.text = "Salon ID: ${booking.salon_id}"
-        tvMeta.text = "Status: ${booking.status}\nTime: ${booking.appointment_time}"
+        tvMeta.text = "Status: ${booking.status}\nPayment: ${booking.payment_status}\nTime: ${booking.appointment_time}"
 
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         params.setMargins(0, 0, 0, 14)
