@@ -12,10 +12,8 @@ import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.messaging.FirebaseMessaging
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.bottomNavigation.visibility = View.GONE
         askNotificationPermission()
 
         checkSessionAndRoute()
@@ -52,22 +51,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkSessionAndRoute() {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             try {
-                SupabaseModule.client.auth.loadFromStorage()
-                val session = SupabaseModule.client.auth.currentSessionOrNull()
-
-                withContext(Dispatchers.Main) {
-                    if (session != null) {
-                        // Authenticated — show the app
-                        binding.bottomNavigation.visibility = View.VISIBLE
-                        showTab(R.id.nav_home, HomeFragment())
-                        fetchAndSaveFCMToken()
-                    } else {
-                        // No session — go to login
-                        startActivity(Intent(this@MainActivity, LoginActivity::class.java))
-                        finish() // prevent back-navigating to a blank MainActivity
-                    }
+                val loggedIn = ApiClient.isLoggedIn()
+                if(loggedIn){
+                    binding.bottomNavigation.visibility = View.VISIBLE
+                    showTab(R.id.nav_home, HomeFragment())
+                    fetchAndSaveFCMToken()
+                }
+                else{
+                    startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                    finish()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -78,7 +72,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     fun openBookings() {
         showTab(R.id.nav_bookings, BookingsFragment())
@@ -119,18 +112,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             val token = task.result
-            CoroutineScope(Dispatchers.IO).launch {
+            lifecycleScope.launch {
                 try {
-                    val session = SupabaseModule.client.auth.currentSessionOrNull()
-                    session?.user?.id?.let { userId ->
-                        SupabaseModule.client.postgrest["profiles"]
-                            .update(FcmTokenUpdate(token)) {
-                                filter {
-                                    eq("id", userId)
-                                }
-                            }
+                    ApiClient.apiService.updateProfile(ProfileUpdateRequest(fcm_token = token))
                     }
-                } catch (e: Exception) {
+                catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
