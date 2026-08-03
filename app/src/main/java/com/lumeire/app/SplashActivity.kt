@@ -10,8 +10,6 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
 import kotlinx.coroutines.launch
 import android.widget.Toast
 import com.lumeire.app.databinding.ActivitySplashBinding
@@ -34,23 +32,27 @@ class SplashActivity : AppCompatActivity() {
     }
         private fun checkAuthAndNavigate() {
             lifecycleScope.launch {
-                try {
-                    SupabaseModule.client.auth.loadFromStorage() // now actually loads from DataStore
-                    val session = SupabaseModule.client.auth.currentSessionOrNull()
-                    if (session != null) {
-                        showBiometricPrompt() //  biometric gate for returning users
-                    } else {
-                        startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))
-                        finish()
-                    }
-                } catch (e: Exception) {
+                val logged = ApiClient.isLoggedIn()
+                if(logged)
+                    showBiometricPrompt()
+                else{
                     startActivity(Intent(this@SplashActivity, OnboardingActivity::class.java))
                     finish()
                 }
-            }
         }
+    }
 
+    private fun checkBiometrics() : Boolean{
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+
+        return BiometricManager.from(this).canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+    }
     private fun showBiometricPrompt() {
+        if(!checkBiometrics()) {
+            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+            finish()
+            return
+        }
         val executor = ContextCompat.getMainExecutor(this)
         val biometricPrompt = BiometricPrompt(this, executor,
             object : BiometricPrompt.AuthenticationCallback() {
@@ -115,7 +117,6 @@ class SplashActivity : AppCompatActivity() {
             .setStartDelay(1500)
             .start()
 
-        // Simple progress bar animation
         binding.progressBarFill.post {
             val width = binding.loadingContainer.width
             binding.progressBarFill.layoutParams.width = 0
