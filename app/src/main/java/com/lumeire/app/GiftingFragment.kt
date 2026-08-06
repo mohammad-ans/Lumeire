@@ -216,7 +216,7 @@ class GiftingFragment : Fragment() {
                         email,
                         salon.id,
                         service.id,
-                        occasionLabel,
+                        binding.tvGiftServicePrice.toString().toDouble() ,
                         message.ifBlank { null })
                 )
                 binding.btnSendGift.text = "✓ Gift Sent!"

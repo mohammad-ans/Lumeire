@@ -29,10 +29,10 @@ class OtpActivity : AppCompatActivity() {
             finish()
             return
         }
-        binding.tvEmailLabel.text = getString(R.string.otp_sent_to, email)
+        binding.tvSubtitle.text = getString(R.string.otp_sent_to, email)
         binding.btnVerify.setOnClickListener {
             val code = binding.etOtpCode.text.toString().trim()
-            if(code.length < 6){
+            if(code.length != 6){
                 Toast.makeText(this, "Enter the code from your email", Toast.LENGTH_LONG).show()
             }
             else{
@@ -45,8 +45,6 @@ class OtpActivity : AppCompatActivity() {
                 binding.btnResend.isEnabled = true
                 val msg = if (success) "Code resent" else (error ?: "Could not resend code")
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-
-
             }
         }
 
