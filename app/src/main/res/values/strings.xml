@@ -109,4 +109,9 @@
     <string name="dob_hint">Data of birth</string>
     <string name="save">Save</string>
     <string name="saving">Saving…</string>
+    <string name="forgot_title">Forgot Password</string>
+    <string name="forgot_subtitle">Enter email to find your account</string>
+    <string name="email_hint">Email address</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="send_code">Send code</string>
 </resources>
