@@ -289,7 +289,7 @@
                     android:text="Congrats"
                     android:textColor="@color/text_medium" />
             </LinearLayout>
-            <!-- Salon Selector -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -312,7 +312,6 @@
                     android:orientation="horizontal" />
             </HorizontalScrollView>
 
-            <!-- Service Selector -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -334,6 +333,26 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal" />
             </HorizontalScrollView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Or send a custom amount instead"
+                android:textColor="@color/text_medium"
+                android:textSize="12sp"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/custom_amount"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_input_field"
+                android:hint="Custom amount "
+                android:inputType="numberDecimal"
+                android:padding="16dp"
+                android:textColor="@color/text_dark"
+                android:textColorHint="@color/text_light"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

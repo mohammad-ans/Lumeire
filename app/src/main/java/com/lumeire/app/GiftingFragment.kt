@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -54,6 +55,13 @@ class GiftingFragment : Fragment() {
 
         binding.tvPaymentReference.text = "LUM-${System.currentTimeMillis().toString().takeLast(6)}"
 
+        binding.customAmount.doAfterTextChanged {
+            if(getCustomAmount() != null){
+                selectedServiceIndex = -1
+                refreshServiceChips()
+            }
+            updatePreview()
+        }
         lifecycleScope.launch {
             viewModel.salons.collect { salonList ->
                 if (salonList.isNotEmpty()) {
@@ -66,6 +74,13 @@ class GiftingFragment : Fragment() {
         binding.btnSendGift.setOnClickListener { handleSendGift() }
     }
 
+    private fun getCustomAmount(): Double?{
+        val raw = binding.customAmount.text?.toString()?.trim().orEmpty()
+        if(raw.isBlank())
+            return null
+        val value = raw.toDoubleOrNull() ?: return null
+        return if (value > 0) value else null
+    }
     private fun buildSalonChips() {
         val container = binding.llSalonChips
         container.removeAllViews()
@@ -80,7 +95,8 @@ class GiftingFragment : Fragment() {
             container.addView(chip)
         }
 
-        if (salons.isNotEmpty()) fetchServicesForSalon(salons[selectedSalonIndex].id)
+        if (salons.isNotEmpty())
+            fetchServicesForSalon(salons[selectedSalonIndex].id)
     }
 
     private fun refreshSalonChips() {
@@ -137,10 +153,21 @@ class GiftingFragment : Fragment() {
     }
 
     private fun updatePreview() {
-        if (services.isEmpty()) return
-        val service = services[selectedServiceIndex]
         val salon = salons.getOrNull(selectedSalonIndex)
+        val customAmount = getCustomAmount()
+        if(customAmount != null){
+            binding.tvGiftPreviewTitle.text = "Custom Gift Amount"
+            binding.tvGiftPreviewDesc.text = salon?.name ?: ""
+            binding.tvGiftPreviewValue.text = "PKR ${customAmount.toInt()}"
+            binding.tvGiftPreviewDuration.text = ""
+            binding.tvGiftServiceName.text = "Custom Amount"
+            binding.tvGiftServicePrice.text = "PKR ${customAmount.toInt()}"
+            binding.tvGiftTotal.text = "PKR ${customAmount.toInt()}"
+            binding.btnSendGift.text = buildSendLabel()
+            return
+        }
 
+        val service = services[selectedServiceIndex]
         binding.tvGiftPreviewTitle.text = service.name
         binding.tvGiftPreviewDesc.text = salon?.name ?: ""
         binding.tvGiftPreviewValue.text = "PKR ${service.price.toInt()}"
@@ -152,7 +179,12 @@ class GiftingFragment : Fragment() {
     }
 
     private fun buildSendLabel(): String {
-        if (services.isEmpty()) return getString(R.string.send_gift)
+        val amount = getCustomAmount()
+        if(amount != null)
+            return "Send Gift · ${amount.toInt()}"
+        if (services.isEmpty())
+            return getString(R.string.send_gift)
+
         val service = services[selectedServiceIndex]
         return "Send Gift · $${service.price}"
     }
@@ -161,28 +193,25 @@ class GiftingFragment : Fragment() {
         val email = binding.etRecipientName.text?.toString()?.trim().orEmpty()
         val message = binding.etGiftMessage.text?.toString()?.trim().orEmpty()
         val salon = salons.getOrNull(selectedSalonIndex)
-        val service = services.getOrNull(selectedServiceIndex)
+        val amount = getCustomAmount()
+        val service = if(amount == null) services.getOrNull(selectedServiceIndex) else null
+
 
         if (email.isBlank()) {
-            Toast.makeText(requireContext(), "Please enter recipient's email.", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireContext(), "Please enter recipient's email.", Toast.LENGTH_SHORT).show()
             return
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(
-                requireContext(),
-                "Please enter a valid email address.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(requireContext(),"Please enter a valid email address.",Toast.LENGTH_SHORT).show()
             return
         }
-        if (salon == null || service == null) {
-            Toast.makeText(
-                requireContext(),
-                "Please select a salon and service first.",
-                Toast.LENGTH_SHORT
-            ).show()
+
+        if (salon == null) {
+            Toast.makeText(requireContext(),"Please select a salon first",Toast.LENGTH_SHORT).show()
             return
+        }
+        if(amount == null && service == null){
+            Toast.makeText(requireContext(),"Please select a service or enter a custom amount.",Toast.LENGTH_SHORT).show()
         }
 
         binding.btnSendGift.isEnabled = false
@@ -192,31 +221,25 @@ class GiftingFragment : Fragment() {
             try {
                 val currentUserEmail = ApiClient.authService.getMe().email
                 if (email.equals(currentUserEmail, ignoreCase = true)) {
-                    Toast.makeText(
-                        requireContext(),
-                        "You cannot send a gift to yourself",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(requireContext(),"You cannot send a gift to yourself",Toast.LENGTH_SHORT).show()
                     resetSend()
                     return@launch
                 }
                 val exists = ApiClient.bookingApiService.checkUser(email).exists
                 if (!exists) {
-                    Toast.makeText(
-                        requireContext(),
-                        "No Lumeire account found for $email.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(requireContext(),"No Lumeire account found for $email.",Toast.LENGTH_SHORT).show()
                     resetSend()
                     return@launch
                 }
                 val occasionLabel = occasionChips.getOrNull(selectedOccasionIndex)?.text?.toString()
+
                 ApiClient.bookingApiService.sendGift(
                     GiftCardCreateRequest(
                         email,
                         salon.id,
-                        service.id,
-                        binding.tvGiftServicePrice.toString().toDouble() ,
+                        service?.id,
+                        amount,
+                        message.ifBlank { null},
                         message.ifBlank { null })
                 )
                 binding.btnSendGift.text = "✓ Gift Sent!"
@@ -225,17 +248,16 @@ class GiftingFragment : Fragment() {
                     .show()
                 binding.btnSendGift.postDelayed({
                     if (_binding != null) {
+                        binding.etRecipientName.setText("")
+                        binding.etGiftMessage.setText("")
+                        binding.customAmount.setText("")
                         updatePreview()
                         binding.btnSendGift.isEnabled = true
                         binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_gold)
                     }
                 }, 2200L)
             } catch (e: Exception) {
-                Toast.makeText(
-                    requireContext(),
-                    "Failed tp send gift: ${toMessage(e)}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(requireContext(),"Failed tp send gift: ${toMessage(e)}",Toast.LENGTH_SHORT).show()
                 resetSend()
             }
         }
@@ -268,7 +290,8 @@ class GiftingFragment : Fragment() {
     }
 
     private fun ViewGroup.forEachIndexed(action: (Int, View) -> Unit) {
-        for (i in 0 until childCount) action(i, getChildAt(i))
+        for (i in 0 until childCount)
+            action(i, getChildAt(i))
     }
 
     private fun updateOccasionSelection(chips: List<TextView>) {
@@ -283,7 +306,7 @@ private fun toMessage(e: Exception) : String {
     when(e) {
 
         is HttpException -> {
-            val code =e.code()
+            val code = e.code()
             when(code) {
                 401 -> message = "Please login again"
                 404 -> message = "Not found"
