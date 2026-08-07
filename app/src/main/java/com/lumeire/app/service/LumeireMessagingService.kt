@@ -9,66 +9,85 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.lumeire.app.ApiClient
 import com.lumeire.app.MainActivity
+import com.lumeire.app.ProfileUpdateRequest
 import com.lumeire.app.R
-import com.lumeire.app.di.SupabaseModule
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-
-@Serializable
-data class FcmTokenUpdate(val fcm_token: String)
+import java.util.concurrent.atomic.AtomicInteger
 
 class LumeireMessagingService : FirebaseMessagingService() {
 
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val notificationCounter = AtomicInteger(0)
+
+    companion object{
+        private const val CHANNEL_ID = "lumeire_notifications"
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // Whenever the token is refreshed, update it in Supabase
-        updateTokenInSupabase(token)
+        updateTokenOnServer(token)
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        // Handle the incoming message
         remoteMessage.notification?.let {
             showNotification(it.title ?: "Lumiere", it.body ?: "")
         }
     }
 
-    private fun updateTokenInSupabase(token: String) {
-        CoroutineScope(Dispatchers.IO).launch {
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
+    }
+
+    private fun updateTokenOnServer(token: String) {
+        serviceScope.launch {
             try {
-                val session = SupabaseModule.client.auth.currentSessionOrNull()
-                session?.user?.id?.let { userId ->
-                    SupabaseModule.client.postgrest["profiles"]
-                        .update(FcmTokenUpdate(token)) {
-                            filter {
-                                eq("id", userId)
-                            }
-                        }
-                }
-            } catch (e: Exception) {
+                if(!ApiClient.isLoggedIn())
+                    return@launch
+                ApiClient.apiService.updateProfile(ProfileUpdateRequest(token))
+            }
+            catch (e: Exception){
                 e.printStackTrace()
             }
         }
     }
 
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Lumiere Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
     private fun showNotification(title: String, body: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         }
-        
+        val notificationId = notificationCounter.incrementAndGet()
         val pendingIntent = PendingIntent.getActivity(
             this, 0, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val channelId = "lumeire_notifications"
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_logo)
             .setContentTitle(title)
             .setContentText(body)
@@ -76,17 +95,6 @@ class LumeireMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Create the NotificationChannel for Android 8.0 and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Lumiere Notifications",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationManager.createNotificationChannel(channel)
-        }
-
         notificationManager.notify(0, notificationBuilder.build())
     }
 }
