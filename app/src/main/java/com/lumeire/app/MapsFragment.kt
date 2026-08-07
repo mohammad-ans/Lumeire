@@ -33,6 +33,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.LocationServices
+import com.lumeire.app.data.model.Salon
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -44,7 +45,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private var googleMap: GoogleMap? = null
     private var userLocation: LatLng? = null
 
-    // Add this launcher at the top with other fields
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -85,12 +85,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
 
-//        rows = listOf(
-//            SalonRow(DummyContent.salons[0], binding.rowSalon1, null, binding.ivSalon1, binding.tvSalon1Name, binding.tvSalon1Category, binding.tvSalon1Meta, binding.tvSalon1Price),
-//            SalonRow(DummyContent.salons[1], binding.rowSalon2, null, binding.ivSalon2, binding.tvSalon2Name, binding.tvSalon2Category, binding.tvSalon2Meta, binding.tvSalon2Price),
-//            SalonRow(DummyContent.salons[2], binding.rowSalon3, null, binding.ivSalon3, binding.tvSalon3Name, binding.tvSalon3Category, binding.tvSalon3Meta, binding.tvSalon3Price),
-//            SalonRow(DummyContent.salons[3], binding.rowSalon4, null, binding.ivSalon4, binding.tvSalon4Name, binding.tvSalon4Category, binding.tvSalon4Meta, binding.tvSalon4Price)
-//        )
 
         lifecycleScope.launch {
             viewModel.salons.collect { salonList ->
@@ -172,14 +166,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             val salon = Salon(
                 id = salonTemp.id,
                 name = salonTemp.name,
-                category = "Hair and Makeup",
                 rating = salonTemp.rating,
-                reviews = salonTemp.review_count,
-                distance = distanceStr,
-                price = "",
+                review_count = salonTemp.review_count,
                 address = salonTemp.address,
-                openUntil = "8 PM",
-                imageUrl = "...",
+                closeTime = "8 PM",
+                image_url = "...",
                 latitude = salonTemp.latitude,
                 longitude = salonTemp.longitude
             )
@@ -248,7 +239,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             val salonLat = row.salon.latitude ?: return@forEach
             val salonLng = row.salon.longitude ?: return@forEach
             val distanceKm = calculateDistance(origin.latitude, origin.longitude, salonLat, salonLng)
-            row.meta.text = "${"%.1f".format(distanceKm)} km · ${getString(R.string.open_until, row.salon.openUntil)}"
+            row.meta.text = "${"%.1f".format(distanceKm)} km · ${getString(R.string.open_until, row.salon.closeTime)}"
         }
     }
 

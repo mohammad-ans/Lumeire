@@ -114,7 +114,7 @@ class GiftCardCreateRequest(BaseModel):
     receiver_email: EmailStr
     salon_id: str
     service_id: Optional[str] = None
-    amount: Optional[str] = None
+    amount: Optional[float] = None
     occasion: Optional[str] = None
     message: Optional[str] = None
 

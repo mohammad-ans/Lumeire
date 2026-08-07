@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
 from database import get_db
@@ -10,8 +10,20 @@ from auth import get_current_user
 router = APIRouter()
 
 @router.get("/salons", response_model=List[SalonResponse])
-def list_salons(db: Session = Depends(get_db)):
-    return db.query(Salon).all()
+def list_salons(category: Optional[str] = Query(None), search: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    query = db.query(Salon)
+    if category:
+        query = query.filter(Salon.category.ilike(f"%{category}%"))
+    if search:
+        query = query.filter(Salon.name.ilike(f"%{search}%"))
+    return query.all()
+
+@router.get("/salons/{salon_id}", response_model=SalonResponse)
+def gsalon(salon_id: str, db: Session = Depends(get_db)):
+    salon = db.query(Salon).filter(Salon.id == salon_id).first()
+    if not salon:
+        raise HTTPException(status_code=404, detail="Salon Not found")
+    return salon
 
 @router.get("/salons/{salon_id}/services", response_model=List[ServiceResponse])
 def list_services(salon_id: str, db: Session = Depends(get_db)):
