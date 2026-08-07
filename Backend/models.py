@@ -105,7 +105,7 @@ class GiftCard(Base):
 
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
     salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
-    service_id = Column(UUID(as_uuid=False), ForeignKey("services.id"), nullable=False)
+    service_id = Column(UUID(as_uuid=False), ForeignKey("services.id"), nullable=True)
     amount = Column(Float, nullable=False)
     currency = Column(String, default="USD")
     occasion = Column(String)
