@@ -15,8 +15,10 @@ import retrofit2.http.Query
 
 interface BookingApiService {
     @GET("salons")
-    suspend fun getSalons(): List<Salon>
+    suspend fun getSalons(@Query("category") category: String? = null, @Query("search") search: String? = null ): List<Salon>
 
+    @GET("salons/{salon_id}")
+    suspend fun getSalon(@Path("salon_id") salonId: String) : Salon
     @GET("salons/{salon_id}/services")
     suspend fun getServices(@Path("salonId") salonId: String): List<Service>
 

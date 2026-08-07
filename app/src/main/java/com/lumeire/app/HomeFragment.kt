@@ -15,12 +15,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.lumeire.app.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
-import android.util.Log
 import android.widget.LinearLayout
 import android.view.Gravity
 import androidx.core.widget.doAfterTextChanged
-import com.google.android.gms.common.api.Api
-import kotlinx.serialization.json.jsonPrimitive
 
 class HomeFragment : Fragment() {
 

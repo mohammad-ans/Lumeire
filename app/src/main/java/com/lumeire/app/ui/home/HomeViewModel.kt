@@ -64,4 +64,26 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
+    fun checkUserExists(email: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val result = ApiClient.bookingApiService.checkUser(email)
+                onResult(result.exists)
+            }
+            catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
+    fun fetchUserEmail(onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val me = ApiClient.authService.getMe()
+                onResult(me.email)
+            }
+            catch (e: Exception) {
+                onResult(null)
+            }
+        }
+    }
 }

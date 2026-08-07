@@ -27,13 +27,17 @@ import com.lumeire.app.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
 import kotlin.getValue
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.LocationServices
 import com.lumeire.app.data.model.Salon
+import androidx.core.net.toUri
+import androidx.core.view.isVisible
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -95,42 +99,54 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
 
         binding.btnMapLocate.setOnClickListener {
-            Toast.makeText(requireContext(), "Location is mocked around the city center.", Toast.LENGTH_SHORT).show()
+            val map = googleMap
+            val location = userLocation
+            if(map != null && location != null){
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
+            }
+            else{
+                Toast.makeText(requireContext(), "Still locating you...", Toast.LENGTH_SHORT).show()
+                fetchUserLocation()
+            }
         }
         binding.btnMapCall.setOnClickListener {
-            Toast.makeText(requireContext(), "Calling is not connected in this dummy app.", Toast.LENGTH_SHORT).show()
+            val selected = viewModel.salons.value.firstOrNull {it.id == selectedSalonId}
+            val phone = selected?.phone
+            if(phone.isNullOrBlank())
+                Toast.makeText(requireContext(), "No phone number listed for this salon.", Toast.LENGTH_SHORT).show()
+            else{
+                val intent = Intent(Intent.ACTION_CALL, "tel:$phone".toUri())
+                startActivity(intent)
+            }
         }
-        binding.btnMapNavigate.setOnClickListener {
-            binding.btnMapNavigate.setOnClickListener {
-                val selected = rows.firstOrNull { it.salon.id == selectedSalonId }
 
-                when {
-                    selected == null -> {
-                        Toast.makeText(requireContext(), "No salon selected.", Toast.LENGTH_SHORT).show()
-                    }
-                    selected.salon.latitude == null || selected.salon.longitude == null -> {
-                        Toast.makeText(requireContext(), "Location not available for ${selected.salon.name}.", Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {
-                        val gmmIntentUri = android.net.Uri.parse(
-                            "geo:${selected.salon.latitude},${selected.salon.longitude}?q=${android.net.Uri.encode(selected.salon.name)}"
-                        )
-                        val mapIntent = android.content.Intent(android.content.Intent.ACTION_VIEW, gmmIntentUri)
-                        mapIntent.setPackage("com.google.android.apps.maps")
-                        if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
-                            startActivity(mapIntent)
-                        } else {
-                            Toast.makeText(requireContext(), "Google Maps is not installed.", Toast.LENGTH_SHORT).show()
-                        }
+        binding.btnMapNavigate.setOnClickListener {
+            val selected = rows.firstOrNull { it.salon.id == selectedSalonId }
+
+            when {
+                selected == null -> {
+                    Toast.makeText(requireContext(), "No salon selected.", Toast.LENGTH_SHORT).show()
+                }
+                selected.salon.latitude == null || selected.salon.longitude == null -> {
+                    Toast.makeText(requireContext(), "Location not available for ${selected.salon.name}.", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    val gmmIntentUri =
+                        "geo:${selected.salon.latitude},${selected.salon.longitude}?q=${Uri.encode(selected.salon.name)}".toUri()
+                    val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                    mapIntent.setPackage("com.google.android.apps.maps")
+                    if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
+                        startActivity(mapIntent)
+                    } else {
+                        Toast.makeText(requireContext(), "Google Maps is not installed.", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
         binding.etMapSearch.doAfterTextChanged { filterSalons(it?.toString().orEmpty()) }
-
     }
 
-    private fun buildRows(salonList: List<com.lumeire.app.data.model.Salon>): List<SalonRow> {
+    private fun buildRows(salonList: List<Salon>): List<SalonRow> {
         val binding = _binding ?: return emptyList()
         val imageViews = listOf(binding.ivSalon1, binding.ivSalon2, binding.ivSalon3, binding.ivSalon4)
         val rowBindings = listOf(
@@ -140,20 +156,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             Triple(binding.rowSalon4, binding.tvSalon4Name, Triple(binding.tvSalon4Category, binding.tvSalon4Meta, binding.tvSalon4Price))
         )
         val sorted = userLocation?.let { origin ->
-            salonList.sortedWith(compareBy(
-                // nulls go to the end
-                { s -> if (s.latitude == null || s.longitude == null) Double.MAX_VALUE
+            salonList.sortedWith(compareBy{ s ->
+                if (s.latitude == null || s.longitude == null) Double.MAX_VALUE
                 else calculateDistance(origin.latitude, origin.longitude, s.latitude, s.longitude) }
-            ))
+            )
         } ?: salonList
-
-        sorted.take(4).forEach { s ->
-            Log.d("MapsFragment", "Sorted salon: ${s.name} | lat=${s.latitude} lng=${s.longitude} | dist=${
-                userLocation?.let { o ->
-                    "%.1f km".format(calculateDistance(o.latitude, o.longitude, s.latitude ?: 0.0, s.longitude ?: 0.0))
-                } ?: "no location"
-            }")
-        }
 
         return sorted.take(4).mapIndexed { index, salonTemp ->
             val row = rowBindings[index % rowBindings.size]
@@ -166,11 +173,13 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             val salon = Salon(
                 id = salonTemp.id,
                 name = salonTemp.name,
+                category = salonTemp.category ?: "Salon",
                 rating = salonTemp.rating,
                 review_count = salonTemp.review_count,
+                distance=distanceStr,
                 address = salonTemp.address,
-                closeTime = "8 PM",
-                image_url = "...",
+                closeTime = salonTemp.closeTime ?: "Hours not listed",
+                image_url = salonTemp.image_url ?: "",
                 latitude = salonTemp.latitude,
                 longitude = salonTemp.longitude
             )
@@ -180,7 +189,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun applyRows(newRows: List<SalonRow>) {
-        if (newRows.isEmpty()) return  // guard against empty list
+        if (newRows.isEmpty())
+            return
 
         rows = newRows
         rows.forEach { row ->
@@ -231,22 +241,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             }
     }
 
-    private fun refreshRowDistances() {
-        val origin = userLocation ?: return
-        if (!::rows.isInitialized || rows.isEmpty()) return  // add this
-
-        rows.forEach { row ->
-            val salonLat = row.salon.latitude ?: return@forEach
-            val salonLng = row.salon.longitude ?: return@forEach
-            val distanceKm = calculateDistance(origin.latitude, origin.longitude, salonLat, salonLng)
-            row.meta.text = "${"%.1f".format(distanceKm)} km · ${getString(R.string.open_until, row.salon.closeTime)}"
-        }
-    }
-
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val results = FloatArray(1)
         Location.distanceBetween(lat1, lon1, lat2, lon2, results)
-        return (results[0] / 1000.0) // convert meters to km
+        return (results[0] / 1000.0)
     }
 
     override fun onMapReady(map: GoogleMap) {
@@ -273,7 +271,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         var selectedLocation: LatLng? = null
         
         rows.forEach { row ->
-            if (row.card.visibility == View.VISIBLE) {
+            if (row.card.isVisible) {
                 val salon = row.salon
                 val lat = salon.latitude ?: 0.0
                 val lng = salon.longitude ?: 0.0
@@ -301,14 +299,17 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private fun bindRow(row: SalonRow) {
         val salon = row.salon
-        Glide.with(this).load(salon.imageUrl).centerCrop().into(row.image)
+        Glide.with(this).load(salon.image_url).centerCrop().into(row.image)
         row.name.text = salon.name
         row.category.text = salon.category
-        row.meta.text = "${salon.distance} · ${getString(R.string.open_until, salon.openUntil)}"
+        row.meta.text = "${salon.distance} · ${getString(R.string.open_until, salon.closeTime)}"
         row.price.text = salon.price
     }
 
     private fun filterSalons(query: String) {
+        if(!::rows.isInitialized)
+            return
+
         val normalized = query.trim().lowercase()
         var visibleCount = 0
         var firstVisibleId: String? = null
@@ -316,7 +317,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         rows.forEach { row ->
             val visible = normalized.isBlank() ||
                 row.salon.name.lowercase().contains(normalized) ||
-                row.salon.category.lowercase().contains(normalized)
+                row.salon.category?.lowercase()?.contains(normalized) ?: false
 
             row.card.visibility = if (visible) View.VISIBLE else View.GONE
             
@@ -329,15 +330,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         binding.tvMapResultCount.text = "$visibleCount ${getString(R.string.salons_nearby)}"
 
-        if (rows.none { it.salon.id == selectedSalonId && it.card.visibility == View.VISIBLE } && firstVisibleId != null) {
-            updateSelection(firstVisibleId!!)
+        if (rows.none { it.salon.id == selectedSalonId && it.card.isVisible } && firstVisibleId != null) {
+            updateSelection(firstVisibleId)
         } else {
             updateMapMarkers()
         }
     }
 
     private fun updateSelection(salonId: String) {
-        if (salonId.isEmpty() || !::rows.isInitialized || rows.isEmpty()) return
+        if (salonId.isEmpty() || !::rows.isInitialized || rows.isEmpty())
+            return
 
         val selected = rows.firstOrNull { it.salon.id == salonId } ?: return
         selectedSalonId = salonId
@@ -350,12 +352,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         }
 
         Glide.with(this)
-            .load(selected.salon.imageUrl)
+            .load(selected.salon.image_url)
             .centerCrop()
             .into(binding.ivMapHighlight)
         binding.tvMapHighlightName.text = selected.salon.name
         binding.tvMapHighlightMeta.text =
-            "${selected.salon.address} · ${selected.salon.rating} (${selected.salon.reviews})"
+            "${selected.salon.address} · ${selected.salon.rating} (${selected.salon.review_count})"
 
         updateMapMarkers()
     }
