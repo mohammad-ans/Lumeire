@@ -25,7 +25,6 @@ class SplashActivity : AppCompatActivity() {
 
         startAnimations()
 
-        // Navigate to Onboarding after a delay
         Handler(Looper.getMainLooper()).postDelayed({
             checkAuthAndNavigate()
         }, 3000)
