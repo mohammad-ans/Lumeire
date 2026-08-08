@@ -3,15 +3,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from models import GiftCard, Salon, Service, User
-from schemas import EmailExistsResponse, GiftCardCreateRequest, GiftCardResponse
+from schemas import EmailExistResponse, GiftCardCreateRequest, GiftCardResponse
 from auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/user/exists", response_model=EmailExistsResponse)
+@router.get("/user/exists", response_model=EmailExistResponse)
 def check(email: str = Query(...), db: Session = Depends(get_db)):
     exists = db.query(User).filter(User.email == email).first() is not None
-    return EmailExistsResponse(exists=exists)
+    return EmailExistResponse(exists=exists)
 
 @router.post("/gifts", response_model=GiftCardResponse, status_code=201)
 def send_gift(data: GiftCardCreateRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):

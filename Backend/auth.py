@@ -4,7 +4,7 @@ from database import get_db
 from models import User, Profile, PendingUser, PasswordReset
 from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth, MessageResponse, Otp, ResendOtp, ForgotPassword, ResetPassword
 import os
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from dotenv import load_dotenv
 from typing import Optional
 from datetime import datetime, timedelta
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/auth")
 
 
 
-pwd_context = CryptContext(schemas=["bycrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -59,7 +59,7 @@ def generate_otp(length: int = 6) -> str:
     return "".join(secrets.choice("0123456789") for _ in range(length))
 
 @router.post("/signup", response_model=MessageResponse)
-def signup(data: SignUp, db: Session = Depends(get_db)):
+async def signup(data: SignUp, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -67,7 +67,8 @@ def signup(data: SignUp, db: Session = Depends(get_db)):
     expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
     try:
         response = await send_otp(data.email, otp_code)
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
     pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
     if pending:
@@ -79,12 +80,12 @@ def signup(data: SignUp, db: Session = Depends(get_db)):
     else:
         pending = PendingUser(
         email = data.email,
-        name = data.name,
+        name = data.full_name,
         hashed_password = hash_password(data.password),
         otp_code = otp_code,
         otp_expires_at = expires_at
         )
-        db.add(user)
+        db.add(pending)
     db.commit()
     return MessageResponse(message="Verification code sent to your email")
 
@@ -119,7 +120,7 @@ def verify_otp(data: Otp, db : Session = Depends(get_db)):
     return TokenResponse(access_token=create_access_token(user.id))
 
 @router.post("/resend-otp", response_model=MessageResponse)
-def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
+async def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
     pending = db.query(PendingUser).filter(PendingUser.email == data.email).first()
     if not pending:
         raise HTTPException(status_code=404, detail="No pending signup found for this email")
@@ -188,7 +189,7 @@ async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
     otp_code = generate_otp()
     expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
 
-    reset = db.query(PasswordReset).filter(PasswordReset.email === data.email).first()
+    reset = db.query(PasswordReset).filter(PasswordReset.email == data.email).first()
     if reset:
         reset.otp_code = otp_code
         reset.expires_at = expires_at

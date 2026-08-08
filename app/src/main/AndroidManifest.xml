@@ -11,7 +11,9 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Lumeire">
+        android:theme="@style/Theme.Lumeire"
+        android:networkSecurityConfig="@xml/network_config"
+        >
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

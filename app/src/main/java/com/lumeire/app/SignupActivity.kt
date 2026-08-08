@@ -58,7 +58,8 @@ class SignupActivity : AppCompatActivity() {
                     is OtpState.CodeSent -> {
                         binding.btnSignup.isEnabled = true
                         binding.btnSignup.text = getString(R.string.sign_in)
-                        startActivity(Intent(this@SignupActivity, MainActivity::class.java))
+                        startActivity(Intent(this@SignupActivity, OtpActivity::class.java).putExtra(
+                            OtpActivity.EXTRA_EMAIL, state.email))
                         finish()
                     }
                     is OtpState.Error -> {

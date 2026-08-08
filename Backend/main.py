@@ -5,6 +5,7 @@ import models
 import auth
 from profile import router
 import bookings
+import gift
 
 Base.metadata.create_all(bind=engine)
 
@@ -14,9 +15,10 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True
+    allow_credentials=False
 )
 
 app.include_router(auth.router)
 app.include_router(router)
 app.include_router(bookings.router)
+app.include_router(gift.router)
