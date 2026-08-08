@@ -86,6 +86,10 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
 
+        binding.tvForgotPassword.setOnClickListener {
+            startActivity(Intent(this, ForgotPasswordActivity::class.java))
+        }
+
     }
 
     private val googleSignInLauncher =

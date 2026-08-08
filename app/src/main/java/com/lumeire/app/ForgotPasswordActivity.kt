@@ -29,18 +29,18 @@ class ForgotPasswordActivity: AppCompatActivity() {
             if(email.isNotEmpty())
                 viewModel.requestReset(email)
             else
-                Toast.makeText(this, "", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.login_missing_fields, Toast.LENGTH_SHORT).show()
         }
         lifecycleScope.launch {
             viewModel.requestState.collect { state->
                 when(state){
                     is RequestResetState.Loading -> {
                         binding.btnSendCode.isEnabled = false
-                        binding.btnSendCode.text = ""
+                        binding.btnSendCode.text = getString(R.string.loading)
                     }
                     is RequestResetState.CodeSent -> {
                         binding.btnSendCode.isEnabled = true
-                        binding.btnSendCode.text = ""
+                        binding.btnSendCode.text = getString(R.string.send_code)
                         Toast.makeText(this@ForgotPasswordActivity, state.message, Toast.LENGTH_SHORT).show()
                         val intent = Intent(this@ForgotPasswordActivity, ResetPasswordActivity::class.java)
                         intent.putExtra(ResetPasswordActivity.EXTRA_EMAIL , state.email)
@@ -49,12 +49,12 @@ class ForgotPasswordActivity: AppCompatActivity() {
                     }
                     is RequestResetState.Error -> {
                         binding.btnSendCode.isEnabled = true
-                        binding.btnSendCode.text = ""
+                        binding.btnSendCode.text = getString(R.string.send_code)
                         Toast.makeText(this@ForgotPasswordActivity, state.message, Toast.LENGTH_SHORT).show()
                     }
                     is RequestResetState.Idle -> {
                         binding.btnSendCode.isEnabled = true
-                        binding.btnSendCode.text = ""
+                        binding.btnSendCode.text = getString(R.string.send_code)
                     }
                 }
 

@@ -28,13 +28,13 @@ class ResetPasswordActivity : AppCompatActivity() {
             finish()
             return
         }
-        binding.tvSubtitle.text = ""
+        binding.tvSubtitle.text = getString(R.string.reset_subtitle, email)
         binding.btnBack.setOnClickListener {
             finish()
         }
         binding.tvResendCode.setOnClickListener {
             viewModel.requestReset(email)
-            Toast.makeText(this, "", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.code_resent), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnResetPassword.setOnClickListener {
@@ -43,10 +43,13 @@ class ResetPasswordActivity : AppCompatActivity() {
             val confirmPassword = binding.etConfirmPassword.text.toString()
             when {
                 otp.isEmpty() || newPassword.isEmpty() || confirmPassword.isEmpty() -> {
-                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_missing_fields), Toast.LENGTH_SHORT).show()
                 }
                 newPassword.length < 8 -> {
-                    Toast.makeText(this, "", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.passwords_mis_match), Toast.LENGTH_SHORT).show()
+                }
+                newPassword != confirmPassword -> {
+                    Toast.makeText(this, getString(R.string.passwords_mis_match), Toast.LENGTH_SHORT).show()
                 }
                 else -> {
                     viewModel.resetPassword(email, otp, newPassword)
@@ -58,7 +61,7 @@ class ResetPasswordActivity : AppCompatActivity() {
                 when(state) {
                     is ResetPasswordState.Loading -> {
                         binding.btnResetPassword.isEnabled = false
-                        binding.btnResetPassword.text = ""
+                        binding.btnResetPassword.text = getString(R.string.loading)
                     }
                     is ResetPasswordState.Success -> {
                         Toast.makeText(this@ResetPasswordActivity, state.message, Toast.LENGTH_LONG).show()
@@ -69,11 +72,11 @@ class ResetPasswordActivity : AppCompatActivity() {
                     }
                     is ResetPasswordState.Error -> {
                         binding.btnResetPassword.isEnabled = true
-                        binding.btnResetPassword.text = ""
+                        binding.btnResetPassword.text = getString(R.string.reset_password_button)
                     }
                     is ResetPasswordState.Idle -> {
                         binding.btnResetPassword.isEnabled = true
-                        binding.btnResetPassword.text = ""
+                        binding.btnResetPassword.text = getString(R.string.reset_password_button)
                     }
                 }
             }

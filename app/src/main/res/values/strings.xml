@@ -110,8 +110,18 @@
     <string name="save">Save</string>
     <string name="saving">Saving…</string>
     <string name="forgot_title">Forgot Password</string>
-    <string name="forgot_subtitle">Enter email to find your account</string>
+    <string name="forgot_subtitle">Enter your email and we will send you a code to reset your password</string>
     <string name="email_hint">Email address</string>
     <string name="back_to_login">Back to Login</string>
     <string name="send_code">Send code</string>
+    <string name="reset_subtitle">Enter the code sent to %1$s and choose a new password</string>
+    <string name="verification_code">Verification Code</string>
+    <string name="resend_code">Resend code</string>
+    <string name="code_resent">A new code has been sent</string>
+    <string name="new_psd">New Password</string>
+    <string name="confirm_psd">Confirm Password</string>
+    <string name="reset_password_button">Reset Password</string>
+    <string name="passwords_mis_match">Passwords do not match</string>
+    <string name="password_short">Password must be at least 8 characters</string>
+    <string name="loading">Loading…</string>
 </resources>
