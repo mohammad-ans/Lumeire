@@ -46,7 +46,7 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
     amount_due = service.price
     gift_card = None
     if data.gift_card_id:
-        gift_card = db.query(GiftCard.id == payload.gift_card_id, GiftCard.receiver_id == current_user.id).first()
+        gift_card = db.query(GiftCard.id == payload.gift_card_id, GiftCard.receiver_id == current_user.id).with_for_update().first()
         if not gift_card:
             raise HTTPException(status_code=404, detail="Gift card not found")
         if gift_card.is_used:
@@ -62,6 +62,7 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
     appointment_time = data.appointment_time,
     status = "Upcoming",
     total_amount = amount_due,
+    currency=service.salon.currency,
     payment_status = "paid" if amount_due <= 0 else "unpaid"
     )
     db.add(booking)

@@ -68,6 +68,7 @@ class Salon(Base):
     openTime = Column(String)
     closeTime = Column(String)
     image_url = Column(String)
+    currency = Column(String, default="USD")
 
     services = relationship("Service", back_populates="salon", cascade="all, delete-orphan")
     stylists = relationship("Stylist", back_populates="salon", cascade="all, delete-orphan")
@@ -82,6 +83,10 @@ class Service(Base):
     price = Column(Float)
     salon_id = Column(UUID(as_uuid=False), ForeignKey("salons.id"), nullable=False)
     salon = relationship("Salon", back_populates="services")
+
+    @property
+    def currency(self) -> str:
+        return self.salon.currency if self.salon else "USD"
 
 class Stylist(Base):
     __tablename__ = "stylists"
@@ -102,6 +107,7 @@ class Booking(Base):
     appointment_time = Column(DateTime, nullable=False)
     status = Column(String, default="Upcoming")
     total_amount = Column(Float, nullable=False)
+    currency = Column(String, default="USD")
     created_at = Column(DateTime, default=datetime.utcnow)
     payment_status = Column(String, default="unpaid")
 
@@ -130,3 +136,7 @@ class GiftCard(Base):
     service = relationship("Service")
     sender = relationship("User", foreign_keys=[sender_id])
     receiver = relationship("User", foreign_keys=[receiver_id])
+
+    @property
+    def salon_name(self) -> str:
+        return self.salon.name if self.salon else ""

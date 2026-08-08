@@ -82,6 +82,7 @@ class SalonResponse(BaseModel):
     openTime: Optional[str] = None
     closeTime: Optional[str] = None
     image_url: Optional[str] = None
+    currency: str = "USD"
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -110,6 +111,7 @@ class BookingResponse(BaseModel):
     appointment_time: datetime
     status: str
     total_amount: float
+    currency: str = "USD"
     payment_status: str
     created_at: datetime
 

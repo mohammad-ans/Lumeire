@@ -41,6 +41,7 @@ def send_gift(data: GiftCardCreateRequest, db: Session = Depends(get_db), user: 
         salon_id=data.salon_id,
         service_id=data.service_id,
         amount=amount,
+        currency=salon.currency,
         occasion=data.occasion,
         message=data.message,
         sender_id=user.id,
