@@ -132,3 +132,13 @@ data class GiftCardCreateRequest(
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class EmailExistsResponse(val exists: Boolean)
+
+@SuppressLint("UnsafeOptInUsageError")
+data class ForgotPassword(val email: String)
+
+@SuppressLint("UnsafeOptInUsageError")
+data class ResetPassword(
+    val email: String,
+    val otp_code: String,
+    val new_password: String
+)

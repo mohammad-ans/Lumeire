@@ -17,6 +17,11 @@ interface AuthApiService {
     @POST("auth/signin")
     suspend fun login(@Body request: SignIn): TokenResponse
 
+    @POST("auth/forgot-password")
+    suspend fun forgotPassword(@Body request: ForgotPassword) : MessageResponse
+
+    @POST("auth/reset-password")
+    suspend fun resetPassword(@Body request: ResetPassword): MessageResponse
     @POST("auth/google")
     suspend fun googleAuth(@Body request: GoogleAuth): TokenResponse
 
