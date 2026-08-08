@@ -14,7 +14,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.lumeire.app.ui.bookings.BookingsViewModel
 import kotlinx.coroutines.launch
-import com.lumeire.app.data.model.Salon
 import com.lumeire.app.data.model.Booking
 import androidx.appcompat.app.AlertDialog
 
@@ -100,7 +99,7 @@ class BookingsFragment : Fragment() {
 
         tvName.text = "Booking #${booking.id.takeLast(4)}"
         tvCategory.text = "Salon ID: ${booking.salon_id}"
-        tvMeta.text = "Status: ${booking.status}\nPayment: ${booking.payment_status}\nTime: ${booking.appointment_time}"
+        tvMeta.text = "Status: ${booking.status}\nPayment: ${booking.payment_status} (${booking.currency} ${booking.total_amount.toInt()})\nTime: ${booking.appointment_time}"
 
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         params.setMargins(0, 0, 0, 14)
