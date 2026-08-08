@@ -34,7 +34,7 @@ def list_services(salon_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/bookings", response_model=BookingResponse, status_code=201)
-def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), current_user: Depends()get_current_user)):
+def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), current_user: Depends(get_current_user)):
     service = db.query(Service).filter(Service.id == data.service_id, Service.salon_id == data.salon_id).first()
     if not service:
         raise HTTPException(status_code=404, detail="Service not found for this salon")

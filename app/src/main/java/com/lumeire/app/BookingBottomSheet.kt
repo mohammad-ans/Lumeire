@@ -128,7 +128,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
                     val booking = ApiClient.bookingApiService.createBooking(request)
                     val message = if (giftCard != null) "Booking confirmed! Gift card applied - PKR ${booking.total_amount.toInt()} remaining" else "Booking confirmed"
 
-                    Toast.makeText(requireContext(), "Booking confirmed!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                     onBookingConfirmed?.invoke()
                     dismiss()
                 } catch (e: Exception) {

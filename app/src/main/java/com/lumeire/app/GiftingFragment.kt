@@ -74,6 +74,9 @@ class GiftingFragment : Fragment() {
         binding.btnSendGift.setOnClickListener { handleSendGift() }
     }
 
+    private fun currentSalon() : Salon? {
+        return salons.getOrNull(selectedSalonIndex)
+    }
     private fun getCustomAmount(): Double?{
         val raw = binding.customAmount.text?.toString()?.trim().orEmpty()
         if(raw.isBlank())
@@ -153,46 +156,48 @@ class GiftingFragment : Fragment() {
     }
 
     private fun updatePreview() {
-        val salon = salons.getOrNull(selectedSalonIndex)
+        val salon = currentSalon()
+        val currency = salon?.currency ?: "USD"
         val customAmount = getCustomAmount()
         if(customAmount != null){
             binding.tvGiftPreviewTitle.text = "Custom Gift Amount"
             binding.tvGiftPreviewDesc.text = salon?.name ?: ""
-            binding.tvGiftPreviewValue.text = "PKR ${customAmount.toInt()}"
+            binding.tvGiftPreviewValue.text = "$currency ${customAmount.toInt()}"
             binding.tvGiftPreviewDuration.text = ""
             binding.tvGiftServiceName.text = "Custom Amount"
-            binding.tvGiftServicePrice.text = "PKR ${customAmount.toInt()}"
-            binding.tvGiftTotal.text = "PKR ${customAmount.toInt()}"
+            binding.tvGiftServicePrice.text = "$currency ${customAmount.toInt()}"
+            binding.tvGiftTotal.text = "$currency ${customAmount.toInt()}"
             binding.btnSendGift.text = buildSendLabel()
             return
         }
 
-        val service = services[selectedServiceIndex]
+        val service = services.getOrNull(selectedServiceIndex) ?: return
         binding.tvGiftPreviewTitle.text = service.name
         binding.tvGiftPreviewDesc.text = salon?.name ?: ""
-        binding.tvGiftPreviewValue.text = "PKR ${service.price.toInt()}"
+        binding.tvGiftPreviewValue.text = "$currency ${service.price.toInt()}"
         binding.tvGiftPreviewDuration.text = "${service.duration_minutes} min"
         binding.tvGiftServiceName.text = service.name
-        binding.tvGiftServicePrice.text = "PKR ${service.price.toInt()}"
-        binding.tvGiftTotal.text = "PKR ${service.price.toInt()}"
+        binding.tvGiftServicePrice.text = "$currency ${service.price.toInt()}"
+        binding.tvGiftTotal.text = "$currency ${service.price.toInt()}"
         binding.btnSendGift.text = buildSendLabel()
     }
 
     private fun buildSendLabel(): String {
+        val currency = currentSalon()?.currency ?: "USD"
         val amount = getCustomAmount()
         if(amount != null)
-            return "Send Gift · ${amount.toInt()}"
+            return "Send Gift · $currency ${amount.toInt()}"
         if (services.isEmpty())
             return getString(R.string.send_gift)
 
         val service = services[selectedServiceIndex]
-        return "Send Gift · $${service.price}"
+        return "Send Gift · $currency $${service.price}"
     }
 
     private fun handleSendGift() {
         val email = binding.etRecipientName.text?.toString()?.trim().orEmpty()
         val message = binding.etGiftMessage.text?.toString()?.trim().orEmpty()
-        val salon = salons.getOrNull(selectedSalonIndex)
+        val salon = currentSalon()
         val amount = getCustomAmount()
         val service = if(amount == null) services.getOrNull(selectedServiceIndex) else null
 
@@ -212,6 +217,7 @@ class GiftingFragment : Fragment() {
         }
         if(amount == null && service == null){
             Toast.makeText(requireContext(),"Please select a service or enter a custom amount.",Toast.LENGTH_SHORT).show()
+            return
         }
 
         binding.btnSendGift.isEnabled = false
@@ -235,12 +241,12 @@ class GiftingFragment : Fragment() {
 
                 ApiClient.bookingApiService.sendGift(
                     GiftCardCreateRequest(
-                        email,
-                        salon.id,
-                        service?.id,
-                        amount,
-                        message.ifBlank { null},
-                        message.ifBlank { null })
+                        receiver_email =  email,
+                        salon_id = salon.id,
+                        service_id =  service?.id,
+                        amount = amount,
+                        occasion = message.ifBlank { null},
+                        message = message.ifBlank { null })
                 )
                 binding.btnSendGift.text = "✓ Gift Sent!"
                 binding.btnSendGift.setBackgroundResource(R.drawable.bg_button_green)
@@ -310,7 +316,7 @@ private fun toMessage(e: Exception) : String {
             when(code) {
                 401 -> message = "Please login again"
                 404 -> message = "Not found"
-                in 500..599 -> "Server is down. Try again in a while"
+                in 500..599 -> message = "Server is down. Try again in a while"
                 else -> message = "Something went wrong. $code"
             }
         }

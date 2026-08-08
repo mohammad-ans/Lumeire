@@ -10,5 +10,6 @@ data class Service(
     val category: String,
     val duration_minutes: Int,
     val price: Double,
-    val salon_id: String
+    val salon_id: String,
+    val currency: String = "USD"
 )
