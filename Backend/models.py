@@ -33,6 +33,15 @@ class PendingUser(Base):
     otp_expires_at = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class PasswordReset(Base):
+    __tablename__ = "password_resets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True, nullable=False)
+    otp_code = Column(String, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class Profile(Base):
     __tablename__ = "profiles"
     id = Column(UUID(as_uuid=False), primary_key=True, ForeignKey("users.id"))

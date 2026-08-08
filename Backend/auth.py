@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import get_db
-from models import User, Profile, PendingUser
-from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth, MessageResponse, Otp, ResendOtp
+from models import User, Profile, PendingUser, PasswordReset
+from schemas import UserResponse, SignIn, SignUp, TokenResponse, GoogleAuth, MessageResponse, Otp, ResendOtp, ForgotPassword, ResetPassword
 import os
 from jose import jwt, JWTError
 from dotenv import load_dotenv
@@ -178,6 +178,56 @@ def g_auth(data: GoogleAuth, db : Session = Depends(get_db)):
 
     return TokenResponse(access_token=create_access_token(user.id))
 
+@router.post("/forgot-password", response_model=MessageResponse)
+async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == data.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="No account found for this email")
+
+    otp_code = generate_otp()
+    expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
+
+    reset = db.query(PasswordReset).filter(PasswordReset.email === data.email).first()
+    if reset:
+        reset.otp_code = otp_code
+        reset.expires_at = expires_at
+        reset.created_at = datetime.utcnow()
+    else:
+        reset = PasswordReset(
+            email=data.email,
+            otp_code=otp_code,
+            expires_at=expires_at
+        )
+        db.add(reset)
+    try:
+        await send_otp(data.email, otp_code)
+    except:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
+    db.commit()
+
+    return MessageResponse(message="Verification code sent to your email")
+
+@router.post("/reset-password", response_model=MessageResponse)
+def reset_password(data: ResetPassword, db: Session = Depends(get_db)):
+    reset = db.query(PasswordReset).filter(PasswordReset.email == data.email).first()
+    if not reset or reset.otp_code != data.otp_code:
+        raise HTTPException(status_code=400, detail="Invalid verification code")
+
+    if reset.expires_at < datetime.utcnow():
+        db.delete(reset)
+        db.commit()
+        raise HTTPException(status_code = 400, detail="Verification code expired, request a new one")
+
+    user = db.query(User).filter(User.email == data.email).first()
+    if not user:
+        db.delete(reset)
+        db.commit()
+        raise HTTPException(status_code=404, detail="User not found")
+    user.hashed_password = hash_password(data.new_password)
+    db.delete(reset)
+    db.commit()
+
+    return MessageResponse(message="Password reset, login by using new password")
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user

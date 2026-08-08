@@ -11,6 +11,14 @@ class SignIn(BaseModel):
     email: EmailStr
     password: str
 
+class ResetPassword(BaseModel):
+    email: str
+    otp_code: str
+    new_password: str
+
+class ForgotPassword(BaseModel):
+    email: str
+
 class GoogleAuth(BaseModel):
     id_token: str
 
