@@ -11,7 +11,7 @@ import retrofit2.HttpException
 class ForgotPasswordViewModel: ViewModel() {
     private val _requestState = MutableStateFlow<RequestResetState>(RequestResetState.Idle)
     val requestState: StateFlow<RequestResetState> = _requestState
-    private val _resetState = MutableStateFlow(ResetPasswordState.Idle)
+    private val _resetState = MutableStateFlow<ResetPasswordState>(ResetPasswordState.Idle)
     val resetState: StateFlow<ResetPasswordState> = _resetState
 
     fun requestReset(email: String) {
@@ -29,6 +29,21 @@ class ForgotPasswordViewModel: ViewModel() {
 
     fun resetRequestState() {
         _requestState.value = RequestResetState.Idle
+    }
+    fun resetResetState() {
+        _resetState.value = ResetPasswordState.Idle
+    }
+
+    fun resetPassword(email: String, otp: String, newPsd: String) {
+        viewModelScope.launch {
+            _resetState.value = ResetPasswordState.Loading
+            try{
+                val response = ApiClient.authService.resetPassword(ResetPassword(email, otp, newPsd))
+            }
+            catch (e: Exception) {
+                _resetState.value = ResetPasswordState.Error(parseError(e))
+            }
+        }
     }
     private fun parseError(e: Exception): String{
         if(e is HttpException) {
