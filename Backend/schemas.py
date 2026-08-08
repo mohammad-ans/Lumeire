@@ -36,7 +36,7 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-class UserResponse(BaseMode):
+class UserResponse(BaseModel):
     id: str
     email: str
     name: Optional[str]  = None

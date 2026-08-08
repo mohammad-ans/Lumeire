@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from database import get_db
 from models import Booking, Salon, Service, Stylist, User, GiftCard
-from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse,
+from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse
 
 from auth import get_current_user
 
@@ -34,7 +34,7 @@ def list_services(salon_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/bookings", response_model=BookingResponse, status_code=201)
-def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), current_user: Depends(get_current_user)):
+def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), current_user= Depends(get_current_user)):
     service = db.query(Service).filter(Service.id == data.service_id, Service.salon_id == data.salon_id).first()
     if not service:
         raise HTTPException(status_code=404, detail="Service not found for this salon")
@@ -46,7 +46,7 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
     amount_due = service.price
     gift_card = None
     if data.gift_card_id:
-        gift_card = db.query(GiftCard.id == payload.gift_card_id, GiftCard.receiver_id == current_user.id).with_for_update().first()
+        gift_card = db.query(GiftCard.id == data.gift_card_id, GiftCard.receiver_id == current_user.id).with_for_update().first()
         if not gift_card:
             raise HTTPException(status_code=404, detail="Gift card not found")
         if gift_card.is_used:
@@ -69,7 +69,7 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
     db.flush()
     if gift_card:
         gift_card.is_used = True
-        gift.redeemed_booking_id = booking.id
+        gift_card.redeemed_booking_id = booking.id
 
     db.commit()
     db.refresh(booking)

@@ -20,5 +20,6 @@ data class Salon(
     val closeTime: String? = null,
     val image_url: String? = null,
     val distance: String? = null,
+    val price: String? = null,
     val currency: String = "USD"
 )

@@ -8,7 +8,7 @@ from auth import get_current_user
 
 router = APIRouter()
 
-@router.get("/user/exists" response_model=EmailExistsResponse)
+@router.get("/user/exists", response_model=EmailExistsResponse)
 def check(email: str = Query(...), db: Session = Depends(get_db)):
     exists = db.query(User).filter(User.email == email).first() is not None
     return EmailExistsResponse(exists=exists)
@@ -53,7 +53,7 @@ def send_gift(data: GiftCardCreateRequest, db: Session = Depends(get_db), user: 
     return gift
 
 @router.get("/gifts/received", response_model=List[GiftCardResponse])
-def received_gifts(unused_only: bool = True, db: Session = Depends(get_db), user: User):
+def received_gifts(unused_only: bool = True, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     query = db.query(GiftCard).filter(GiftCard.receiver_id == user.id)
     if unused_only:
         query = query.filter(GiftCard.is_used == False)

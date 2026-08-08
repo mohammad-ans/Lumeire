@@ -44,7 +44,7 @@ class PasswordReset(Base):
 
 class Profile(Base):
     __tablename__ = "profiles"
-    id = Column(UUID(as_uuid=False), primary_key=True, ForeignKey("users.id"))
+    id = Column(UUID(as_uuid=False), ForeignKey("users.id"), primary_key=True)
     full_name = Column(String)
     phone = Column(String)
     dob = Column(String)

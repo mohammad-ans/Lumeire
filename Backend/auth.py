@@ -13,6 +13,7 @@ from fastapi.security import OAuth2PasswordBearer
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 import secrets
+from email_send import send_otp
 
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")

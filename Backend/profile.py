@@ -76,7 +76,7 @@ def get_my_profile(current_user: User = Depends(get_current_user), db: Session =
     return to_response(current_user, profile, total_bookings)
 
 @router.put("/me", response_model=ProfileResponse)
-def update_my_profile(data: ProfileUpdateRequest, current_user: user = Depends(get_current_user), db: Session = Depends(get_db)):
+def update_my_profile(data: ProfileUpdateRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     profile = db.query(Profile).filter(Profile.id == current_user.id).first()
     if not profile:
         profile = Profile(id=current_user.id)
