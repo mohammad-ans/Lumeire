@@ -6,6 +6,7 @@ class SignUp(BaseModel):
     email: EmailStr
     password: str
     full_name: str
+    referral_code: Optional[str] = None
 
 class SignIn(BaseModel):
     email: EmailStr
@@ -143,3 +144,19 @@ class GiftCardResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class VoucherResponse(BaseModel):
+    id: str
+    code: str
+    discount_type: str
+    discount_value: float
+    reason: Optional[str] = None
+    is_used: bool
+    expires_at: Optional[datetime] = None
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class ReferralInfoResponse(BaseModel):
+    referral_code: str
+    share_message: str
