@@ -1,10 +1,11 @@
 package com.lumeire.app
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -130,12 +131,37 @@ class HomeFragment : Fragment() {
 
     private fun showFirstVisitVoucher() {
         lifecycleScope.launch {
+            try {
+                val vouchers = ApiClient.voucherService.getMyVouchers(false)
+                val firstVisit = vouchers.firstOrNull{it.reason == "first_visit"}
+                when{
+                    firstVisit == null -> Toast.makeText(requireContext(), "No welcome voucher found on your account.", Toast.LENGTH_SHORT).show()
+                    firstVisit.is_used -> Toast.makeText(requireContext(), "You have already used your welcome voucher.", Toast.LENGTH_SHORT).show()
+                    else -> AlertDialog.Builder(requireContext())
+                        .setTitle("20% Off First Visit")
+                        .setMessage("Your code: ${firstVisit.code}\n\nApply it at checkout to get ${firstVisit.discount_value.toInt()}% off.")
+                        .setPositiveButton("OK", null)
+                        .show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Could not load your voucher, please try again.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     private fun shareReferralCode() {
         lifecycleScope.launch {
-
+            try{
+                val info = ApiClient.voucherService.getMyReferralInfo()
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, info.share_message)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Invite a friend"))
+            }
+            catch (e: Exception) {
+                Toast.makeText(requireContext(), "Could not load your referral code, please try again.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
     private fun filterSalons() {
@@ -154,7 +180,7 @@ class HomeFragment : Fragment() {
 
         Glide.with(this).load(ApiClient.resolve(salon.image_url)).placeholder(R.drawable.ic_nav_map).error(R.drawable.ic_nav_map).centerCrop().into(ivSalon)
         tvName.text = salon.name
-        tvCategory.text = salon.address ?: "Salon"
+        tvCategory.text = salon.category ?: "Salon"
         tvMeta.text = "${salon.rating ?: 0.0} (${salon.review_count})"
         tvPrice.text = ""
 
@@ -166,7 +192,6 @@ class HomeFragment : Fragment() {
             sheet.show(parentFragmentManager, "BookingBottomSheet")
         }
 
-        // Adjust layout params for vertical list
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
         params.setMargins(0, 0, 0, 14.toInt())
         cardView.layoutParams = params
