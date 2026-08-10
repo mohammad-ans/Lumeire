@@ -25,6 +25,9 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
     private val binding get() = _binding!!
 
+    private lateinit var chips: List<TextView>
+    private var selectedChip: TextView? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,24 +55,28 @@ class HomeFragment : Fragment() {
             }
         }
 
-
-        
-
         binding.etHomeSearch.doAfterTextChanged { filterSalons() }
 
-        listOf(
-            binding.chipHaircut,
-            binding.chipFacial,
-            binding.chipMassage,
-            binding.chipNails
-        ).forEach { viewItem ->
-            viewItem.setOnClickListener {
-                val label = (viewItem as TextView).text.toString()
-                viewModel.updateCategoryFilter(label)
+        chips = listOf(binding.chipHaircut, binding.chipFacial, binding.chipMassage, binding.chipNails)
+        chips.forEach { }
+
+        chips.forEach { chip ->
+            chip.setOnClickListener {
+                if(selectedChip == chip) {
+                    selectedChip = null
+                    viewModel.updateCategoryFilter(null)
+                }
+                else {
+                    selectedChip?.let {  }
+                    selectedChip = chip
+                    viewModel.updateCategoryFilter(chip.text.toString())
+                }
             }
         }
 
         binding.tvHomeFilter.setOnClickListener {
+            selectedChip?.let {  }
+            selectedChip = null
             viewModel.updateCategoryFilter(null)
         }
 

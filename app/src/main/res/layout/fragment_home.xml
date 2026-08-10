@@ -35,6 +35,7 @@
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/tv_home_greeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/good_morning"
@@ -47,7 +48,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/user_name"
+                        android:text=""
                         android:textColor="@color/white"
                         android:textSize="24sp"
                         android:textStyle="bold"
@@ -63,7 +64,7 @@
                     android:contentDescription="Notifications"
                     android:padding="10dp"
                     android:src="@android:drawable/ic_dialog_info"
-                    android:tint="@color/white" />
+                    app:tint="@color/white" />
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/iv_home_avatar"
@@ -86,7 +87,7 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:src="@android:drawable/ic_menu_search"
-                    android:tint="@color/gold_main" />
+                    app:tint="@color/gold_main" />
 
                 <EditText
                     android:id="@+id/et_home_search"
@@ -129,11 +130,15 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/card_offer_first_visit"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_button_gold"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    >
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -156,18 +161,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Valid this week only"
+                        android:text="Tap to view your code"
                         android:textColor="#CCFFFFFF"
                         android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/card_offer_referral"
                     android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:background="@drawable/bg_offer_purple"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    >
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -190,7 +199,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Invite friends to Lumeire"
+                        android:text="Tap to share your code"
                         android:textColor="#CCFFFFFF"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -221,6 +230,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_see_all_services"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/see_all"
@@ -318,6 +328,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_see_all_recommended"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/see_all"
