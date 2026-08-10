@@ -58,16 +58,18 @@ class HomeFragment : Fragment() {
         binding.etHomeSearch.doAfterTextChanged { filterSalons() }
 
         chips = listOf(binding.chipHaircut, binding.chipFacial, binding.chipMassage, binding.chipNails)
-        chips.forEach { }
+        chips.forEach { setChipSelected(it, false) }
 
         chips.forEach { chip ->
             chip.setOnClickListener {
                 if(selectedChip == chip) {
+                    setChipSelected(chip, false)
                     selectedChip = null
                     viewModel.updateCategoryFilter(null)
                 }
                 else {
-                    selectedChip?.let {  }
+                    selectedChip?.let { setChipSelected(it, false) }
+                    setChipSelected(chip,false)
                     selectedChip = chip
                     viewModel.updateCategoryFilter(chip.text.toString())
                 }
@@ -75,7 +77,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.tvHomeFilter.setOnClickListener {
-            selectedChip?.let {  }
+            selectedChip?.let { setChipSelected(it, false) }
             selectedChip = null
             viewModel.updateCategoryFilter(null)
         }
@@ -102,8 +104,40 @@ class HomeFragment : Fragment() {
         binding.btnHomeNotifications.setOnClickListener {
             Toast.makeText(requireContext(), "Notifications are mocked for this app.", Toast.LENGTH_SHORT).show()
         }
+        binding.tvSeeAllServices.setOnClickListener {
+            (activity as? MainActivity)?.openMaps()
+        }
+        binding.tvSeeAllRecommended.setOnClickListener {
+            (activity as? MainActivity)?.openMaps()
+        }
+        binding.cardOfferFirstVisit.setOnClickListener {
+            showFirstVisitVoucher()
+        }
+        binding.cardOfferReferral.setOnClickListener {
+            shareReferralCode()
+        }
+    }
+    private fun setChipSelected(chip: TextView, selected: Boolean) {
+        if(selected) {
+            chip.setBackgroundResource(R.drawable.bg_chip_gold_filled)
+            chip.setTextColor(resources.getColor(R.color.white, null))
+        }
+        else {
+            chip.setBackgroundResource(R.drawable.bg_chip_outlined)
+            chip.setTextColor(resources.getColor(R.color.text_medium, null))
+        }
     }
 
+    private fun showFirstVisitVoucher() {
+        lifecycleScope.launch {
+        }
+    }
+
+    private fun shareReferralCode() {
+        lifecycleScope.launch {
+
+        }
+    }
     private fun filterSalons() {
         viewModel.updateSearchQuery(binding.etHomeSearch.text.toString())
     }
