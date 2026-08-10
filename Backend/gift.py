@@ -15,7 +15,7 @@ def check(email: str = Query(...), db: Session = Depends(get_db)):
 
 @router.post("/gifts", response_model=GiftCardResponse, status_code=201)
 def send_gift(data: GiftCardCreateRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    if data.receiver_email.lower() == user.email_lower():
+    if data.receiver_email.lower() == user.email.lower():
         raise HTTPException(status_code=400, detail="You cannot send a gift to yourself")
     receiver = db.query(User).filter(User.email == data.receiver_email).first()
     if not receiver:

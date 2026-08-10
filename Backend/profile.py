@@ -113,7 +113,7 @@ def upload_avatar(file : UploadFile = File(...), current_user: User = Depends(ge
 
     with open(filepath, "wb") as f:
         f.write(content)
-    profile = db.query(Profile).filter(Profile.id == current_user.id).count()
+    profile = db.query(Profile).filter(Profile.id == current_user.id).first()
     if not profile:
         profile = Profile(id=current_user.id)
         db.add(profile)
