@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import android.widget.LinearLayout
 import android.view.Gravity
 import androidx.core.widget.doAfterTextChanged
+import java.util.Calendar
 
 class HomeFragment : Fragment() {
 
@@ -40,6 +41,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.tvHomeGreeting.text = currentGreeting()
         lifecycleScope.launch {
             try {
                 val user = ApiClient.apiService.getMyProfile()
@@ -70,7 +73,7 @@ class HomeFragment : Fragment() {
                 }
                 else {
                     selectedChip?.let { setChipSelected(it, false) }
-                    setChipSelected(chip,false)
+                    setChipSelected(chip,true)
                     selectedChip = chip
                     viewModel.updateCategoryFilter(chip.text.toString())
                 }
@@ -116,6 +119,14 @@ class HomeFragment : Fragment() {
         }
         binding.cardOfferReferral.setOnClickListener {
             shareReferralCode()
+        }
+    }
+    private fun currentGreeting(): String {
+        return when(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+            in 5..11 -> getString(R.string.good_morning)
+            in 12..16 -> getString(R.string.good_afternoon)
+            in 17..20 -> getString(R.string.good_evening)
+            else -> getString(R.string.good_night)
         }
     }
     private fun setChipSelected(chip: TextView, selected: Boolean) {

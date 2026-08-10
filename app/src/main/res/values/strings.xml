@@ -124,4 +124,7 @@
     <string name="passwords_mis_match">Passwords do not match</string>
     <string name="password_short">Password must be at least 8 characters</string>
     <string name="loading">Loading…</string>
+    <string name="good_night">Hello, Night Owl</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_evening">Good Evening</string>
 </resources>

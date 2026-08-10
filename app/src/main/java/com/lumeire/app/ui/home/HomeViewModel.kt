@@ -27,7 +27,7 @@ class HomeViewModel : ViewModel() {
     val filteredSalons: StateFlow<List<Salon>> = combine(_salons, _searchQuery, _categoryFilter) { salonsList, query, category ->
         salonsList.filter { salon ->
             val matchesQuery = query.isBlank() || salon.name.contains(query, ignoreCase = true) || (salon.address?.contains(query, ignoreCase = true) == true)
-            val matchesCategory = category == null || salon.name.contains(category, ignoreCase = true)
+            val matchesCategory = category == null || (salon.category?.contains(category, ignoreCase = true) == true)
             matchesQuery && matchesCategory
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
