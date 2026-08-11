@@ -135,4 +135,13 @@
     <string name="sent">Sent</string>
     <string name="no_gift_cards_received">You have not received any gift cards yet</string>
     <string name="no_gift_cards_sent">You have not sent any gift cards yet</string>
+    <string name="faqs">Frequently Asked question</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="email_us">Email Us</string>
+    <string name="call_us">Call Us</string>
+    <string name="subject">Subject</string>
+    <string name="how_can_we_help">How can we help?</string>
+    <string name="send_message">Send Message</string>
+    <string name="ticket_submitted">Thanks! Our support team will get back to you soon.</string>
+    <string name="ticket_submit_failed">Could not send your message. Please try again.</string>
 </resources>
