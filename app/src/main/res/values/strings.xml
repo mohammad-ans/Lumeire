@@ -127,4 +127,12 @@
     <string name="good_night">Hello, Night Owl</string>
     <string name="good_afternoon">Good Afternoon</string>
     <string name="good_evening">Good Evening</string>
+    <string name="back">Back</string>
+    <string name="generic_load_error">Something went wrong loading this. Please try again.</string>
+    <string name="fill_all_fields">Please fill in all fields</string>
+    <string name="confirm">Confirm</string>
+    <string name="received">Received</string>
+    <string name="sent">Sent</string>
+    <string name="no_gift_cards_received">You have not received any gift cards yet</string>
+    <string name="no_gift_cards_sent">You have not sent any gift cards yet</string>
 </resources>
