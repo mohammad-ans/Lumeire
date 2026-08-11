@@ -6,6 +6,7 @@ import auth
 from profile import router
 import bookings
 import gift
+import support
 
 Base.metadata.create_all(bind=engine)
 
@@ -22,3 +23,4 @@ app.include_router(auth.router)
 app.include_router(router)
 app.include_router(bookings.router)
 app.include_router(gift.router)
+app.include_router(support.router)
