@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from database import get_db
 from models import GiftCard, Salon, Service, User
@@ -15,9 +16,9 @@ def check(email: str = Query(...), db: Session = Depends(get_db)):
 
 @router.post("/gifts", response_model=GiftCardResponse, status_code=201)
 def send_gift(data: GiftCardCreateRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    if data.receiver_email.lower() == user.email.lower():
+    if data.receiver_email.strip().lower() == user.email.strip().lower():
         raise HTTPException(status_code=400, detail="You cannot send a gift to yourself")
-    receiver = db.query(User).filter(User.email == data.receiver_email).first()
+    receiver = db.query(User).filter(func.lower(User.email) == data.receiver_email.strip().lower()).first()
     if not receiver:
         raise HTTPException(status_code=404, detail="No Lumeire account found for that email")
 

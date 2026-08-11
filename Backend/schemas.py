@@ -160,3 +160,7 @@ class VoucherResponse(BaseModel):
 class ReferralInfoResponse(BaseModel):
     referral_code: str
     share_message: str
+
+class PasswordChangeReq(BaseModel):
+    password: str
+    new_password: str

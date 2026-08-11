@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Profile, Booking, User
-from schemas import ProfileResponse, ProfileUpdateRequest
-from auth import get_current_user
+from schemas import ProfileResponse, ProfileUpdateRequest, MessageResponse, PasswordChangeReq
+from auth import get_current_user, verify_password, hash_password
 
 router = APIRouter(prefix="/profile")
 
@@ -123,3 +123,23 @@ def upload_avatar(file : UploadFile = File(...), current_user: User = Depends(ge
 
     total_bookings = db.query(Booking).filter(Booking.user_id == current_user.id).count()
     return to_response(current_user, profile, total_bookings)
+
+@router.put("/me/password", response_model=MessageResponse)
+def change_password(data: PasswordChangeReq, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not current_user.hashed_password:
+        raise HTTPException(status_code=400, detail="This account has no password set up yet")
+    if not verify_password(data.password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    if len(data.new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
+    if data.password == data.new_password:
+        raise HTTPException(status_code=400, detail="New password must be different than previous password")
+    current_user.hashed_password = hash_password(data.new_password)
+    db.commit()
+    return MessageResponse(message="Password updated successfully")
+
+@router.delete("/me", response_model=MessageResponse)
+def del_acc(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    db.delete(current_user)
+    db.commit()
+    return MessageResponse(message="Account deleted")

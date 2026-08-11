@@ -146,6 +146,13 @@ class GiftCard(Base):
     def salon_name(self) -> str:
         return self.salon.name if self.salon else ""
 
+    @property
+    def sender_name(self) -> str:
+        return self.sender.name if self.sender and self.sender.name else (self.sender.email if self.sender else "")
+    @property
+    def receiver_name(self) -> str:
+        return self.receiver_name.name if self.receiver and self.receiver.name else (self.receiver.email if self.receiver else "")
+
 class Voucher(Base):
     __tablename__ = "vouchers"
     id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
@@ -157,6 +164,18 @@ class Voucher(Base):
     is_used = Column(Boolean, default=False)
     redeemed_booking_id = Column(UUID(as_uuid=False), ForeignKey("bookings.id"), nullable=True)
     expires_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+
+class SupportTicket(Base):
+    __tablename__ = "support_tickets"
+
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    user_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    subject = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    status = Column(String, default="open")
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
