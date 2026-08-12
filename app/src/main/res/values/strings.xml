@@ -144,4 +144,16 @@
     <string name="send_message">Send Message</string>
     <string name="ticket_submitted">Thanks! Our support team will get back to you soon.</string>
     <string name="ticket_submit_failed">Could not send your message. Please try again.</string>
+    <string name="change_password">Change Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="confirm_new_password">Confirm new password</string>
+    <string name="update_password">Update Password</string>
+    <string name="password_update_failed">Could not update your password. Please try again.</string>
+    <string name="google_account_password_note">You signed in with Google, so there is no password to change here.</string>
+    <string name="account_data">Account Data</string>
+    <string name="delete_account_description">Permanently delete your account, profile, and booking history. This cannot be undone</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_confirm_message">The will permanently delete your account and all associated data. This action cannot be undone.</string>
+    <string name="account_deleted">Your account has been deleted</string>
+    <string name="account_delete_failed">Could not delete your account. Please try again.</string>
 </resources>
