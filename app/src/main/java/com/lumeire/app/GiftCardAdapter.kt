@@ -28,7 +28,7 @@ class GiftCardAdapter(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): GiftCardAdapter.GiftCardViewHolder {
+    ): GiftCardViewHolder {
         val binding = ItemGiftCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return GiftCardViewHolder(binding)
     }
@@ -53,12 +53,12 @@ class GiftCardAdapter(
     }
     inner class GiftCardViewHolder(private val binding: ItemGiftCardBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(gift: GiftCard) {
-            binding.tvGiftSalon.text = gift.salon_id ?: "Gift Card"
+            binding.tvGiftSalon.text = gift.salon_name ?: "Gift Card"
             binding.tvGiftAmount.text = "${gift.currency} ${gift.amount.toInt()}"
             binding.tvGiftDate.text = formatDate(gift.created_at)
             binding.tvGiftParty.text = when(mode) {
-                Mode.RECEIVED -> "From ${gift.sender_id ?: "a friend"}"
-                Mode.SENT -> "To ${gift.receiver_id ?: "recipient"}"
+                Mode.RECEIVED -> "From ${gift.sender_name ?: "a friend"}"
+                Mode.SENT -> "To ${gift.receiver_name ?: "recipient"}"
             }
             if (!gift.message.isNullOrBlank()) {
                 binding.tvGiftMessage.visibility = android.view.View.VISIBLE

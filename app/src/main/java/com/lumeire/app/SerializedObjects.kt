@@ -105,7 +105,10 @@ data class GiftCard(
     val sender_id: String,
     val receiver_id: String,
     val is_used: Boolean,
-    val created_at: String
+    val created_at: String,
+    val salon_name: String? = null,
+    val sender_name: String? = null,
+    val receiver_name: String? = null
 )
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -141,4 +144,22 @@ data class ResetPassword(
     val email: String,
     val otp_code: String,
     val new_password: String
+)
+
+data class PasswordChangeReq(
+    val curr_pass: String,
+    val new_pass: String
+)
+
+data class SupportTicketCreateReq(
+    val sbj: String,
+    val msg: String
+)
+
+data class SupportTicket(
+    val id: String,
+    val sbj: String,
+    val msg: String,
+    val status: String,
+    val created_at: String
 )
