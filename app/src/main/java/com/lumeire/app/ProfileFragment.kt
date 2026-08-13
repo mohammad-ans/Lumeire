@@ -76,20 +76,17 @@ class ProfileFragment : Fragment() {
             }
         }
         binding.ivProfileAvatar.setOnClickListener { pickImageLauncher.launch("image/*") }
-        listOf(
-            binding.rowProfilePayment to getString(R.string.payment_methods),
-            binding.rowProfileRewards to getString(R.string.rewards_points),
-            binding.rowProfilePrivacy to getString(R.string.privacy_security),
-            binding.rowProfileSettings to getString(R.string.settings),
-            binding.rowProfileHelp to getString(R.string.help_support)
-        ).forEach { (viewItem, label) ->
-            viewItem.setOnClickListener {
+        binding.rowProfilePayment.setOnClickListener {
                 Toast.makeText(
-                    requireContext(),
-                    getString(R.string.section_placeholder_message, label),
+                    requireContext(), getString(R.string.section_placeholder_message, "Payment Methods"),
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        binding.rowProfileRewards.setOnClickListener {
+            startActivity(Intent(requireContext(), RewardsActivity::class.java))
+        }
+        binding.rowProfileHelp.setOnClickListener {
+            startActivity(Intent(requireContext(), HelpSupportActivity::class.java))
         }
         binding.rowProfileEdit.setOnClickListener {
             val current = viewModel.profile.value
@@ -100,23 +97,7 @@ class ProfileFragment : Fragment() {
             editProfileLauncher.launch(intent)
         }
         binding.rowProfileGifts.setOnClickListener {
-            viewModel.fetchGiftCards {giftCards ->
-                if(!isAdded)
-                    return@fetchGiftCards
-                if(giftCards.isEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "You have no active gift cards",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                else {
-                    val cardStrings = giftCards.map {"PKR ${it.amount.toInt()}" }.toTypedArray()
-                    AlertDialog.Builder(requireContext()).setTitle(R.string.my_gift_cards)
-                        .setItems(cardStrings, null)
-                        .setPositiveButton("OK", null).show()
-                }
-            }
+            startActivity(Intent(requireContext(), GiftCardActivity::class.java))
         }
 
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->

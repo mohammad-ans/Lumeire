@@ -46,18 +46,6 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun fetchGiftCards(onResult: (List<GiftCard>) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val result = ApiClient.bookingApiService.getReceivedGifts(true)
-                onResult(result)
-            }
-            catch (e: Exception){
-                Log.e("Profile view model", "Error fetching gift cards", e)
-                onResult(emptyList())
-            }
-        }
-    }
     fun uploadAvatar(context: Context, uri: Uri) {
         viewModelScope.launch {
             try {
