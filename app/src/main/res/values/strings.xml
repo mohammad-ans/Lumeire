@@ -75,8 +75,6 @@
     <string name="experience_value">Experience Value</string>
     <string name="gift_ready_message">Gift prepared for %1$s</string>
 
-    <string name="profile_name">Hammad Ahmad</string>
-    <string name="profile_email">hammad@gmail.com</string>
     <string name="premium_member">Premium Member</string>
     <string name="edit_profile">Edit Profile</string>
     <string name="payment_methods">Payment Methods</string>
