@@ -22,7 +22,7 @@
             tools:text="How do I cancel a booking?"
             />
         <ImageView
-            android:id="@+id/tv_faq_chevron"
+            android:id="@+id/iv_faq_chevron"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@android:drawable/arrow_down_float"
