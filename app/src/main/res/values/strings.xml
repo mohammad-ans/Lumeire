@@ -64,7 +64,7 @@
     <string name="occasion">Occasion</string>
     <string name="recipient_details">Recipient Details</string>
     <string name="recipient_name_hint">Recipient\'s name</string>
-    <string name="message_hint">Add a personal message... (optional)</string>
+    <string name="message_hint">Add a personal message… (optional)</string>
     <string name="gift_wrapping">Gift wrapping</string>
     <string name="gift_wrapping_free">Free</string>
     <string name="total">Total</string>
@@ -90,7 +90,6 @@
     <string name="sign_out_confirm">Sign Out?</string>
     <string name="sign_out_message">You will need to sign in again to access your account.</string>
     <string name="loyalty_points">Loyalty Points</string>
-    <string name="points_to_gold">420 more points to reach Gold status</string>
     <string name="account_section">Account</string>
     <string name="preferences_section">Preferences</string>
     <string name="support_section">Support</string>
@@ -156,4 +155,15 @@
     <string name="delete_account_confirm_message">The will permanently delete your account and all associated data. This action cannot be undone.</string>
     <string name="account_deleted">Your account has been deleted</string>
     <string name="account_delete_failed">Could not delete your account. Please try again.</string>
+    <string name="tier_member_badge">%1$s Member</string>
+    <string name="points_label">POINTS</string>
+    <string name="membership_tiers">Membership Tiers</string>
+    <string name="how_to_earn_points">How to Earn Points</string>
+    <string name="earn_points_rule_booking">Earn points automatically every time you complete a booking.</string>
+    <string name="earn_points_rule_referral">Refer a friend and earn bonus points once they complete their first booking.</string>
+    <string name="earn_points_rule_review">Leave a review after your appointment to earn extra points.</string>
+    <string name="point_to_next_tier">%1$d more points to reach %2$s</string>
+    <string name="max_tier_reached">You have reached %1$s, our top tier</string>
+    <string name="tier_row_reached">%1$s - %1$d points</string>
+    <string name="tier_row_locked">%1$s - %1$d</string>
 </resources>
