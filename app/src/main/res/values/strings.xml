@@ -166,4 +166,13 @@
     <string name="max_tier_reached">You have reached %1$s, our top tier</string>
     <string name="tier_row_reached">%1$s - %1$d points</string>
     <string name="tier_row_locked">%1$s - %1$d</string>
+    <string name="push_notifications">Push Notifications</string>
+    <string name="push_notifications_desc">Get notified about booking updates and offers</string>
+    <string name="booking_reminders">Booking Reminders</string>
+    <string name="booking_reminders_desc">Reminders shown before your upcoming appointments</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_restart_note">Dark mode preference saved</string>
+    <string name="appearance">Appearance</string>
+    <string name="about_section">About</string>
+    <string name="app_version">App Version</string>
 </resources>
