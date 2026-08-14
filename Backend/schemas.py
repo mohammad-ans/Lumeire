@@ -177,3 +177,14 @@ class SupportTicketResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class NotificationResponse(BaseModel):
+    id: str
+    title: str
+    body: str
+    type: str
+    is_read: bool
+    created_at: datetime
+    related_booking_id: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)

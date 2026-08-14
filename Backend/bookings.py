@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
-from models import Booking, Salon, Service, Stylist, User, GiftCard
+from models import Booking, Salon, Service, Stylist, User, GiftCard, Voucher
 from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse
 
 from datetime import datetime
 from auth import get_current_user
+from notifications import create_notification
 
 router = APIRouter()
 
@@ -88,6 +89,7 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
         voucher.is_used = True
         voucher.redeemed_booking_id = booking.id
     db.commit()
+    create_notification(db, current_user.id, "Booking confirmed", f"Your appointment on {booking.appointment_time.strftime('%b %d, %Y at %I:%M %p')} has been booked,", type="booking", r = booking.id)
     db.refresh(booking)
     return booking
 
@@ -107,6 +109,8 @@ def mark_paid(booking_id: str, db: Session = Depends(get_db), user: User = Depen
 
     booking.payment_status = "paid"
     db.commit()
+    create_notification(db, user.id, "Payment received", f"We have received your payment for your upcoming appointment.", type="booking", r = booking.id)
+
     db.refresh(booking)
     return booking
 
@@ -130,5 +134,7 @@ def cancel_booking(booking_id: str, db: Session = Depends(get_db), current_user:
         booking.payment_status = "refund_due" if booking.total_amount > 0 else "refunded"
     booking.status = "Cancelled"
     db.commit()
+    create_notification(db, current_user.id, "Booking cancelled", f"Your appointment on {booking.appointment_time.strftime('%b %d, %Y at %I:%M %p')} has been cancelled,", type="booking", r = booking.id)
+
     db.refresh(booking)
     return booking

@@ -179,3 +179,16 @@ class SupportTicket(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
+
+class Notification(Base):
+    __tablename__ = "notifications"
+    id = Column(UUID(as_uuid=False), primary_key=True, default=gen_uuid)
+    user_id = Column(UUID(as_uuid=False), ForeignKey("users.id"), nullable=False)
+    title = Column(String, nullable=False)
+    body = Column(String, nullable=False)
+    type = Column(String, default="general")
+    related_booking_id = Column(UUID(as_uuid=False), ForeignKey("bookings.id"), nullable=True)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
