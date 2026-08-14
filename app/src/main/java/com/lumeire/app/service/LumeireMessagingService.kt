@@ -19,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import java.util.concurrent.atomic.AtomicInteger
 
 class LumeireMessagingService : FirebaseMessagingService() {
@@ -29,6 +28,8 @@ class LumeireMessagingService : FirebaseMessagingService() {
 
     companion object{
         private const val CHANNEL_ID = "lumeire_notifications"
+        const val EXTRA_OPEN_NOTIFICATIONS = "open_notifications"
+        const val EXTRA_RELATED_BOOKING_ID = "related_booking_id"
     }
 
     override fun onCreate() {
@@ -47,9 +48,11 @@ class LumeireMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        remoteMessage.notification?.let {
-            showNotification(it.title ?: "Lumiere", it.body ?: "")
-        }
+        val title =remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Lumiere"
+        val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
+        val id = remoteMessage.data["related_booking_id"]
+
+        showNotification(title, body, id)
     }
 
     override fun onDestroy() {
@@ -81,13 +84,18 @@ class LumeireMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
     }
-    private fun showNotification(title: String, body: String) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        }
+    private fun showNotification(title: String, body: String, id: String?) {
         val notificationId = notificationCounter.incrementAndGet()
+
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            putExtra(EXTRA_OPEN_NOTIFICATIONS, true)
+            if(id != null)
+                putExtra(EXTRA_RELATED_BOOKING_ID, id)
+        }
+
         val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
+            this, notificationId, intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -99,6 +107,6 @@ class LumeireMessagingService : FirebaseMessagingService() {
             .setContentIntent(pendingIntent)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(0, notificationBuilder.build())
+        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 }
