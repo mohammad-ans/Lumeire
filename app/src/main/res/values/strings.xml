@@ -162,8 +162,8 @@
     <string name="earn_points_rule_review">Leave a review after your appointment to earn extra points.</string>
     <string name="point_to_next_tier">%1$d more points to reach %2$s</string>
     <string name="max_tier_reached">You have reached %1$s, our top tier</string>
-    <string name="tier_row_reached">%1$s - %1$d points</string>
-    <string name="tier_row_locked">%1$s - %1$d</string>
+    <string name="tier_row_reached">%1$s - %2$d points</string>
+    <string name="tier_row_locked">%1$s - %2$d</string>
     <string name="push_notifications">Push Notifications</string>
     <string name="push_notifications_desc">Get notified about booking updates and offers</string>
     <string name="booking_reminders">Booking Reminders</string>
@@ -173,4 +173,5 @@
     <string name="appearance">Appearance</string>
     <string name="about_section">About</string>
     <string name="app_version">App Version</string>
+    <string name="mark_all">Mark all read</string>
 </resources>

@@ -163,3 +163,13 @@ data class SupportTicket(
     val status: String,
     val created_at: String
 )
+
+data class Notification(
+    val id: String,
+    val title: String,
+    val body: String,
+    val type: String,
+    val is_read: Boolean,
+    val created_at: String,
+    val related_booking_id: String? = null
+)

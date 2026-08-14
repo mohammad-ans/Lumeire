@@ -58,19 +58,19 @@ class RewardsActivity: AppCompatActivity() {
                 setPadding(48,40,48,40)
                 if(reached){
                     text = getString(R.string.tier_row_reached, t.name, t.threshold)
-                    setTextColor(R.color.text_dark)
+                    setTextColor(resources.getColor(R.color.text_dark, null))
                     setTypeface(typeface, Typeface.BOLD)
                 }
                 else{
                     text = getString(R.string.tier_row_locked, t.name, t.threshold)
-                    setTextColor(R.color.text_muted)
+                    setTextColor(resources.getColor(R.color.text_muted, null))
                 }
             }
             binding.tierListContainer.addView(row)
             if (i != tiers.lastIndex) {
                 val divider = View(this).apply {
                     layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 2)
-                    setBackgroundColor(R.color.cream_bg)
+                    setBackgroundColor(resources.getColor(R.color.cream_bg, null))
                 }
                 binding.tierListContainer.addView(divider)
             }

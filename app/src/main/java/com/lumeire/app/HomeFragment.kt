@@ -104,7 +104,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.btnHomeNotifications.setOnClickListener {
-            Toast.makeText(requireContext(), "Notifications are mocked for this app.", Toast.LENGTH_SHORT).show()
+            startActivity(Intent(requireContext(), NotificationsActivity::class.java))
         }
         binding.tvSeeAllServices.setOnClickListener {
             clearFilter()

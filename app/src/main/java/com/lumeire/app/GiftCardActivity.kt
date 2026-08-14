@@ -38,12 +38,12 @@ class GiftCardActivity: AppCompatActivity() {
         currentMode = mode
         val received = mode == GiftCardAdapter.Mode.RECEIVED
         if(received){
-            binding.tabReceived.setTextColor(R.color.text_dark)
-            binding.tabSent.setTextColor(R.color.text_muted)
+            binding.tabReceived.setTextColor(resources.getColor(R.color.text_dark, null))
+            binding.tabSent.setTextColor(resources.getColor(R.color.text_muted, null))
         }
         else {
-            binding.tabReceived.setTextColor(R.color.text_muted)
-            binding.tabSent.setTextColor(R.color.text_dark)
+            binding.tabReceived.setTextColor(resources.getColor(R.color.text_muted, null))
+            binding.tabSent.setTextColor(resources.getColor(R.color.text_dark, null))
         }
         loadGifts(mode)
     }

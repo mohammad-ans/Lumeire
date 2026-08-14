@@ -20,10 +20,10 @@ def create_notification(db: Session, id: str, t: str, b: str, type: str = "gener
 def list_notifications(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     return db.query(Notification).filter(Notification.user_id == user.id).order_by(Notification.created_at.desc()).all()
 
-@router.get("/unread-count")
+@router.get("/unreadCount")
 def unread_count(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     count = db.query(Notification).filter(Notification.user_id == user.id, Notification.is_read == False).count()
-    return {"count": count}
+    return count
 
 @router.patch("/{id}/read", response_model=NotificationResponse)
 def mark_read(id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
@@ -39,4 +39,4 @@ def mark_read(id: str, db: Session = Depends(get_db), user: User = Depends(get_c
 def mark_all(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     db.query(Notification).filter(Notification.user_id == user, Notification.is_read == False).update({Notification.is_read: True})
     db.commit()
-    return "All notifications marked as read"
+    return MessageResponse(message="All notifications marked as read")
