@@ -95,6 +95,7 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
 
 @router.get("/bookings", response_model=List[BookingResponse])
 def list_bookings(db : Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    finalize_bookings(db, current_user.id)
     return db.query(Booking).filter(Booking.user_id == current_user.id).order_by(Booking.appointment_time.desc()).all()
 
 @router.patch("/bookings/{booking_id}/mark-paid", response_model=BookingResponse)
@@ -138,3 +139,22 @@ def cancel_booking(booking_id: str, db: Session = Depends(get_db), current_user:
 
     db.refresh(booking)
     return booking
+
+def finalize_bookings(db: Session, id: Optional[str] = None) -> List[Booking]:
+    query = db.query(Booking).filter(Booking.status == "Upcoming", Booking.appointment_time < datetime.utcnow())
+
+    if id:
+        query = db.filter(Booking.user_id == id)
+    stale_bookings = query.all()
+
+    if not stale_bookings:
+        return []
+    for booking in stale_bookings:
+        booking.status = "Done"
+    db.commit()
+
+    for booking in stale_bookings:
+        db.refresh(booking)
+        create_notification(db, booking.user_id, "How was your visit", f"Your appointment on {booking.appointment_time.strftime('%b %d %Y at %I%M %p')} is complete. We would love to hear how it went!", type="booking_done", r=booking.id)
+
+    return stale_bookings

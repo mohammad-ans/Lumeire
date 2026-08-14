@@ -2,18 +2,25 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
-from models import Notification, User
+from models import Notification, User, Profile
 from schemas import NotificationResponse, UnreadCountResponse, MessageResponse
 from auth import get_current_user
+from push import send_push
 
 router = APIRouter(prefix="/notifications")
 
 def create_notification(db: Session, id: str, t: str, b: str, type: str = "general", r: Optional[str] = None, commit: bool = True) -> Notification:
     notification = Notification(user_id=id, title=t, body=b, type=type, related_booking_id=r)
     db.add(notification)
+    db.flush()
     if commit:
         db.commit()
         db.refresh(notification)
+
+    profile = db.query(Profile).filter(Profile.id == id).first()
+    token = profile.fcm_token if profile else None
+    if token:
+        send_push(token, t, b, data={"type": type, "id": notification.id, "related_booking_id": r})
     return notification
 
 @router.get("", response_model=List[NotificationResponse])

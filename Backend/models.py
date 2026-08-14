@@ -151,7 +151,7 @@ class GiftCard(Base):
         return self.sender.name if self.sender and self.sender.name else (self.sender.email if self.sender else "")
     @property
     def receiver_name(self) -> str:
-        return self.receiver_name.name if self.receiver and self.receiver.name else (self.receiver.email if self.receiver else "")
+        return self.receiver.name if self.receiver and self.receiver.name else (self.receiver.email if self.receiver else "")
 
 class Voucher(Base):
     __tablename__ = "vouchers"

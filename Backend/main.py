@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import asyncio
 from database import engine, Base
 import models
 import auth
@@ -27,3 +28,18 @@ app.include_router(router)
 app.include_router(bookings.router)
 app.include_router(gift.router)
 app.include_router(support.router)
+
+async def finalize_bookings_loop():
+    while True:
+        try:
+            db = SessionLocal()
+            try:
+                bookings.finalize_bookings(db)
+            finally:
+                db.close()
+        except:
+            await asyncio.sleep(600)
+
+@app.on_event("startup")
+async def bg_task():
+    asyncio.create_task(finalize_bookings_loop())
