@@ -60,14 +60,14 @@ def create_booking(data: BookingCreateRequest, db: Session = Depends(get_db), cu
 
     if data.voucher_id:
         voucher = db.query(Voucher).filter(Voucher.id == data.voucher_id, Voucher.user_id == current_user.id).with_for_update().first()
-    if voucher.is_used:
-        raise HTTPException(status_code=400, detail="Voucher has already been used")
-    if voucher.expires_at and voucher.expires_at < datetime.utcnow():
-        raise HTTPException(status_code=400, detail="Vouvher has expired")
-    if voucher.discount_type == "percent":
-        amount_due = max(amount_due - (amount_due * voucher.discount_value / 100.0), 0.0)
-    else:
-        amount_due = max(amount_due - voucher.discount_value, 0.0)
+        if voucher.is_used:
+            raise HTTPException(status_code=400, detail="Voucher has already been used")
+        if voucher.expires_at and voucher.expires_at < datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Vouvher has expired")
+        if voucher.discount_type == "percent":
+            amount_due = max(amount_due - (amount_due * voucher.discount_value / 100.0), 0.0)
+        else:
+            amount_due = max(amount_due - voucher.discount_value, 0.0)
 
     booking = Booking(
         user_id = current_user.id,

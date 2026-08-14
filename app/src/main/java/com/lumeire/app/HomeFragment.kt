@@ -55,7 +55,7 @@ class HomeFragment : Fragment() {
                     .centerCrop()
                     .into(binding.ivHomeAvatar)
             } catch (e: Exception) {
-                binding.homeUsername.text = "Hi there 👋"
+                binding.homeUsername.text = "Hi there "
             }
         }
 
@@ -81,9 +81,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.tvHomeFilter.setOnClickListener {
-            selectedChip?.let { setChipSelected(it, false) }
-            selectedChip = null
-            viewModel.updateCategoryFilter(null)
+            clearFilter()
         }
 
         lifecycleScope.launch {
@@ -109,7 +107,7 @@ class HomeFragment : Fragment() {
             Toast.makeText(requireContext(), "Notifications are mocked for this app.", Toast.LENGTH_SHORT).show()
         }
         binding.tvSeeAllServices.setOnClickListener {
-            (activity as? MainActivity)?.openMaps()
+            clearFilter()
         }
         binding.tvSeeAllRecommended.setOnClickListener {
             (activity as? MainActivity)?.openMaps()
@@ -120,6 +118,12 @@ class HomeFragment : Fragment() {
         binding.cardOfferReferral.setOnClickListener {
             shareReferralCode()
         }
+    }
+
+    private fun clearFilter() {
+        selectedChip?.let { setChipSelected(it, false) }
+        selectedChip = null
+        viewModel.updateCategoryFilter(null)
     }
     private fun currentGreeting(): String {
         return when(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {

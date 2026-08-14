@@ -138,7 +138,7 @@ async def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
 @router.post("/signin", response_model=TokenResponse)
 def login(data: SignIn, db : Session = Depends(get_db)):
     user = db.query(User).filter(User.email == data.email).first()
-    if not user or not user.hashed or not verify_password(data.password, user.hashed_password):
+    if not user or not user.hashed_password or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
 
     return TokenResponse(access_token=create_access_token(user.id))

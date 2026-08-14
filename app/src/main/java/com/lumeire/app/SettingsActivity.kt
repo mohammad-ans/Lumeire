@@ -35,11 +35,11 @@ class SettingsActivity: AppCompatActivity() {
         binding.switchDarkMode.isChecked = prefs.getBoolean(KEY_DARK_MODE, false)
         binding.tvAppVersion.text = getVersion()
         binding.switchPushNotifications.setOnCheckedChangeListener {_, isChecked ->
-            prefs.edit().putBoolean(KEY_BOOKING_REMINDERS, isChecked).apply()
+            prefs.edit().putBoolean(KEY_PUSH_NOTIFICATIONS, isChecked).apply()
             syncPushPreference(isChecked)
         }
         binding.switchBookingReminders.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean(KEY_DARK_MODE, isChecked).apply()
+            prefs.edit().putBoolean(KEY_BOOKING_REMINDERS, isChecked).apply()
         }
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean(KEY_DARK_MODE, isChecked).apply()

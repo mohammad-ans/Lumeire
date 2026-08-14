@@ -93,7 +93,7 @@ class ProfileFragment : Fragment() {
             val intent = Intent(requireContext(), EditProfileActivity::class.java)
             intent.putExtra(EditProfileActivity.FULL_NAME, current?.full_name ?: "")
             intent.putExtra(EditProfileActivity.PHONE, current?.phone ?: "")
-            intent.putExtra(EditProfileActivity.DOB, current?.data_of_birth ?: "")
+            intent.putExtra(EditProfileActivity.DOB, current?.date_of_birth ?: "")
             editProfileLauncher.launch(intent)
         }
         binding.rowProfileGifts.setOnClickListener {

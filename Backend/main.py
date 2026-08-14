@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from database import engine, Base
 import models
 import auth
@@ -18,6 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=False
 )
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.include_router(auth.router)
 app.include_router(router)

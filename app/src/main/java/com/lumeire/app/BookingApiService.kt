@@ -19,7 +19,7 @@ interface BookingApiService {
 
     @GET("salons/{salon_id}")
     suspend fun getSalon(@Path("salon_id") salonId: String) : Salon
-    @GET("salons/{salon_id}/services")
+    @GET("salons/{salonId}/services")
     suspend fun getServices(@Path("salonId") salonId: String): List<Service>
 
     @POST("bookings")
@@ -34,7 +34,7 @@ interface BookingApiService {
     @PATCH("bookings/{bookingId}/mark-paid")
     suspend fun markBookingPaid(@Path("bookingId") bookingId: String): Booking
 
-    @GET("users/exists")
+    @GET("user/exists")
     suspend fun checkUser(@Query("email") email: String): EmailExistsResponse
 
     @POST("gifts")

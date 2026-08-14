@@ -62,7 +62,7 @@ class LumeireMessagingService : FirebaseMessagingService() {
             try {
                 if(!ApiClient.isLoggedIn())
                     return@launch
-                ApiClient.apiService.updateProfile(ProfileUpdateRequest(token))
+                ApiClient.apiService.updateProfile(ProfileUpdateRequest(fcm_token = token))
             }
             catch (e: Exception){
                 e.printStackTrace()

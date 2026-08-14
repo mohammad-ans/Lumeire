@@ -72,7 +72,7 @@ data class ProfileResponse(
     val email: String,
     val full_name: String? = null,
     val phone: String? = null,
-    val data_of_birth: String? = null,
+    val date_of_birth: String? = null,
     val reward_points: Int = 0,
     val fcm_token: String? = null,
     val avatar_url: String? = null,
@@ -147,8 +147,8 @@ data class ResetPassword(
 )
 
 data class PasswordChangeReq(
-    val curr_pass: String,
-    val new_pass: String
+    val password: String,
+    val new_password: String
 )
 
 data class SupportTicketCreateReq(

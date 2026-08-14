@@ -166,8 +166,8 @@ class PasswordChangeReq(BaseModel):
     new_password: str
 
 class SupportTicketCreate(BaseModel):
-    subject: str
-    message: str
+    sbj: str
+    msg: str
 
 class SupportTicketResponse(BaseModel):
     id: str
