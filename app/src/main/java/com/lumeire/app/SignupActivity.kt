@@ -33,11 +33,12 @@ class SignupActivity : AppCompatActivity() {
             val fullname = binding.etFullname.text.toString()
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
+            val referralCode = binding.etReferralCode.text.toString().trim().ifBlank { null }
 
             Log.d("User name: ", "$fullname")
             if (fullname.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
                 if (password == binding.etConfirmPassword.text.toString()) {
-                    viewModel.register(email, password, fullname)
+                    viewModel.register(email, password, fullname, referralCode)
                 }
                 else {
                     Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show()
@@ -125,6 +126,3 @@ class SignupActivity : AppCompatActivity() {
         }
 
 }
-
-
-

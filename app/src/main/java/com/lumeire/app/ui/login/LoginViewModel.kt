@@ -35,12 +35,12 @@ class LoginViewModel : ViewModel() {
             }
         }
     }
-    
-    fun register(email: String, password: String, fullname: String) {
+
+    fun register(email: String, password: String, fullname: String, referralCode: String?) {
         viewModelScope.launch {
             _otpState.value = OtpState.Loading
             try {
-                ApiClient.authService.register(SignUp(email, password, fullname))
+                ApiClient.authService.register(SignUp(email, password, fullname, referralCode))
                 _otpState.value = OtpState.CodeSent(email)
             } catch (e: Exception) {
                 _otpState.value = OtpState.Error(parseError(e))
@@ -74,11 +74,11 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    fun googleAuth(idToken: String) {
+    fun googleAuth(idToken: String, referralCode: String? = null) {
         viewModelScope.launch {
             _loginState.value = LoginState.Loading
             try {
-                val response = ApiClient.authService.googleAuth(GoogleAuth(idToken))
+                val response = ApiClient.authService.googleAuth(GoogleAuth(idToken, referralCode))
                 ApiClient.saveToken(response.access_token)
                 _loginState.value = LoginState.Success
             }

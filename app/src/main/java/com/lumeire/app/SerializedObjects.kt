@@ -8,7 +8,8 @@ import kotlinx.serialization.Serializable
 data class SignUp(
     val email: String,
     val password: String,
-    val full_name: String
+    val full_name: String,
+    val referral_code: String? = null
 )
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
@@ -20,7 +21,8 @@ data class SignIn(
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class GoogleAuth(
-    val id_token: String
+    val id_token: String,
+    val referral_code: String? = null
 )
 
 @SuppressLint("UnsafeOptInUsageError")

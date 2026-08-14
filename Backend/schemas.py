@@ -22,6 +22,7 @@ class ForgotPassword(BaseModel):
 
 class GoogleAuth(BaseModel):
     id_token: str
+    referral_code: Optional[str] = None
 
 class Otp(BaseModel):
     email: EmailStr

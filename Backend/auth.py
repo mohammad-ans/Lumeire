@@ -14,6 +14,8 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 import secrets
 from email_send import send_otp
+from vouchers import onboard_new_user
+
 
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
@@ -23,7 +25,6 @@ OTP_EXPIRE_MINUTES = 2
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 router = APIRouter(prefix="/auth")
-
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -113,6 +114,7 @@ def verify_otp(data: Otp, db : Session = Depends(get_db)):
     db.add(user)
     db.flush()
     db.add(Profile(id=user.id, full_name=pending.name))
+    onboard_new_user(db, user, pending.referred_by_code)
     db.delete(pending)
     db.commit()
     db.refresh(user)
@@ -176,6 +178,7 @@ def g_auth(data: GoogleAuth, db : Session = Depends(get_db)):
             db.add(user)
             db.flush()
             db.add(Profile(id=user.id, full_name=name))
+            onboard_new_user(db, user, pending.referred_by_code)
         db.commit()
 
     return TokenResponse(access_token=create_access_token(user.id))
@@ -230,6 +233,7 @@ def reset_password(data: ResetPassword, db: Session = Depends(get_db)):
     db.commit()
 
     return MessageResponse(message="Password reset, login by using new password")
+
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user

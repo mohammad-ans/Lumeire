@@ -9,6 +9,7 @@ from profile import router
 import bookings
 import gift
 import support
+import vouchers
 
 Base.metadata.create_all(bind=engine)
 
@@ -28,6 +29,7 @@ app.include_router(router)
 app.include_router(bookings.router)
 app.include_router(gift.router)
 app.include_router(support.router)
+app.include_router(vouchers.router)
 
 async def finalize_bookings_loop():
     while True:
