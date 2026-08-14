@@ -98,7 +98,7 @@ data class ProfileUpdateRequest(
 @Serializable
 data class GiftCard(
     val id: String,
-    val salon_id: String,
+    val salon_id: String? = null,
     val service_id: String? = null,
     val amount: Double,
     val currency: String = "USD",
@@ -120,7 +120,8 @@ data class BookingCreateRequest(
     val service_id: String,
     val stylist_id: String? = null,
     val appointment_time: String,
-    val gift_card_id: String? = null
+    val gift_card_id: String? = null,
+    val voucher_id: String? = null
 )
 
 @SuppressLint("UnsafeOptInUsageError")

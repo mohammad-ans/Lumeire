@@ -104,6 +104,7 @@ class BookingCreateRequest(BaseModel):
     stylist_id: Optional[str] = None
     appointment_time: datetime
     gift_card_id: Optional[str] = None
+    voucher_id: Optional[str] = None
 
 class BookingResponse(BaseModel):
     id: str
@@ -132,7 +133,7 @@ class GiftCardCreateRequest(BaseModel):
 
 class GiftCardResponse(BaseModel):
     id: str
-    salon_id: str
+    salon_id: Optional[str] = None
     salon_name: str
     service_id: Optional[str] = None
     amount: float

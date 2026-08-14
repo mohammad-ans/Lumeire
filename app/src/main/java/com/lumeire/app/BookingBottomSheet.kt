@@ -61,7 +61,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
                     return@launch
                 }
 
-                val serviceNames = services.map { "${it.name} — PKR ${it.price.toInt()} (${it.duration_minutes} min)" }
+                val serviceNames = services.map { "${it.name} — ${it.currency} ${it.price.toInt()} (${it.duration_minutes} min)" }
                 spinnerServices.adapter = ArrayAdapter(
                     requireContext(),
                     android.R.layout.simple_spinner_dropdown_item,
@@ -93,7 +93,6 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
             }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
         }
 
-        // Confirm booking
         btnConfirm.setOnClickListener {
             val service = selectedService
             val dateTime = selectedDateTime
@@ -112,23 +111,42 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
 
             lifecycleScope.launch {
                 try {
-                    val applicableGift = try{
-                        ApiClient.bookingApiService.getReceivedGifts(unusedOnly = true).firstOrNull { it.salon_id == salon.id }
+                    val gifts = try{
+                        ApiClient.bookingApiService.getReceivedGifts(unusedOnly = true).firstOrNull { it.salon_id == null || it.salon_id == salon.id }
                     }
-                    catch (e: Exception){
+                    catch (_: Exception){
                         null
                     }
-                    val giftCard = if(applicableGift != null) { askToUseGift(applicableGift, service.price) } else null
+                    var giftCard : String? = null
+                    if (gifts != null)
+                        giftCard = useGift(gifts, service.price)
+                    val vouchers = try {
+                        ApiClient.voucherService.getMyVouchers(unusedOnly = true).firstOrNull()
+                    }
+                    catch (_: Exception) {
+                        null
+                    }
+                    var voucher : String? = null
+                    if(vouchers != null)
+                        voucher = useVoucher(vouchers, service.price)
                     val request = BookingCreateRequest(
                         salon_id = salon.id,
                         service_id = service.id,
                         appointment_time = dateTime,
-                        gift_card_id = giftCard
+                        gift_card_id = giftCard,
+                        voucher_id = voucher
                     )
                     val booking = ApiClient.bookingApiService.createBooking(request)
-                    val message = if (giftCard != null) "Booking confirmed! Gift card applied - PKR ${booking.total_amount.toInt()} remaining" else "Booking confirmed"
+                    val applied = mutableListOf<String>()
+                    if(giftCard != null)
+                        applied.add("gift card")
+                    if(voucher != null)
+                        applied.add("voucher")
+                    var msg = "Booking confirmed"
+                    if (applied.isNotEmpty())
+                        msg = "Booking confirmed! ${applied.joinToString(" and ")} - ${service.currency} ${booking.total_amount.toInt()} remaining"
 
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
                     onBookingConfirmed?.invoke()
                     dismiss()
                 } catch (e: Exception) {
@@ -140,7 +158,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private suspend fun askToUseGift(gift: GiftCard, servicePrice: Double): String? {
+    private suspend fun useGift(gift: GiftCard, price: Double): String? {
         val rt = suspendCancellableCoroutine {cont ->
             if(!isAdded) {
                 cont.resume(null) {}
@@ -148,8 +166,28 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
             }
             AlertDialog.Builder(requireContext())
                 .setTitle("Use Gift Card?")
-                .setMessage("You have gift card for this salon worth PKR ${gift.amount.toInt()}. Apply it to this PKR ${servicePrice.toInt()} booking?")
+                .setMessage("You have gift card for this salon worth ${gift.currency} ${gift.amount.toInt()}. Apply it to this ${gift.currency} ${price.toInt()} booking?")
                 .setPositiveButton("Yes") {_, _, -> cont.resume(gift.id) {} }
+                .setNegativeButton("No"){_, _, -> cont.resume(null) {} }
+                .setOnCancelListener { cont.resume(null) {} }
+                .show()
+        }
+        return rt
+    }
+
+    private suspend fun useVoucher(v: VoucherResponse, price: Double): String? {
+        val rt = suspendCancellableCoroutine {cont ->
+            if(!isAdded) {
+                cont.resume(null) {}
+                return@suspendCancellableCoroutine
+            }
+            val label = "USD ${v.discount_value.toInt()} off"
+            if(v.discount_type == "percent")
+                "${v.discount_value.toInt()} off"
+            AlertDialog.Builder(requireContext())
+                .setTitle("Use Voucher?")
+                .setMessage("You have a voucher (${v.code}) worth $label. Apply it to this ${price.toInt()} booking?")
+                .setPositiveButton("Yes") {_, _, -> cont.resume(v.id) {} }
                 .setNegativeButton("No"){_, _, -> cont.resume(null) {} }
                 .setOnCancelListener { cont.resume(null) {} }
                 .show()
