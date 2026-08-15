@@ -76,17 +76,21 @@ class ProfileFragment : Fragment() {
         }
         binding.ivProfileAvatar.setOnClickListener { pickImageLauncher.launch("image/*") }
         binding.rowProfilePayment.setOnClickListener {
-                Toast.makeText(
-                    requireContext(), getString(R.string.section_placeholder_message, "Payment Methods"),
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+                Toast.makeText(requireContext(), getString(R.string.section_placeholder_message, "Payment Methods"),Toast.LENGTH_SHORT).show()
+        }
         binding.rowProfileRewards.setOnClickListener {
             startActivity(Intent(requireContext(), RewardsActivity::class.java))
         }
         binding.rowProfileHelp.setOnClickListener {
             startActivity(Intent(requireContext(), HelpSupportActivity::class.java))
         }
+        binding.rowProfilePrivacy.setOnClickListener {
+            startActivity(Intent(requireContext(), PrivacySecurity::class.java))
+        }
+        binding.rowProfileSettings.setOnClickListener {
+            startActivity(Intent(requireContext(), SettingsActivity::class.java))
+        }
+
         binding.rowProfileEdit.setOnClickListener {
             val current = viewModel.profile.value
             val intent = Intent(requireContext(), EditProfileActivity::class.java)
@@ -99,8 +103,10 @@ class ProfileFragment : Fragment() {
             startActivity(Intent(requireContext(), GiftCardActivity::class.java))
         }
 
+        binding.switchNotifications.isChecked = PushPreferences.getPush(requireContext())
+        binding.switchNotifications.setOnCheckedChangeListener(null)
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
-
+            PushPreferences.setPushed(requireContext(), isChecked, lifecycleScope)
             val message = if (isChecked) "Notifications enabled." else "Notifications paused."
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }

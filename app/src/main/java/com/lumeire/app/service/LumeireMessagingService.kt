@@ -12,6 +12,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.lumeire.app.ApiClient
 import com.lumeire.app.MainActivity
 import com.lumeire.app.ProfileUpdateRequest
+import com.lumeire.app.PushPreferences
 import com.lumeire.app.R
 import com.lumeire.app.SettingsActivity
 import kotlinx.coroutines.CoroutineScope
@@ -39,9 +40,7 @@ class LumeireMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        val prefs = applicationContext.getSharedPreferences(SettingsActivity.PREFS_NAME, Context.MODE_PRIVATE)
-        val enabled = prefs.getBoolean(SettingsActivity.KEY_PUSH_NOTIFICATIONS, true)
-        if (enabled)
+        if(PushPreferences.getPush(applicationContext))
             updateTokenOnServer(token)
     }
 

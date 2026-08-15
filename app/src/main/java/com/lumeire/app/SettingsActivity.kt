@@ -16,12 +16,7 @@ class SettingsActivity: AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var prefs: SharedPreferences
 
-    companion object {
-        const val PREFS_NAME = "lumeire_settings"
-        const val KEY_PUSH_NOTIFICATIONS = "push_notifications_enabled"
-        const val KEY_BOOKING_REMINDERS = "booking_reminders_enabled"
-        const val KEY_DARK_MODE = "dark_mode_enabled"
-    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,21 +52,6 @@ class SettingsActivity: AppCompatActivity() {
                 }
             }
             return
-        }
-        FirebaseMessaging.getInstance().token.addOnCompleteListener {task ->
-            if(!task.isSuccessful) {
-                Log.e("Settings", "Fetching FCM token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = task.result ?: return@addOnCompleteListener
-            lifecycleScope.launch {
-                try {
-                    ApiClient.apiService.updateProfile(ProfileUpdateRequest(fcm_token = token))
-                }
-                catch (e : Exception) {
-                    Log.e("Settings", "Failed to sync push notification", e)
-                }
-            }
         }
     }
     private fun getVersion(): String {
