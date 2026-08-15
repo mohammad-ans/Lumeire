@@ -181,9 +181,9 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
                 cont.resume(null) {}
                 return@suspendCancellableCoroutine
             }
-            val label = "USD ${v.discount_value.toInt()} off"
+            var label = "USD ${v.discount_value.toInt()} off"
             if(v.discount_type == "percent")
-                "${v.discount_value.toInt()} off"
+                label = "${v.discount_value.toInt()} off"
             AlertDialog.Builder(requireContext())
                 .setTitle("Use Voucher?")
                 .setMessage("You have a voucher (${v.code}) worth $label. Apply it to this ${price.toInt()} booking?")

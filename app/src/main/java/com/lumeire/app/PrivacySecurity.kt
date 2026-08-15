@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 class PrivacySecurity: AppCompatActivity() {
     private lateinit var binding: ActivityPrivacySecurityBinding
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         binding = ActivityPrivacySecurityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.btnBack.setOnClickListener { finish() }

@@ -15,7 +15,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.common.api.Api
 import kotlinx.coroutines.launch
 import com.lumeire.app.databinding.FragmentProfileBinding
 import com.lumeire.app.ui.profile.ProfileViewModel
@@ -69,7 +68,7 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
-        
+
         lifecycleScope.launch {
             viewModel.totalBookings.collect { total ->
                 binding.tvProfileStatBookings.text = total.toString()
@@ -101,6 +100,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+
             val message = if (isChecked) "Notifications enabled." else "Notifications paused."
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }

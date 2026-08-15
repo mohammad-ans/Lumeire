@@ -115,7 +115,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             if(phone.isNullOrBlank())
                 Toast.makeText(requireContext(), "No phone number listed for this salon.", Toast.LENGTH_SHORT).show()
             else{
-                val intent = Intent(Intent.ACTION_CALL, "tel:$phone".toUri())
+                val intent = Intent(Intent.ACTION_DIAL, "tel:$phone".toUri())
                 startActivity(intent)
             }
         }
@@ -273,8 +273,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         rows.forEach { row ->
             if (row.card.isVisible) {
                 val salon = row.salon
-                val lat = salon.latitude ?: 0.0
-                val lng = salon.longitude ?: 0.0
+                val lat = salon.latitude ?: return@forEach
+                val lng = salon.longitude ?: return@forEach
                 val location = LatLng(lat, lng)
                 val isSelected = salon.id == selectedSalonId
                 val icon = if (isSelected) BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE) else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)

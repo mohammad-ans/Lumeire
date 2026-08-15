@@ -14,7 +14,6 @@ import com.lumeire.app.ui.login.LoginState
 import com.lumeire.app.ui.login.LoginViewModel
 import kotlinx.coroutines.launch
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 

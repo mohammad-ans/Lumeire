@@ -3,7 +3,6 @@ package com.lumeire.app.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lumeire.app.ApiClient
-import com.lumeire.app.data.model.Profile
 import com.lumeire.app.data.model.Salon
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -2,7 +2,6 @@ package com.lumeire.app
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.lumeire.app.databinding.ItemVoucherBinding
 import java.text.SimpleDateFormat

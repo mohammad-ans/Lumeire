@@ -46,7 +46,7 @@ class SettingsActivity: AppCompatActivity() {
             Toast.makeText(this, getString(R.string.dark_mode_restart_note), Toast.LENGTH_SHORT).show()
         }
     }
-    private fun syncPushPreference(enabled: Boolean) {
+    fun syncPushPreference(enabled: Boolean) {
         if(!enabled) {
             lifecycleScope.launch {
                 try {

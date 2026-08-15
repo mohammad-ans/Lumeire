@@ -140,25 +140,33 @@ data class GiftCardCreateRequest(
 data class EmailExistsResponse(val exists: Boolean)
 
 @SuppressLint("UnsafeOptInUsageError")
+@Serializable
 data class ForgotPassword(val email: String)
 
 @SuppressLint("UnsafeOptInUsageError")
+@Serializable
 data class ResetPassword(
     val email: String,
     val otp_code: String,
     val new_password: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
 data class PasswordChangeReq(
     val password: String,
     val new_password: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
 data class SupportTicketCreateReq(
     val sbj: String,
     val msg: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
 data class SupportTicket(
     val id: String,
     val sbj: String,
@@ -167,6 +175,8 @@ data class SupportTicket(
     val created_at: String
 )
 
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
 data class Notification(
     val id: String,
     val title: String,

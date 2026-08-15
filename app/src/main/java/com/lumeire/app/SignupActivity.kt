@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.lumeire.app.data.model.Profile
 import com.lumeire.app.ui.login.OtpState
 
 class SignupActivity : AppCompatActivity() {

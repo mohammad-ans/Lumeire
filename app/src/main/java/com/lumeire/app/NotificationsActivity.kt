@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.lumeire.app.databinding.ActivityNotificationsBinding
 import kotlinx.coroutines.launch
-import kotlin.io.path.Path
 
 class NotificationsActivity: AppCompatActivity() {
     private lateinit var binding: ActivityNotificationsBinding
