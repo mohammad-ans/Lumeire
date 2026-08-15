@@ -72,6 +72,19 @@ class BookingsViewModel : ViewModel() {
      }
     }
 
+    fun markBooking(bookingId: String) {
+        viewModelScope.launch {
+            try {
+                ApiClient.bookingApiService.markBookingPaid(bookingId)
+                fetchBookings()
+            }
+            catch (e: Exception) {
+                android.util.Log.e("BookingsViewModel", "Error marking booking as paid", e)
+                _error.value = toUserMessage(e)
+            }
+        }
+    }
+
     private fun toUserMessage(e: Exception): String {
         var message = ""
         when(e) {

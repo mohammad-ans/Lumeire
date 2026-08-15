@@ -14,7 +14,6 @@ import com.lumeire.app.MainActivity
 import com.lumeire.app.ProfileUpdateRequest
 import com.lumeire.app.PushPreferences
 import com.lumeire.app.R
-import com.lumeire.app.SettingsActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

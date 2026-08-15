@@ -3,7 +3,6 @@ package com.lumeire.app
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 

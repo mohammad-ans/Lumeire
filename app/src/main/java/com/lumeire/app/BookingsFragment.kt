@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -91,20 +92,80 @@ class BookingsFragment : Fragment() {
 
     private fun createBookingCard(booking: Booking, isUpcoming: Boolean): View {
         val inflater = LayoutInflater.from(requireContext())
-        val cardView = inflater.inflate(R.layout.row_map_salon_content, if(isUpcoming) binding.layoutUpcoming else binding.layoutPast, false) as com.google.android.material.card.MaterialCardView
+        val parent = if(isUpcoming) binding.layoutUpcoming else binding.layoutPast
 
-        val tvName = cardView.findViewById<TextView>(R.id.tv_salon_2_name)
-        val tvMeta = cardView.findViewById<TextView>(R.id.tv_salon_2_meta)
-        val tvCategory = cardView.findViewById<TextView>(R.id.tv_salon_2_category)
+        val contentRow = inflater.inflate(R.layout.row_map_salon_content, parent, false) as LinearLayout
+
+        val tvName = contentRow.findViewById<TextView>(R.id.tv_salon_2_name)
+        val tvMeta = contentRow.findViewById<TextView>(R.id.tv_salon_2_meta)
+        val tvCategory = contentRow.findViewById<TextView>(R.id.tv_salon_2_category)
 
         tvName.text = "Booking #${booking.id.takeLast(4)}"
         tvCategory.text = "Salon ID: ${booking.salon_id}"
         tvMeta.text = "Status: ${booking.status}\nPayment: ${booking.payment_status} (${booking.currency} ${booking.total_amount.toInt()})\nTime: ${booking.appointment_time}"
 
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-        params.setMargins(0, 0, 0, 14)
-        cardView.layoutParams = params
-        return cardView
+        val card = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.VERTICAL
+            setBackgroundResource(R.drawable.bg_card_white)
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                setMargins(0,0,0,14)
+            }
+        }
+        card.addView(contentRow)
+        val canCancel = isUpcoming && booking.status == "Upcoming"
+        val canPay = booking.payment_status == "unpaid" && booking.status != "Cancelled"
+
+        if (canPay || canCancel) {
+            val actionRow = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                setPadding(24,0,24,16)
+                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+            }
+            if (canPay) {
+                val payBtn = Button(requireContext()).apply {
+                    text = "Pay Now"
+                    setTextColor(Color.WHITE)
+                    setBackgroundResource(R.drawable.bg_button_gold)
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    setOnClickListener { markPaid(booking) }
+                }
+                actionRow.addView(payBtn)
+            }
+
+            if(canCancel) {
+                val cancelBtn = Button(requireContext()).apply {
+                    text = "Cancel"
+                    setTextColor(Color.DKGRAY)
+                    setBackgroundResource(R.drawable.bg_cancel_button)
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                        if (canPay)
+                            marginStart = 12
+                    }
+                    setOnClickListener { cancelBooking(booking) }
+                }
+                actionRow.addView(cancelBtn)
+            }
+            card.addView(actionRow)
+        }
+        return card
+    }
+
+    private fun cancelBooking(booking: Booking) {
+        AlertDialog.Builder(requireContext()).setTitle("Cancel Booking")
+            .setMessage("Are you sure you want to cancel this booking? This cannot be undone.")
+            .setNegativeButton("Keep booking", null)
+            .setPositiveButton("Cancel Booking") {_,_ ->
+                viewModel.cancelBooking(booking.id)
+            }.show()
+    }
+
+    private fun markPaid(booking: Booking) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Mark as paid?")
+            .setMessage("Confirm you have completed payment of ${booking.currency} ${booking.total_amount.toInt()} for this booking.")
+            .setNegativeButton("Not yet", null)
+            .setPositiveButton("Confirm payment") {_,_ -> viewModel.markBooking(booking.id)}.show()
     }
 
     private fun showUpcoming(showUpcoming: Boolean) {
@@ -116,13 +177,15 @@ class BookingsFragment : Fragment() {
 
         binding.btnTabUpcoming.apply {
             setBackgroundResource(if (showUpcoming) R.drawable.bg_tab_selected else 0)
-            if (!showUpcoming) setBackgroundColor(Color.TRANSPARENT)
+            if (!showUpcoming)
+                setBackgroundColor(Color.TRANSPARENT)
             setTextColor(if (showUpcoming) selectedColor else unselectedColor)
         }
 
         binding.btnTabPast.apply {
             setBackgroundResource(if (!showUpcoming) R.drawable.bg_tab_selected else 0)
-            if (showUpcoming) setBackgroundColor(Color.TRANSPARENT)
+            if (showUpcoming)
+                setBackgroundColor(Color.TRANSPARENT)
             setTextColor(if (!showUpcoming) selectedColor else unselectedColor)
         }
     }
