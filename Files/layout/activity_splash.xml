@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_splash">
+
+    <!-- Decorative top-right circle -->
+    <View
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="-80dp"
+        android:layout_marginEnd="-60dp"
+        android:background="@drawable/shape_circle_cream_glow"
+        android:alpha="0.2" />
+
+    <!-- Decorative bottom-left circle -->
+    <View
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginBottom="-60dp"
+        android:layout_marginStart="-80dp"
+        android:background="@drawable/shape_circle_gold_glow"
+        android:alpha="0.15" />
+
+    <!-- Center content -->
+    <LinearLayout
+        android:id="@+id/splash_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:alpha="0"
+        android:translationY="30dp">
+
+        <!-- Logo icon container -->
+        <FrameLayout
+            android:id="@+id/logo_container"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:layout_marginBottom="24dp"
+            android:scaleX="0.6"
+            android:scaleY="0.6">
+
+            <!-- Glow ring (animated) -->
+            <View
+                android:id="@+id/logo_glow_ring"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shape_logo_ring" />
+
+            <!-- Main logo background -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_logo_gold"
+                android:elevation="2dp">
+
+                <ImageView
+                    android:layout_width="46dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_logo"
+                    android:contentDescription="@string/app_name" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <!-- Brand name "Lumeire" -->
+        <TextView
+            android:id="@+id/tv_brand_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:fontFamily="serif"
+            android:textSize="46sp"
+            android:textColor="@color/text_dark"
+            android:letterSpacing="0.15"
+            android:textStyle="bold"
+            android:alpha="0" />
+
+        <!-- Gold divider with dot -->
+        <LinearLayout
+            android:id="@+id/divider_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:alpha="0">
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="1dp"
+                android:background="@drawable/bg_gradient_left_gold" />
+
+            <View
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/shape_circle_gold" />
+
+            <View
+                android:layout_width="40dp"
+                android:layout_height="1dp"
+                android:background="@drawable/bg_gradient_right_gold" />
+        </LinearLayout>
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/tv_tagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tagline"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="13sp"
+            android:textColor="#8B6840"
+            android:letterSpacing="0.22"
+            android:textAllCaps="true"
+            android:alpha="0"
+            android:translationY="10dp" />
+    </LinearLayout>
+
+    <!-- Loading bar at bottom -->
+    <LinearLayout
+        android:id="@+id/loading_container"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="64dp"
+        android:orientation="vertical"
+        android:alpha="0">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/bg_progress_track">
+
+            <View
+                android:id="@+id/progress_bar_fill"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_gradient_gold_header" />
+        </FrameLayout>
+    </LinearLayout>
+
+</FrameLayout>
