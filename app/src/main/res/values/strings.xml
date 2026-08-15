@@ -174,4 +174,9 @@
     <string name="about_section">About</string>
     <string name="app_version">App Version</string>
     <string name="mark_all">Mark all read</string>
+    <string name="my_vouchers">My Vouchers</string>
+    <string name="active">Active</string>
+    <string name="used">Used</string>
+    <string name="no_vouchers">You have no vouchers.</string>
+    <string name="expire_dynamic">Expires %1$s</string>
 </resources>
