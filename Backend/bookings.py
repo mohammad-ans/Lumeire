@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
 from models import Booking, Salon, Service, Stylist, User, GiftCard, Voucher
-from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse
+from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse, StylistResponse
 
 from datetime import datetime
 from auth import get_current_user
@@ -139,6 +139,13 @@ def cancel_booking(booking_id: str, db: Session = Depends(get_db), current_user:
 
     db.refresh(booking)
     return booking
+
+@router.get("/salons/{id}/stylists", response_model=List[StylistResponse])
+def stylists(id: str, db: Session = Depends(get_db)):
+    salon = db.query(Salon).filter(Salon.id == id).first()
+    if not salon:
+        raise HTTPException(status_code =)
+    return db.query(Stylist).filter(Stylist.salon_id == id).all()
 
 def finalize_bookings(db: Session, id: Optional[str] = None) -> List[Booking]:
     query = db.query(Booking).filter(Booking.status == "Upcoming", Booking.appointment_time < datetime.utcnow())

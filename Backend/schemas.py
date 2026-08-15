@@ -190,3 +190,11 @@ class NotificationResponse(BaseModel):
     related_booking_id: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class StylistResponse(BaseModel):
+    id: str
+    name: str
+    speciality: Optional[str] = None
+    salon_id: str
+
+    model_config = ConfigDict(from_attributes=True)
