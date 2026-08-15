@@ -25,12 +25,12 @@ class GiftingFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: HomeViewModel by viewModels()
 
-    private var selectedOccasionIndex = 0
+    private var selectedOccasion = 0
     private lateinit var occasionChips: List<TextView>
     private var salons: List<Salon> = emptyList()
     private var services: List<Service> = emptyList()
-    private var selectedSalonIndex = 0
-    private var selectedServiceIndex = 0
+    private var selectedSalon = 0
+    private var selectedService = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGiftingBinding.inflate(inflater, container, false)
@@ -47,7 +47,7 @@ class GiftingFragment : Fragment() {
 
         occasionChips.forEachIndexed { index, chip ->
             chip.setOnClickListener {
-                selectedOccasionIndex = index
+                selectedOccasion = index
                 updateOccasionSelection(occasionChips)
             }
         }
@@ -57,7 +57,7 @@ class GiftingFragment : Fragment() {
 
         binding.customAmount.doAfterTextChanged {
             if(getCustomAmount() != null){
-                selectedServiceIndex = -1
+                selectedService = -1
                 refreshServiceChips()
             }
             updatePreview()
@@ -75,7 +75,7 @@ class GiftingFragment : Fragment() {
     }
 
     private fun currentSalon() : Salon? {
-        return salons.getOrNull(selectedSalonIndex)
+        return salons.getOrNull(selectedSalon)
     }
     private fun getCustomAmount(): Double?{
         val raw = binding.customAmount.text?.toString()?.trim().orEmpty()
@@ -89,9 +89,9 @@ class GiftingFragment : Fragment() {
         container.removeAllViews()
 
         salons.forEachIndexed { index, salon ->
-            val chip = makeChip(salon.name, index == selectedSalonIndex)
+            val chip = makeChip(salon.name, index == selectedSalon)
             chip.setOnClickListener {
-                selectedSalonIndex = index
+                selectedSalon = index
                 refreshSalonChips()
                 fetchServicesForSalon(salon.id)
             }
@@ -99,13 +99,13 @@ class GiftingFragment : Fragment() {
         }
 
         if (salons.isNotEmpty())
-            fetchServicesForSalon(salons[selectedSalonIndex].id)
+            fetchServicesForSalon(salons[selectedSalon].id)
     }
 
     private fun refreshSalonChips() {
         binding.llSalonChips.forEachIndexed { index, view ->
             val chip = view as? TextView ?: return@forEachIndexed
-            val selected = index == selectedSalonIndex
+            val selected = index == selectedSalon
             chip.setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
             chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
         }
@@ -115,7 +115,7 @@ class GiftingFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 services = ApiClient.bookingApiService.getServices(salonId)
-                selectedServiceIndex = 0
+                selectedService = 0
                 buildServiceChips()
             } catch (e: Exception) {
                 android.util.Log.e("Gifting Fragment", "Error fetching services", e)
@@ -135,9 +135,9 @@ class GiftingFragment : Fragment() {
         }
 
         services.forEachIndexed { index, service ->
-            val chip = makeChip(service.name, index == selectedServiceIndex)
+            val chip = makeChip(service.name, index == selectedService)
             chip.setOnClickListener {
-                selectedServiceIndex = index
+                selectedService = index
                 refreshServiceChips()
                 updatePreview()
             }
@@ -149,7 +149,7 @@ class GiftingFragment : Fragment() {
     private fun refreshServiceChips() {
         binding.llServiceChips.forEachIndexed { index, view ->
             val chip = view as? TextView ?: return@forEachIndexed
-            val selected = index == selectedServiceIndex
+            val selected = index == selectedService
             chip.setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
             chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
         }
@@ -171,7 +171,7 @@ class GiftingFragment : Fragment() {
             return
         }
 
-        val service = services.getOrNull(selectedServiceIndex) ?: return
+        val service = services.getOrNull(selectedService) ?: return
         binding.tvGiftPreviewTitle.text = service.name
         binding.tvGiftPreviewDesc.text = salon?.name ?: ""
         binding.tvGiftPreviewValue.text = "$currency ${service.price.toInt()}"
@@ -190,7 +190,7 @@ class GiftingFragment : Fragment() {
         if (services.isEmpty())
             return getString(R.string.send_gift)
 
-        val service = services[selectedServiceIndex]
+        val service = services[selectedService]
         return "Send Gift · $currency $${service.price}"
     }
 
@@ -199,7 +199,7 @@ class GiftingFragment : Fragment() {
         val message = binding.etGiftMessage.text?.toString()?.trim().orEmpty()
         val salon = currentSalon()
         val amount = getCustomAmount()
-        val service = if(amount == null) services.getOrNull(selectedServiceIndex) else null
+        val service = if(amount == null) services.getOrNull(selectedService) else null
 
 
         if (email.isBlank()) {
@@ -237,7 +237,7 @@ class GiftingFragment : Fragment() {
                     resetSend()
                     return@launch
                 }
-                val occasionLabel = occasionChips.getOrNull(selectedOccasionIndex)?.text?.toString()
+                val occasionLabel = occasionChips.getOrNull(selectedOccasion)?.text?.toString()
 
                 ApiClient.bookingApiService.sendGift(
                     GiftCardCreateRequest(
@@ -302,7 +302,7 @@ class GiftingFragment : Fragment() {
 
     private fun updateOccasionSelection(chips: List<TextView>) {
         chips.forEachIndexed { index, chip ->
-            val selected = index == selectedOccasionIndex
+            val selected = index == selectedOccasion
             chip.setBackgroundResource(if (selected) R.drawable.bg_chip_gold_filled else R.drawable.bg_chip_outlined)
             chip.setTextColor(resources.getColor(if (selected) R.color.white else R.color.text_medium, null))
         }

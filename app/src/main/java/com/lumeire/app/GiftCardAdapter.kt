@@ -14,11 +14,11 @@ class GiftCardAdapter(
     private val mode: Mode
 ) : RecyclerView.Adapter<GiftCardAdapter.GiftCardViewHolder>() {
     enum class Mode {RECEIVED, SENT}
-    private val isoFormatCandidates = listOf(
+    private val isos = listOf(
         "yyyy-MM-dd'T'HH:mm:ss:SSSSSS",
         "yyyy-MM0dd'T'HH:mm:ss"
     )
-    private val displayFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+    private val format = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
 
     fun submitList(newItems: List<GiftCard>) {
         items = newItems
@@ -40,12 +40,14 @@ class GiftCardAdapter(
         return items.size
     }
     private fun formatDate(s : String) : String {
-        for (pattern in isoFormatCandidates) {
+        for (i in isos) {
             try {
-                val parser = SimpleDateFormat(pattern, Locale.getDefault())
+                val parser = SimpleDateFormat(i, Locale.getDefault())
                 parser.timeZone = TimeZone.getTimeZone("UTC")
-                val date = parser.parse(s) ?: continue
-                return displayFormat.format(date)
+                val date = parser.parse(s)
+                if (date == null)
+                    continue
+                return format.format(date)
             }
             catch (_ : Exception) {}
         }

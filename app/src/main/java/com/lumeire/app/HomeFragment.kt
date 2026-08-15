@@ -113,7 +113,7 @@ class HomeFragment : Fragment() {
             (activity as? MainActivity)?.openMaps()
         }
         binding.cardOfferFirstVisit.setOnClickListener {
-            showFirstVisitVoucher()
+            startActivity(Intent(requireContext(), VoucherActivity::class.java))
         }
         binding.cardOfferReferral.setOnClickListener {
             shareReferralCode()
@@ -143,27 +143,6 @@ class HomeFragment : Fragment() {
             chip.setTextColor(resources.getColor(R.color.text_medium, null))
         }
     }
-
-    private fun showFirstVisitVoucher() {
-        lifecycleScope.launch {
-            try {
-                val vouchers = ApiClient.voucherService.getMyVouchers(false)
-                val firstVisit = vouchers.firstOrNull{it.reason == "first_visit"}
-                when{
-                    firstVisit == null -> Toast.makeText(requireContext(), "No welcome voucher found on your account.", Toast.LENGTH_SHORT).show()
-                    firstVisit.is_used -> Toast.makeText(requireContext(), "You have already used your welcome voucher.", Toast.LENGTH_SHORT).show()
-                    else -> AlertDialog.Builder(requireContext())
-                        .setTitle("20% Off First Visit")
-                        .setMessage("Your code: ${firstVisit.code}\n\nApply it at checkout to get ${firstVisit.discount_value.toInt()}% off.")
-                        .setPositiveButton("OK", null)
-                        .show()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Could not load your voucher, please try again.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     private fun shareReferralCode() {
         lifecycleScope.launch {
             try{

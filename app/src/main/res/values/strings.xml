@@ -178,5 +178,9 @@
     <string name="active">Active</string>
     <string name="used">Used</string>
     <string name="no_vouchers">You have no vouchers.</string>
+    <string name="no_vouchers_used">You have no used vouchers.</string>
+    <string name="no_vouchers_un">You have no active vouchers.</string>
     <string name="expire_dynamic">Expires %1$s</string>
+    <string name="voucher_per_dis">%1$d% off</string>
+    <string name="voucher_dis">%1$d off</string>
 </resources>
