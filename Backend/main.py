@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import asyncio
-from database import engine, Base
+from database import engine, Base, SessionLocal
 import models
 import auth
 from profile import router
@@ -10,6 +10,7 @@ import bookings
 import gift
 import support
 import vouchers
+import notifications
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,6 +31,7 @@ app.include_router(bookings.router)
 app.include_router(gift.router)
 app.include_router(support.router)
 app.include_router(vouchers.router)
+app.include_router(notifications.router)
 
 async def finalize_bookings_loop():
     while True:

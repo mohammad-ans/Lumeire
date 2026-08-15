@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
 from models import Notification, User, Profile
-from schemas import NotificationResponse, UnreadCountResponse, MessageResponse
+from schemas import NotificationResponse, MessageResponse
 from auth import get_current_user
 from push import send_push
 
@@ -44,6 +44,6 @@ def mark_read(id: str, db: Session = Depends(get_db), user: User = Depends(get_c
 
 @router.patch("/readAll")
 def mark_all(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    db.query(Notification).filter(Notification.user_id == user, Notification.is_read == False).update({Notification.is_read: True})
+    db.query(Notification).filter(Notification.user_id == user.id, Notification.is_read == False).update({Notification.is_read: True})
     db.commit()
     return MessageResponse(message="All notifications marked as read")
