@@ -21,7 +21,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
 EXPIRE_MINUTES = 10080
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-OTP_EXPIRE_MINUTES = 2
+OTP_EXPIRE_MINUTES = 10
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 router = APIRouter(prefix="/auth")
