@@ -1,5 +1,6 @@
 package com.lumeire.app
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -39,11 +40,9 @@ class BookingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Setup Tab Click Listeners
         binding.btnTabUpcoming.setOnClickListener { showUpcoming(true) }
         binding.btnTabPast.setOnClickListener { showUpcoming(false) }
 
-        // Observe Bookings for Upcoming Tab
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.bookings.collect { bookingsList ->
                 binding.layoutUpcoming.removeAllViews()
@@ -66,7 +65,6 @@ class BookingsFragment : Fragment() {
             }
         }
 
-        // Observe Bookings for Past Tab
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.bookings.collect { bookingsList ->
                 binding.layoutPast.removeAllViews()
@@ -193,24 +191,5 @@ class BookingsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-    private fun showSalonPickerDialog() {
-        viewModel.fetchSalons { salons ->
-            if (salons.isEmpty()) {
-                Toast.makeText(requireContext(), "No salons available", Toast.LENGTH_SHORT).show()
-                return@fetchSalons
-            }
-            val names = salons.map { it.name }.toTypedArray()
-            requireActivity().runOnUiThread {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Select a Salon")
-                    .setItems(names) { _, index ->
-                        val sheet = BookingBottomSheet.newInstance(salons[index])
-                        sheet.onBookingConfirmed = { viewModel.refresh() }
-                        sheet.show(childFragmentManager, "BookingBottomSheet")
-                    }
-                    .show()
-            }
-        }
     }
 }

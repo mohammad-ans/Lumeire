@@ -1,6 +1,6 @@
 package com.lumeire.app
 
-import android.app.AlertDialog
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,6 +18,7 @@ import com.lumeire.app.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
 import android.widget.LinearLayout
 import android.view.Gravity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import java.util.Calendar
 
@@ -29,6 +30,11 @@ class HomeFragment : Fragment() {
 
     private lateinit var chips: List<TextView>
     private var selectedChip: TextView? = null
+
+    private val salonLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { res->
+        if(res.resultCode == RESULT_OK)
+            (activity as? MainActivity)?.openBookings()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -179,11 +185,8 @@ class HomeFragment : Fragment() {
         tvPrice.text = ""
 
         cardView.setOnClickListener {
-            val sheet = BookingBottomSheet.newInstance(salon)
-            sheet.onBookingConfirmed = {
-                (activity as? MainActivity)?.openBookings()
-            }
-            sheet.show(parentFragmentManager, "BookingBottomSheet")
+            salonLauncher.launch(Intent(requireContext(), SalonActivity::class.java).putExtra(
+                SalonActivity.EXTRA_SALON_ID, salon.id))
         }
 
         val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
