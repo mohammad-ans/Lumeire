@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.lumeire.app.data.model.Service
 import com.lumeire.app.data.model.Salon
+import com.lumeire.app.data.model.Stylist
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okio.IOException
@@ -21,14 +22,19 @@ import java.util.*
 class BookingBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var salon: Salon
-    private var services: List<Service> = emptyList()
-    private var selectedService: Service? = null
+    private var stylists: List<Stylist> = emptyList()
+    private var selectedStylist: Stylist? = null
+    private lateinit var service: Service
     private var selectedDateTime: String? = null
     var onBookingConfirmed: (() -> Unit)? = null
 
     companion object {
-        fun newInstance(salon: Salon): BookingBottomSheet {
-            return BookingBottomSheet().apply { this.salon = salon }
+        fun newInstance(salon: Salon, service: Service, stylists: List<Stylist>): BookingBottomSheet {
+            return BookingBottomSheet().apply {
+                this.service = service
+                this.stylists = stylists
+                this.salon = salon
+            }
         }
     }
 
@@ -42,42 +48,38 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val tvSalonName = view.findViewById<TextView>(R.id.tv_bs_salon_name)
-        val spinnerServices = view.findViewById<Spinner>(R.id.spinner_services)
+        val tvServiceSummary = view.findViewById<TextView>(R.id.tv_bs_service_summary)
+        val spinnerStylists = view.findViewById<Spinner>(R.id.spinner_stylists)
+        val layoutStylists = view.findViewById<LinearLayout>(R.id.layout_stylist_section)
         val btnPickDateTime = view.findViewById<Button>(R.id.btn_pick_datetime)
         val tvSelectedTime = view.findViewById<TextView>(R.id.tv_selected_time)
         val btnConfirm = view.findViewById<Button>(R.id.btn_confirm_booking)
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_booking)
 
         tvSalonName.text = salon.name
-        btnConfirm.isEnabled = false
+        tvServiceSummary.text = "${service.name} - ${service.currency} ${service.price.toInt()} (${service.duration_minutes} min"
+        btnConfirm.isEnabled = true
 
-        lifecycleScope.launch {
-            try {
-                services = ApiClient.bookingApiService.getServices(salon.id)
-
-                if (services.isEmpty()) {
-                    Toast.makeText(requireContext(), "No services available for this salon", Toast.LENGTH_SHORT).show()
-                    dismiss()
-                    return@launch
+        if(stylists.isEmpty())
+            layoutStylists.visibility = View.GONE
+        else {
+            layoutStylists.visibility = View.VISIBLE
+            val options = listOf("No preference") + stylists.map { s->
+                if(s.speciality.isNullOrBlank())
+                    s.name
+                else
+                    "${s.name} - ${s.speciality}"
+            }
+            spinnerStylists.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, options)
+            selectedStylist = null
+            spinnerStylists.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                    selectedStylist = if (p2 == 0) null else stylists[p2 - 1]
                 }
 
-                val serviceNames = services.map { "${it.name} — ${it.currency} ${it.price.toInt()} (${it.duration_minutes} min)" }
-                spinnerServices.adapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    serviceNames
-                )
-                selectedService = services.first()
-                btnConfirm.isEnabled = true
-                spinnerServices.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    override fun onItemSelected(parent: AdapterView<*>, v: View?, pos: Int, id: Long) {
-                        selectedService = services[pos]
-                    }
-                    override fun onNothingSelected(parent: AdapterView<*>) {}
+                override fun onNothingSelected(p0: AdapterView<*>?) {
+
                 }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Failed to load services: ${toUserMessage(e)}", Toast.LENGTH_SHORT).show()
-                dismiss()
             }
         }
 
@@ -94,13 +96,8 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
         }
 
         btnConfirm.setOnClickListener {
-            val service = selectedService
             val dateTime = selectedDateTime
 
-            if (service == null) {
-                Toast.makeText(requireContext(), "Please select a service", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
             if (dateTime == null) {
                 Toast.makeText(requireContext(), "Please select a date and time", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -132,6 +129,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
                     val request = BookingCreateRequest(
                         salon_id = salon.id,
                         service_id = service.id,
+                        stylist_id = selectedStylist?.id,
                         appointment_time = dateTime,
                         gift_card_id = giftCard,
                         voucher_id = voucher

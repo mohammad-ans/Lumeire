@@ -144,7 +144,7 @@ def cancel_booking(booking_id: str, db: Session = Depends(get_db), current_user:
 def stylists(id: str, db: Session = Depends(get_db)):
     salon = db.query(Salon).filter(Salon.id == id).first()
     if not salon:
-        raise HTTPException(status_code =)
+        raise HTTPException(status_code =404, detail="Salon not found")
     return db.query(Stylist).filter(Stylist.salon_id == id).all()
 
 def finalize_bookings(db: Session, id: Optional[str] = None) -> List[Booking]:

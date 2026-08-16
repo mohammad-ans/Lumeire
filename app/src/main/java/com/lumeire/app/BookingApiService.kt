@@ -3,6 +3,7 @@ package com.lumeire.app
 import com.lumeire.app.data.model.Booking
 import com.lumeire.app.data.model.Salon
 import com.lumeire.app.data.model.Service
+import com.lumeire.app.data.model.Stylist
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -20,6 +21,8 @@ interface BookingApiService {
     suspend fun getSalon(@Path("salon_id") salonId: String) : Salon
     @GET("salons/{salonId}/services")
     suspend fun getServices(@Path("salonId") salonId: String): List<Service>
+    @GET("salons/{id}/stylists")
+    suspend fun getStylists(@Path("id") id: String): List<Stylist>
 
     @POST("bookings")
     suspend fun createBooking(@Body request: BookingCreateRequest): Booking

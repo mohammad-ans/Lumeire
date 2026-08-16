@@ -23,3 +23,12 @@ data class Salon(
     val price: String? = null,
     val currency: String = "USD"
 )
+
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+data class Stylist(
+    val id: String,
+    val name: String,
+    val speciality: String?,
+    val salon_id: String
+)
