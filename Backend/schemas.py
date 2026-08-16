@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict, Field
 from datetime import datetime
 
 class SignUp(BaseModel):
@@ -43,9 +43,9 @@ class UserResponse(BaseModel):
     email: str
     name: Optional[str]  = None
     auth_provider: str
-    is_verified: bool
+    is_verified: bool = Field(validation_alias="verified")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 class ProfileResponse(BaseModel):
     id: str
@@ -85,6 +85,8 @@ class SalonResponse(BaseModel):
     closeTime: Optional[str] = None
     image_url: Optional[str] = None
     currency: str = "USD"
+    payment_method_name: Optional[str] = None
+    payment_account_number: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -116,9 +118,14 @@ class BookingResponse(BaseModel):
     total_amount: float
     currency: str = "USD"
     payment_status: str
+    payment_proof_url: Optional[str] = None
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class BookingReschedule(BaseModel):
+    appointment_time: datetime
+    stylist_id: Optional[str] = None
 
 class EmailExistResponse(BaseModel):
     exists: bool

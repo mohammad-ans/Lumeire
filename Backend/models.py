@@ -74,6 +74,8 @@ class Salon(Base):
     closeTime = Column(String)
     image_url = Column(String)
     currency = Column(String, default="USD")
+    payment_method_name = Column(String, nullable=True)
+    payment_account_number = Column(String, nullable=True)
 
     services = relationship("Service", back_populates="salon", cascade="all, delete-orphan")
     stylists = relationship("Stylist", back_populates="salon", cascade="all, delete-orphan")
@@ -115,6 +117,7 @@ class Booking(Base):
     currency = Column(String, default="USD")
     created_at = Column(DateTime, default=datetime.utcnow)
     payment_status = Column(String, default="unpaid")
+    payment_proof_url = Column(String, nullable=True)
 
     user = relationship("User", back_populates="bookings")
     salon = relationship("Salon", back_populates="bookings")

@@ -1,15 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+import os
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
 from models import Booking, Salon, Service, Stylist, User, GiftCard, Voucher
-from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse, StylistResponse
+from schemas import BookingCreateRequest, BookingResponse, SalonResponse, ServiceResponse, StylistResponse, BookingReschedule
 
 from datetime import datetime
 from auth import get_current_user
 from notifications import create_notification
 
 router = APIRouter()
+
+PAYMENT_DIR = "static/payments"
+os.makedirs(PAYMENT_DIR, exist_ok=True)
+
+ALLOWED_CONTENT_TYPES = {"image/jpeg": "jpg", "image/png" : "png", "image/webp": "webp"}
+MAX_AVATAR_SIZE_BYTES = 5120 * 1024
 
 @router.get("/salons", response_model=List[SalonResponse])
 def list_salons(category: Optional[str] = Query(None), search: Optional[str] = Query(None), db: Session = Depends(get_db)):
@@ -98,20 +106,53 @@ def list_bookings(db : Session = Depends(get_db), current_user: User = Depends(g
     finalize_bookings(db, current_user.id)
     return db.query(Booking).filter(Booking.user_id == current_user.id).order_by(Booking.appointment_time.desc()).all()
 
-@router.patch("/bookings/{booking_id}/mark-paid", response_model=BookingResponse)
-def mark_paid(booking_id: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    booking = db.query(Booking).filter(Booking.id == booking_id, Booking.user_id == user.id).first()
+@router.post("/bookings/{id}/payment-proof", response_model=BookingResponse)
+def upload_payment(id: str, file: UploadFile = File(...), db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    booking = db.query(Booking).filter(Booking.id == id, Booking.user_id == user.id).first()
     if not booking:
-        raise HTTPException(status_code=404, detail="Booking not found")
+        raise HTTPException(status_code=404, detail="Booking Not Found")
     if booking.status == "Cancelled":
         raise HTTPException(status_code=400, detail="Booking is cancelled")
-    if booking.payment_status != "unpaid":
-        raise HTTPException(status_code=400, detail=f"Booking is already '{booking.payment_status}'")
+    if booking.payment_status == "paid":
+        raise HTTPException(status_code=400, detail="This booking is already paid")
 
-    booking.payment_status = "paid"
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(status_code=400, detail="Only JPEG/PNG/WEBP are allowed")
+    content = file.file.read()
+    if len(content) > MAX_AVATAR_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="Image must be under 5MB")
+
+    ext = ALLOWED_CONTENT_TYPES[file.content_type]
+    filename = f"{id}_{uuid.uuid4().hex[:8]}.{ext}"
+    filepath = os.path.join(PAYMENT_DIR, filename)
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    booking.payment_proof_url = f"/{PAYMENT_DIR}/{filename}"
+    booking.payment_status = "pending_verification"
     db.commit()
-    create_notification(db, user.id, "Payment received", f"We have received your payment for your upcoming appointment.", type="booking", r = booking.id)
+    create_notification(db, user.id, "Payment Image Received", "Payment image received. Salon will confirm it now.", type="booking", r=booking.id)
+    db.refresh(booking)
+    return booking
 
+@router.patch("/bookings/{id}/reschedule", response_model=BookingResponse)
+def reschedule(id: str, data: BookingReschedule, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    booking = db.query(Booking).filter(Booking.id == id, Booking.user_id == user.id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    if booking.status != "Upcoming":
+        raise HTTPException(status_code=400, detail=f"Cannot reschedule a booking that is {booking.status}")
+    if data.appointment_time < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Please pick a time in the future")
+    if data.stylist_id:
+        stylist = db.query(Stylist).filter(Stylist.id == data.stylist_id, Stylist.salon_id == booking.salon_id).first()
+        if not stylist:
+            raise HTTPException(status_code=404, detail="Selected stylist not found.")
+        booking.stylist_id = data.stylist_id
+    pre_time = booking.appointment_time
+    booking.appointment_time = data.appointment_time
+    db.commit()
+    create_notification(db, user.id, "Booking Rescheduled", f"Your appointment has been moved from {pre_time.strftime('%b %d %Y at %I:%M %p')} to {booking.appointment_time.strftime('%b %d %Y at %I:%M %p')}.", type="booking", r=booking.id)
     db.refresh(booking)
     return booking
 
