@@ -183,7 +183,8 @@
     <string name="expire_dynamic">Expires %1$s</string>
     <string name="voucher_per_dis">%1$d% off</string>
     <string name="voucher_dis">%1$d off</string>
-    <string name="services">Services</string>
     <string name="salon_photo">Salon Photo</string>
     <string name="meet_the_team">Meet the team</string>
+    <string name="your_tickets">Your Tickets</string>
+    <string name="no_tickets">No tickets yet.</string>
 </resources>

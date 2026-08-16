@@ -171,6 +171,35 @@
                         android:textStyle="bold"
                         />
                 </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/your_tickets"
+                    android:textColor="@color/text_muted"
+                    android:textStyle="bold"
+                    />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rv_tickets"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_card_white"
+                    android:visibility="gone"
+                    android:nestedScrollingEnabled="false"
+                    />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_no_tickets"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_card_white"
+                    android:gravity="center"
+                    android:padding="24dp"
+                    android:text="@string/no_tickets"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    />
             </LinearLayout>
         </LinearLayout>
 </androidx.core.widget.NestedScrollView>

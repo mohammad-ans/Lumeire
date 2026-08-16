@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -13,8 +14,9 @@ import kotlinx.coroutines.launch
 
 class HelpSupportActivity: AppCompatActivity() {
     private lateinit var binding: ActivityHelpBinding
+    private lateinit var ticketAdapter: TicketsAdapter
     private val supportPhone = "+923254518068"
-    private val supportEmail = "ansmuhammad098@gmail.com"
+    private val supportEmail = "ansmuhammad340@gmail.com"
 
     private val faqs = listOf(
         Faq(
@@ -50,7 +52,10 @@ class HelpSupportActivity: AppCompatActivity() {
         binding.btnBack.setOnClickListener { finish() }
         binding.rvFaqs.layoutManager = LinearLayoutManager(this)
         binding.rvFaqs.adapter = FaqAdapter(faqs)
-
+        ticketAdapter = TicketsAdapter(emptyList())
+        binding.rvTickets.layoutManager = LinearLayoutManager(this)
+        binding.rvTickets.adapter = ticketAdapter
+        loadTickets()
         binding.btnCallSupport.setOnClickListener {
             startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:$supportPhone")))
         }
@@ -65,6 +70,25 @@ class HelpSupportActivity: AppCompatActivity() {
             binding.btnSubmitTicket.isEnabled = true
         }
     }
+    private fun loadTickets() {
+        lifecycleScope.launch {
+            try {
+                val tickets = ApiClient.apiService.getTickets()
+                if(tickets.isEmpty()) {
+                    binding.rvTickets.visibility = View.GONE
+                    binding.tvNoTickets.visibility = View.VISIBLE
+                }
+                else{
+                    ticketAdapter.submitList(tickets.sortedByDescending{it.created_at})
+                    binding.rvTickets.visibility = View.VISIBLE
+                    binding.tvNoTickets.visibility = View.GONE
+                }
+            }
+            catch (_: Exception) {
+                Toast.makeText(this@HelpSupportActivity, "Could not load tickets", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     private fun submitTicket() {
         val sbj = binding.etTicketSubject.text.toString().trim()
         val msg = binding.etTicketMessage.text.toString().trim()
@@ -73,16 +97,21 @@ class HelpSupportActivity: AppCompatActivity() {
             Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show()
             return
         }
+        binding.btnSubmitTicket.isEnabled = false
         lifecycleScope.launch {
             try {
                 ApiClient.apiService.createSupportTicket(SupportTicketCreateReq(sbj, msg))
                 Toast.makeText(this@HelpSupportActivity, R.string.ticket_submitted, Toast.LENGTH_LONG).show()
                 binding.etTicketSubject.text?.clear()
                 binding.etTicketMessage.text?.clear()
+                loadTickets()
             }
             catch (e: Exception) {
                 Log.e("Help Support", "failed to submit ticket", e)
                 Toast.makeText(this@HelpSupportActivity, R.string.ticket_submit_failed, Toast.LENGTH_SHORT).show()
+            }
+            finally {
+                binding.btnSubmitTicket.isEnabled = true
             }
         }
     }
