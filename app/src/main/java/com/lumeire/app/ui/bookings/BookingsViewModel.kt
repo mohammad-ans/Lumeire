@@ -3,11 +3,11 @@ package com.lumeire.app.ui.bookings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lumeire.app.ApiClient
+import com.lumeire.app.BookingReschedule
 import com.lumeire.app.data.model.Booking
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import com.lumeire.app.data.model.Salon
 import kotlinx.coroutines.flow.asStateFlow
 import okio.IOException
 import retrofit2.HttpException
@@ -60,6 +60,20 @@ class BookingsViewModel : ViewModel() {
      }
     }
 
+    fun rescheduleBooking(id: String, time: String, onResult: (Boolean, String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                ApiClient.bookingApiService.rescheduleBooking(id, BookingReschedule(appointment_time = time))
+                fetchBookings()
+                onResult(true, null)
+            }
+            catch (e: Exception) {
+                val message = toUserMessage(e)
+                _error.value = message
+                onResult(false, message)
+            }
+        }
+    }
     private fun toUserMessage(e: Exception): String {
         var message = ""
         when(e) {

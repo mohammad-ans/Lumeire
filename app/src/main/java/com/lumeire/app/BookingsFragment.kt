@@ -1,7 +1,10 @@
 package com.lumeire.app
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Color
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -110,42 +113,49 @@ class BookingsFragment : Fragment() {
             }
         }
         card.addView(contentRow)
-        val canCancel = isUpcoming && booking.status == "Upcoming"
+        val upcoming = isUpcoming && booking.status == "Upcoming"
         val canPay = booking.payment_status == "unpaid" && booking.status != "Cancelled"
 
-        if (canPay || canCancel) {
-            val actionRow = LinearLayout(requireContext()).apply {
-                orientation = LinearLayout.HORIZONTAL
-                setPadding(24,0,24,16)
-                layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT)
-            }
-            if (canPay) {
+        if (canPay) {
                 val payBtn = Button(requireContext()).apply {
                     text = "Pay Now"
                     setTextColor(Color.WHITE)
-                    setBackgroundResource(R.drawable.bg_button_gold)
-                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                    setOnClickListener { markPaid(booking) }
+                    setBackgroundResource(R.drawable.bg_button_green)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                        setMargins(24,0,24,8)
+                    }
+                    setOnClickListener { openPayment(booking) }
                 }
-                actionRow.addView(payBtn)
+                card.addView(payBtn)
             }
 
-            if(canCancel) {
+            if(upcoming) {
+                val actionRow = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    setPadding(24,0,24,16)
+                    layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT)
+                }
+                val rescheduleBtn = Button(requireContext()).apply {
+                    text = "Reschedule"
+                    setTextColor(resources.getColor(R.color.gold_dark, null))
+                    setBackgroundResource(Color.TRANSPARENT)
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    setOnClickListener { rescheduleDialog(booking) }
+                }
+                actionRow.addView(rescheduleBtn)
                 val cancelBtn = Button(requireContext()).apply {
                     text = "Cancel"
                     setTextColor(Color.DKGRAY)
                     setBackgroundResource(R.drawable.bg_cancel_button)
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
-                        if (canPay)
-                            marginStart = 12
+                        marginStart = 12
                     }
                     setOnClickListener { cancelBooking(booking) }
                 }
                 actionRow.addView(cancelBtn)
+                card.addView(actionRow)
             }
-            card.addView(actionRow)
-        }
         return card
     }
 
@@ -158,14 +168,38 @@ class BookingsFragment : Fragment() {
             }.show()
     }
 
-    private fun markPaid(booking: Booking) {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Mark as paid?")
-            .setMessage("Confirm you have completed payment of ${booking.currency} ${booking.total_amount.toInt()} for this booking.")
-            .setNegativeButton("Not yet", null)
-            .setPositiveButton("Confirm payment") {_,_ -> viewModel.markBooking(booking.id)}.show()
+    private fun openPayment(booking: Booking) {
+        val intent = Intent(requireContext(), PaymentActivity::class.java).apply {
+            putExtra(PaymentActivity.EXTRA_BOOKING_ID, booking.id)
+            putExtra(PaymentActivity.EXTRA_SALON_ID, booking.salon_id)
+            putExtra(PaymentActivity.EXTRA_AMOUNT, booking.total_amount)
+            putExtra(PaymentActivity.EXTRA_CURRENCY, booking.currency)
+        }
+        startActivity(intent)
     }
 
+    private fun rescheduleDialog(booking: Booking) {
+        val cal = Calendar.getInstance()
+        DatePickerDialog(requireContext(), {_, year, month,day ->
+            TimePickerDialog(requireContext(), {_,hour,minute ->
+                val iso = "%04d-%02d-%02dT%02d:%02d:00".format(year, month + 1, day, hour, minute)
+                val displayDateTime = "%02d/%02d/%04d at %02d:%02d".format(day, month + 1, year, hour, minute)
+                AlertDialog.Builder(requireContext()).setTitle("Reschedule Booking").setMessage("Move this booking to $displayDateTime")
+                    .setNegativeButton("Cancel", null).setPositiveButton("Confirm") {_,_ ->
+                        viewModel.rescheduleBooking(booking.id, iso, ::f)
+                    }.show()
+            }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).apply {
+            datePicker.minDate = System.currentTimeMillis() - 1000
+        }.show()
+    }
+
+    private fun f(success: Boolean, msg: String?) {
+        if(success)
+            Toast.makeText(requireContext(), "Booking rescheduled", Toast.LENGTH_SHORT).show()
+        else
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+    }
     private fun showUpcoming(showUpcoming: Boolean) {
         binding.layoutUpcoming.visibility = if (showUpcoming) View.VISIBLE else View.GONE
         binding.layoutPast.visibility = if (showUpcoming) View.GONE else View.VISIBLE

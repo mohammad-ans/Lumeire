@@ -83,7 +83,6 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        // Date + Time picker
         btnPickDateTime.setOnClickListener {
             val cal = Calendar.getInstance()
             DatePickerDialog(requireContext(), { _, year, month, day ->
