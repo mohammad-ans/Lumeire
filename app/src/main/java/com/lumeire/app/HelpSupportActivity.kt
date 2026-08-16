@@ -65,9 +65,7 @@ class HelpSupportActivity: AppCompatActivity() {
             startActivity(Intent.createChooser(intent, getString(R.string.email_us)))
         }
         binding.btnSubmitTicket.setOnClickListener {
-            binding.btnSubmitTicket.isEnabled = false
             submitTicket()
-            binding.btnSubmitTicket.isEnabled = true
         }
     }
     private fun loadTickets() {

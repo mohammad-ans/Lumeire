@@ -86,7 +86,7 @@ class LumeireMessagingService : FirebaseMessagingService() {
         val notificationId = notificationCounter.incrementAndGet()
 
         val intent = Intent(this, MainActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             putExtra(EXTRA_OPEN_NOTIFICATIONS, true)
             if(id != null)
                 putExtra(EXTRA_RELATED_BOOKING_ID, id)

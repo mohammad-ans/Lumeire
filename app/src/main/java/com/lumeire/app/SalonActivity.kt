@@ -81,7 +81,7 @@ class SalonActivity: AppCompatActivity() {
 
         binding.tvDetailName.text = salon?.name
         binding.tvDetailCategory.text = salon?.category ?: "Salon"
-        binding.tvDetailRating.text = "${salon?.rating} ?: 0.0 (${salon?.review_count}) reviews"
+        binding.tvDetailRating.text = "${salon?.rating ?: 0.0} (${salon?.review_count}) reviews"
         binding.tvDetailAddress.text = salon?.address ?: ""
         if(!(salon?.openTime.isNullOrBlank() || salon.closeTime.isNullOrBlank()))
             binding.tvDetailHours.text = "Open ${salon.openTime} - ${salon.closeTime}"

@@ -46,7 +46,7 @@ object ApiClient {
     fun resolve(path: String?): String?{
         if(path == null)
             return path
-        if(path.startsWith("https://"))
+        if(path.startsWith("https://") || path.startsWith("https://"))
             return path
         return BASE_URL.trimEnd('/') + '/' + path.trimStart('/')
     }

@@ -41,7 +41,7 @@ async def finalize_bookings_loop():
                 bookings.finalize_bookings(db)
             finally:
                 db.close()
-        except:
+        finally:
             await asyncio.sleep(600)
 
 @app.on_event("startup")

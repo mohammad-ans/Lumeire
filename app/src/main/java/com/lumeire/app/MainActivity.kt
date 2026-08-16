@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
                     binding.bottomNavigation.visibility = View.VISIBLE
                     showTab(R.id.nav_home, HomeFragment())
                     fetchAndSaveFCMToken()
+                    notificationTap(intent)
                 }
                 else{
                     startActivity(Intent(this@MainActivity, LoginActivity::class.java))

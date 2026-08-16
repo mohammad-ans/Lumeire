@@ -191,7 +191,7 @@ class GiftingFragment : Fragment() {
             return getString(R.string.send_gift)
 
         val service = services[selectedService]
-        return "Send Gift · $currency $${service.price}"
+        return "Send Gift · $currency ${service.price}"
     }
 
     private fun handleSendGift() {
@@ -263,7 +263,7 @@ class GiftingFragment : Fragment() {
                     }
                 }, 2200L)
             } catch (e: Exception) {
-                Toast.makeText(requireContext(),"Failed tp send gift: ${toMessage(e)}",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(),"Failed to send gift: ${toMessage(e)}",Toast.LENGTH_SHORT).show()
                 resetSend()
             }
         }

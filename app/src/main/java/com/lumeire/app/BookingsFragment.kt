@@ -139,7 +139,7 @@ class BookingsFragment : Fragment() {
                 val rescheduleBtn = Button(requireContext()).apply {
                     text = "Reschedule"
                     setTextColor(resources.getColor(R.color.gold_dark, null))
-                    setBackgroundResource(Color.TRANSPARENT)
+                    setBackgroundColor(Color.TRANSPARENT)
                     layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
                     setOnClickListener { rescheduleDialog(booking) }
                 }

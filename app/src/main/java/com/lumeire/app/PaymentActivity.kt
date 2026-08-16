@@ -106,6 +106,7 @@ class PaymentActivity: AppCompatActivity() {
                 val mime = contentResolver.getType(uri) ?: "image/jpeg"
                 val bytes = contentResolver.openInputStream(uri)?.use { it.readBytes() }
                 if (bytes == null) {
+                    binding.btnSubmitImg.isEnabled = true
                     Toast.makeText(this@PaymentActivity, "Could not read the selected image", Toast.LENGTH_SHORT).show()
                     return@launch
                 }

@@ -57,7 +57,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_booking)
 
         tvSalonName.text = salon.name
-        tvServiceSummary.text = "${service.name} - ${service.currency} ${service.price.toInt()} (${service.duration_minutes} min"
+        tvServiceSummary.text = "${service.name} - ${service.currency} ${service.price.toInt()} (${service.duration_minutes}) min"
         btnConfirm.isEnabled = true
 
         if(stylists.isEmpty())
@@ -180,7 +180,7 @@ class BookingBottomSheet : BottomSheetDialogFragment() {
             }
             var label = "USD ${v.discount_value.toInt()} off"
             if(v.discount_type == "percent")
-                label = "${v.discount_value.toInt()} off"
+                label = "${v.discount_value.toInt()}% off"
             AlertDialog.Builder(requireContext())
                 .setTitle("Use Voucher?")
                 .setMessage("You have a voucher (${v.code}) worth $label. Apply it to this ${price.toInt()} booking?")

@@ -134,7 +134,7 @@ async def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
     except:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
     pending.otp_code = otp_code
-    pending.expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
+    pending.otp_expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
     db.commit()
 
     return MessageResponse(message="Verification code resent")
