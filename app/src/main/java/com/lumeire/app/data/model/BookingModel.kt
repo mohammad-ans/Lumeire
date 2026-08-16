@@ -15,5 +15,6 @@ data class Booking(
     val total_amount: Double,
     val currency: String = "USD",
     val payment_status: String,
+    val payment_proof_url: String? = null,
     val created_at: String
 )

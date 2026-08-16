@@ -21,7 +21,9 @@ data class Salon(
     val image_url: String? = null,
     val distance: String? = null,
     val price: String? = null,
-    val currency: String = "USD"
+    val currency: String = "USD",
+    val payment_method_name: String? = null,
+    val payment_account_number: String? = null
 )
 
 @SuppressLint("UnsafeOptInUsageError")

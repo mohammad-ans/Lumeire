@@ -123,7 +123,12 @@ data class BookingCreateRequest(
     val gift_card_id: String? = null,
     val voucher_id: String? = null
 )
-
+@SuppressLint("UnsafeOptInUsageError")
+@Serializable
+data class BookingReschedule(
+    val appointment_time: String,
+    val stylist_id: String? = null
+)
 @SuppressLint("UnsafeOptInUsageError")
 @Serializable
 data class GiftCardCreateRequest(
