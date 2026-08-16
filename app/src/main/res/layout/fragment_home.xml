@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/cream_bg"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,21 +57,48 @@
                         android:fontFamily="serif" />
                 </LinearLayout>
 
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_marginEnd="10dp"
+                    >
                 <ImageButton
                     android:id="@+id/btn_home_notifications"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="10dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="#2EFFFFFF"
                     android:contentDescription="Notifications"
                     android:padding="10dp"
                     android:src="@android:drawable/ic_dialog_info"
-                    app:tint="@color/white" />
-
+                    app:tint="@color/white"
+                    />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tv_notification_badge"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginEnd="-2dp"
+                        android:background="@drawable/notification_badge"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:minWidth="16dp"
+                        android:minHeight="16dp"
+                        android:paddingHorizontal="4dp"
+                        android:paddingVertical="1dp"
+                        android:text=""
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="9"
+                        tools:visibility="visible"
+                        />
+                </FrameLayout>
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/iv_home_avatar"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:contentDescription="Profile avatar"
                     android:scaleType="centerCrop" />
             </LinearLayout>

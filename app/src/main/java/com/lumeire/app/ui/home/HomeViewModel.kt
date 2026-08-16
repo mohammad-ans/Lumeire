@@ -19,6 +19,8 @@ class HomeViewModel : ViewModel() {
 
     private val _searchQuery = MutableStateFlow("")
     private val _categoryFilter = MutableStateFlow<String?>(null)
+    private val _unreadMsgs = MutableStateFlow(0)
+    val unreadMsgs = _unreadMsgs.asStateFlow()
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
     private val _error = MutableStateFlow<String?>(null)
@@ -32,10 +34,12 @@ class HomeViewModel : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
+        fetchUnreadCount()
         fetchSalons()
     }
 
     fun refresh(){
+        fetchUnreadCount()
         fetchSalons()
     }
     fun clearError() {
@@ -63,25 +67,14 @@ class HomeViewModel : ViewModel() {
             }
         }
     }
-    fun checkUserExists(email: String, onResult: (Boolean) -> Unit) {
+    fun fetchUnreadCount() {
         viewModelScope.launch {
             try {
-                val result = ApiClient.bookingApiService.checkUser(email)
-                onResult(result.exists)
+                val result = ApiClient.apiService.getUnread()
+                _unreadMsgs.value = result
             }
-            catch (e: Exception) {
-                onResult(false)
-            }
-        }
-    }
-    fun fetchUserEmail(onResult: (String?) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val me = ApiClient.authService.getMe()
-                onResult(me.email)
-            }
-            catch (e: Exception) {
-                onResult(null)
+            catch(_ : Exception){
+
             }
         }
     }

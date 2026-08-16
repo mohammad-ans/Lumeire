@@ -38,7 +38,7 @@ interface ApiService {
     suspend fun getNotifications(): List<Notification>
 
     @GET("notifications/unreadCount")
-    suspend fun getUnread(): Boolean
+    suspend fun getUnread(): Int
 
     @PATCH("notifications/{id}/read")
     suspend fun markRead(@Path("id") id: String): Notification

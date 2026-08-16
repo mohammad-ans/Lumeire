@@ -108,7 +108,19 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-
+        lifecycleScope.launch {
+            viewModel.unreadMsgs.collect { count->
+                if(count > 0){
+                    binding.tvNotificationBadge.visibility = View.VISIBLE
+                    if(count < 10)
+                        binding.tvNotificationBadge.text = count.toString()
+                    else
+                        binding.tvNotificationBadge.text = "9+"
+                }
+                else
+                    binding.tvNotificationBadge.visibility = View.GONE
+            }
+        }
         binding.btnHomeNotifications.setOnClickListener {
             startActivity(Intent(requireContext(), NotificationsActivity::class.java))
         }
@@ -199,6 +211,11 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refresh()
     }
 }
 
