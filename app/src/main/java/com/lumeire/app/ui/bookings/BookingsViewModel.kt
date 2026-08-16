@@ -32,18 +32,6 @@ class BookingsViewModel : ViewModel() {
     fun clearError() {
         _error.value = null
     }
-    fun fetchSalons(onResult: (List<Salon>) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val result = ApiClient.bookingApiService.getSalons()
-                onResult(result)
-            } catch (e: Exception) {
-                android.util.Log.e("BookingsViewModel", "Error fetching salons", e)
-                _error.value = toUserMessage(e)
-                onResult(emptyList())
-            }
-        }
-    }
     fun fetchBookings() {
         viewModelScope.launch {
             try {
@@ -70,19 +58,6 @@ class BookingsViewModel : ViewModel() {
              _error.value = toUserMessage(e)
          }
      }
-    }
-
-    fun markBooking(bookingId: String) {
-        viewModelScope.launch {
-            try {
-                ApiClient.bookingApiService.markBookingPaid(bookingId)
-                fetchBookings()
-            }
-            catch (e: Exception) {
-                android.util.Log.e("BookingsViewModel", "Error marking booking as paid", e)
-                _error.value = toUserMessage(e)
-            }
-        }
     }
 
     private fun toUserMessage(e: Exception): String {
