@@ -233,7 +233,7 @@ class GiftingFragment : Fragment() {
                 }
                 val exists = ApiClient.bookingApiService.checkUser(email).exists
                 if (!exists) {
-                    Toast.makeText(requireContext(),"No Lumeire account found for $email.",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(),"No Lustre account found for $email.",Toast.LENGTH_SHORT).show()
                     resetSend()
                     return@launch
                 }

@@ -1,4 +1,3 @@
-// data/model/Service.kt
 package com.lumeire.app.data.model
 
 import kotlinx.serialization.Serializable

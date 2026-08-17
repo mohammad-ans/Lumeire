@@ -503,7 +503,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lumeire Bank"
+                        android:text="@string/bank_name"
                         android:textColor="@color/text_dark"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -541,7 +541,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lumeire Gifts Ltd."
+                        android:text="@string/gifts_ltd"
                         android:textColor="@color/text_dark"
                         android:textStyle="bold" />
                 </LinearLayout>

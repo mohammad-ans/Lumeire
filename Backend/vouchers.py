@@ -36,7 +36,7 @@ def apply_referral_reward(db: Session, new_user: User, referred_by_code: Optiona
         amount=REFERRAL_REWARD_AMOUNT,
         currency="USD",
         occasion="Referral Reward",
-        message=f"{new_user.name or 'A friend'} joined Lumeire using your referral code!",
+        message=f"{new_user.name or 'A friend'} joined Lustre using your referral code!",
         sender_id=new_user.id,
         receiver_id=referrer.id
     )
@@ -58,5 +58,5 @@ def get_vouchers(unused_only: bool = False, db: Session = Depends(get_db), user:
 def get_my_referral_info(user: User = Depends(get_current_user)):
     return ReferralInfoResponse(
         referral_code=user.referral_code,
-        share_message= f"Join Lumeire using my code {user.referral_code} to get sign up rewards."
+        share_message= f"Join Lustre using my code {user.referral_code} to get sign up rewards."
     )

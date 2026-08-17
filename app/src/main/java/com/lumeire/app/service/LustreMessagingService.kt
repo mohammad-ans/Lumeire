@@ -21,13 +21,13 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
-class LumeireMessagingService : FirebaseMessagingService() {
+class LustreMessagingService : FirebaseMessagingService() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val notificationCounter = AtomicInteger(0)
 
     companion object{
-        private const val CHANNEL_ID = "lumeire_notifications"
+        private const val CHANNEL_ID = "lustre_notifications"
         const val EXTRA_OPEN_NOTIFICATIONS = "open_notifications"
         const val EXTRA_RELATED_BOOKING_ID = "related_booking_id"
     }
@@ -46,7 +46,7 @@ class LumeireMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        val title =remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Lumiere"
+        val title =remoteMessage.data["title"] ?: remoteMessage.notification?.title ?: "Lustre"
         val body = remoteMessage.data["body"] ?: remoteMessage.notification?.body ?: ""
         val id = remoteMessage.data["related_booking_id"]
 
@@ -75,7 +75,7 @@ class LumeireMessagingService : FirebaseMessagingService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Lumiere Notifications",
+                "Lustre Notifications",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

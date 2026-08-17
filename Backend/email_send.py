@@ -16,7 +16,7 @@ async def send_otp(email: str, otp: str):
     body = {
     "from" : RESEND_EMAIL,
     "to" : email,
-    "subject" : "Lumeire Verification Code",
+    "subject" : "Lustre Verification Code",
     "html" : (
         f"<p>Your verification code is: <strong>{otp}</strong></p>"
         f"<p>It expires in 10 minutes.</p>"

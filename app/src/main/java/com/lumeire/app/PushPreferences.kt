@@ -7,7 +7,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 
 object PushPreferences {
-    const val PREFS_NAME = "lumeire_settings"
+    const val PREFS_NAME = "lustre_settings"
     const val KEY_PUSH_NOTIFICATIONS = "push_notifications_enabled"
     const val KEY_BOOKING_REMINDERS = "booking_reminders_enabled"
     const val KEY_DARK_MODE = "dark_mode_enabled"

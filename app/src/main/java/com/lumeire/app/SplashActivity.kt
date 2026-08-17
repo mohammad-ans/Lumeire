@@ -75,7 +75,7 @@ class SplashActivity : AppCompatActivity() {
             })
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Login to Lumeire")
+            .setTitle("Login to Lustre")
             .setSubtitle("Use your biometric credential or PIN/Pattern")
             .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL)
             .build()

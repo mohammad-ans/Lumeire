@@ -33,7 +33,7 @@ class HelpSupportActivity: AppCompatActivity() {
         ),
         Faq(
             "How do gift cards work?",
-            "Send a gift card to any Lumiere user by email from a salon's page. They can redeem it toward a booking at that salon."
+            "Send a gift card to any Lustre user by email from a salon's page. They can redeem it toward a booking at that salon."
         ),
         Faq(
             "How do I change my password?",

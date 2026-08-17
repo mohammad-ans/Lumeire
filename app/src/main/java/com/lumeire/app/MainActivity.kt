@@ -17,7 +17,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.lumeire.app.databinding.ActivityMainBinding
-import com.lumeire.app.service.LumeireMessagingService
+import com.lumeire.app.service.LustreMessagingService
 
 class MainActivity : AppCompatActivity() {
 
@@ -130,15 +130,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun notificationTap(intent: Intent?) {
-        val open = intent?.getBooleanExtra(LumeireMessagingService.EXTRA_OPEN_NOTIFICATIONS, false) ?: false
+        val open = intent?.getBooleanExtra(LustreMessagingService.EXTRA_OPEN_NOTIFICATIONS, false) ?: false
         if(!open)
             return
-        intent.removeExtra(LumeireMessagingService.EXTRA_OPEN_NOTIFICATIONS)
+        intent.removeExtra(LustreMessagingService.EXTRA_OPEN_NOTIFICATIONS)
 
-        val id = intent.getStringExtra(LumeireMessagingService.EXTRA_RELATED_BOOKING_ID)
+        val id = intent.getStringExtra(LustreMessagingService.EXTRA_RELATED_BOOKING_ID)
         startActivity(Intent(this, NotificationsActivity::class.java).apply {
             if(id != null)
-                putExtra(LumeireMessagingService.EXTRA_RELATED_BOOKING_ID, id)
+                putExtra(LustreMessagingService.EXTRA_RELATED_BOOKING_ID, id)
         })
     }
     private fun loadFragment(fragment: Fragment) {

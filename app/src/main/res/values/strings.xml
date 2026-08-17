@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Lumeire</string>
+    <string name="app_name">Lustre</string>
     <string name="tagline">Glow Beyond Beauty</string>
 
     <string name="onboarding_title_1">Discover Top Salons\nNear You</string>
@@ -71,7 +71,7 @@
     <string name="send_gift">Send Gift</string>
     <string name="gift_sent">Gift Sent Successfully!</string>
     <string name="gift_card_label">Gift Card</string>
-    <string name="lumeire_gift_experience">Lumeire Gift Experience</string>
+    <string name="lumeire_gift_experience">Lustre Gift Experience</string>
     <string name="experience_value">Experience Value</string>
     <string name="gift_ready_message">Gift prepared for %1$s</string>
 
@@ -188,4 +188,6 @@
     <string name="your_tickets">Your Tickets</string>
     <string name="no_tickets">No tickets yet.</string>
     <string name="open_street">&#169; OpenStreetMap Contributors</string>
+    <string name="bank_name">Lustre Bank</string>
+    <string name="gifts_ltd">Lustre Gifts Ltd.</string>
 </resources>
