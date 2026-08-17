@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_logo"
@@ -14,10 +15,6 @@
         android:theme="@style/Theme.Lumeire"
         android:networkSecurityConfig="@xml/network_config"
         >
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBdjD6fzX7Uk2Mma76r_zt3UZ14PbxGh9k" />
 
         <activity
             android:name=".SplashActivity"
