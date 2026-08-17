@@ -15,13 +15,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.android.material.card.MaterialCardView
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.lumeire.app.databinding.FragmentMapsBinding
 import com.lumeire.app.ui.home.HomeViewModel
 import kotlinx.coroutines.launch
@@ -34,20 +27,26 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import com.lumeire.app.data.model.Salon
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.Marker
 
-class MapsFragment : Fragment(), OnMapReadyCallback {
+class MapsFragment : Fragment() {
 
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: HomeViewModel by viewModels()
     private var selectedSalonId: String = ""
     private lateinit var rows: List<SalonRow>
-    private var googleMap: GoogleMap? = null
-    private var userLocation: LatLng? = null
+    private var mapView: MapView? = null
+    private var userLocation: GeoPoint? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -61,6 +60,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         selectedSalonId = arguments?.getString(ARG_SELECTED_SALON_ID) ?: ""
+
+        Configuration.getInstance().userAgentValue = requireContext().packageName
+        Configuration.getInstance().osmdroidTileCache = requireContext().cacheDir
     }
 
     override fun onCreateView(
@@ -74,7 +76,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        mapView = binding.map.apply {
+            setTileSource(TileSourceFactory.MAPNIK)
+            setMultiTouchControls(true)
+            controller.setZoom(12.5)
+            controller.setCenter(GeoPoint(24, 24))
+        }
+        if(::rows.isInitialized && rows.isNotEmpty())
+            updateMapMarkers()
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fetchUserLocation()
         } else {
@@ -85,11 +94,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                 )
             )
         }
-
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(this)
-
-
         lifecycleScope.launch {
             viewModel.salons.collect { salonList ->
                 if (salonList.isEmpty()) return@collect
@@ -97,12 +101,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             }
         }
 
-
         binding.btnMapLocate.setOnClickListener {
-            val map = googleMap
+            val map = mapView
             val location = userLocation
             if(map != null && location != null){
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
+                map.controller.animateTo(location)
+                map.controller.setZoom(14.0)
             }
             else{
                 Toast.makeText(requireContext(), "Still locating you...", Toast.LENGTH_SHORT).show()
@@ -131,10 +135,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     Toast.makeText(requireContext(), "Location not available for ${selected.salon.name}.", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    val gmmIntentUri =
-                        "geo:${selected.salon.latitude},${selected.salon.longitude}?q=${Uri.encode(selected.salon.name)}".toUri()
+                    val gmmIntentUri = "geo:${selected.salon.latitude},${selected.salon.longitude}?q=${Uri.encode(selected.salon.name)}".toUri()
                     val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                    mapIntent.setPackage("com.google.android.apps.maps")
                     if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
                         startActivity(mapIntent)
                     } else {
@@ -226,7 +228,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             .addOnSuccessListener { location ->
                 if (location != null && _binding != null) {
                     Log.d("MapsFragment", "Location fetched: lat=${location.latitude}, lng=${location.longitude}")
-                    userLocation = LatLng(location.latitude, location.longitude)
+                    userLocation = GeoPoint(location.latitude, location.longitude)
                     val salonList = viewModel.salons.value
                     if (_binding != null && salonList.isNotEmpty()) {
                         applyRows(buildRows(salonList))
@@ -246,54 +248,50 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         Location.distanceBetween(lat1, lon1, lat2, lon2, results)
         return (results[0] / 1000.0)
     }
-
-    override fun onMapReady(map: GoogleMap) {
-        googleMap = map
-        if (::rows.isInitialized && rows.isNotEmpty()) {
-            updateMapMarkers()
-        }
-    }
-
     private fun updateMapMarkers() {
-        val map = googleMap ?: return
-        if (!::rows.isInitialized || rows.isEmpty()) return
-        map.clear()
+        val map = mapView ?: return
+        if (!::rows.isInitialized || rows.isEmpty())
+            return
+        map.overlays.clear()
 
-        userLocation?.let {
-            map.addMarker(
-                MarkerOptions()
-                    .position(it)
-                    .title("You are here")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-            )
+        userLocation?.let { p ->
+            val marker = Marker(map).apply {
+                position = p
+                title = "You are here"
+                icon = ContextCompat.getDrawable(requireContext(), R.drawable.marker_user)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+            }
+            map.overlays.add(marker)
         }
 
-        var selectedLocation: LatLng? = null
+        var selectedLocation: GeoPoint? = null
         
         rows.forEach { row ->
             if (row.card.isVisible) {
                 val salon = row.salon
                 val lat = salon.latitude ?: return@forEach
                 val lng = salon.longitude ?: return@forEach
-                val location = LatLng(lat, lng)
+                val location = GeoPoint(lat, lng)
                 val isSelected = salon.id == selectedSalonId
-                val icon = if (isSelected) BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE) else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+                val iconT = if (isSelected) R.drawable.marker_dest else R.drawable.marker_unselected
                 
-                map.addMarker(MarkerOptions()
-                    .position(location)
-                    .title(salon.name)
-                    .snippet(salon.category)
-                    .icon(icon))
-
-                    
-                if (salon.id == selectedSalonId) {
+                val marker = Marker(map).apply {
+                    position = location
+                    title = salon.name
+                    snippet = salon.category
+                    icon = ContextCompat.getDrawable(requireContext(), iconT)
+                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                }
+                map.overlays.add(marker)
+                if (isSelected) {
                     selectedLocation = location
                 }
             }
         }
-        
+        map.invalidate()
         selectedLocation?.let {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(it, 14f))
+            map.controller.animateTo(it)
+            map.controller.setZoom(14.0)
         }
     }
 
@@ -364,9 +362,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        mapView?.overlays?.clear()
+        mapView = null
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
+    }
     private val Int.dp: Int
         get() = (this * resources.displayMetrics.density).toInt()
 
