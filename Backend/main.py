@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import asyncio
 from database import engine, Base, SessionLocal
-import models
 import auth
 from profile import router
 import bookings

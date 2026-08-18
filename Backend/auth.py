@@ -14,7 +14,6 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 import secrets
 from email_send import send_otp
-from vouchers import onboard_new_user
 
 
 load_dotenv()
@@ -58,6 +57,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 def generate_otp(length: int = 6) -> str:
     return "".join(secrets.choice("0123456789") for _ in range(length))
+
+
+from vouchers import onboard_new_user
 
 @router.post("/signup", response_model=MessageResponse)
 async def signup(data: SignUp, db: Session = Depends(get_db)):
