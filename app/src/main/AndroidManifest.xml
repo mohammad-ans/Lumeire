@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_logo"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Lumeire"
+        android:theme="@style/Theme.Lustre"
         android:networkSecurityConfig="@xml/network_config"
         >
 
@@ -20,7 +20,7 @@
             android:name=".SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Lumeire.Splash">
+            android:theme="@style/Theme.Lustre.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

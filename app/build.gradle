@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.lumeire.app'
+    namespace 'com.lustre.app'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.lumeire.app"
+        applicationId "com.lustre.app"
         minSdk 26
         targetSdk 35
         versionCode 1

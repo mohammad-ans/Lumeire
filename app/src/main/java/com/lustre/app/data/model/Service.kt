@@ -1,0 +1,14 @@
+package com.lustre.app.data.model
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Service(
+    val id: String,
+    val name: String,
+    val category: String,
+    val duration_minutes: Int,
+    val price: Double,
+    val salon_id: String,
+    val currency: String = "USD"
+)
