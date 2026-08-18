@@ -71,7 +71,7 @@
     <string name="send_gift">Send Gift</string>
     <string name="gift_sent">Gift Sent Successfully!</string>
     <string name="gift_card_label">Gift Card</string>
-    <string name="lumeire_gift_experience">Lustre Gift Experience</string>
+    <string name="lustre_gift_experience">Lustre Gift Experience</string>
     <string name="experience_value">Experience Value</string>
     <string name="gift_ready_message">Gift prepared for %1$s</string>
 

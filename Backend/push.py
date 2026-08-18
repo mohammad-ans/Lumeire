@@ -3,7 +3,7 @@ Sends push notifications via Firebase Cloud Messaging (FCM).
 
 This is what was actually missing: `notifications.py` was only ever writing
 rows to the `notifications` table, so the Android app's
-`LumeireMessagingService` (a FirebaseMessagingService) never had anything to
+`lustreMessagingService` (a FirebaseMessagingService) never had anything to
 receive — it was correctly wired up on the client, but nothing on the server
 ever called Firebase to trigger it. This module is what `create_notification`
 now calls after saving a notification, so it also reaches the device as a
@@ -79,7 +79,7 @@ def _get_firebase_app():
 def send_push(token: Optional[str], title: str, body: str, data: Optional[Dict[str, Any]] = None) -> bool:
     """
     Sends a DATA-ONLY FCM message (no top-level `notification` payload), so
-    LumeireMessagingService.onMessageReceived() is guaranteed to fire and
+    lustreMessagingService.onMessageReceived() is guaranteed to fire and
     build the system notification itself — both in foreground and
     background/killed states. (A `notification`-payload message is instead
     auto-displayed by the OS when the app is backgrounded, bypassing our
