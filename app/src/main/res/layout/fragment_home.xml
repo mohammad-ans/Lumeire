@@ -67,7 +67,7 @@
                     android:layout_width="44dp"
                     android:layout_height="44dp"
                     android:background="#2EFFFFFF"
-                    android:contentDescription="Notifications"
+                    android:contentDescription="@string/notifications"
                     android:padding="10dp"
                     android:src="@android:drawable/ic_dialog_info"
                     app:tint="@color/white"
@@ -99,7 +99,7 @@
                     android:id="@+id/iv_home_avatar"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
-                    android:contentDescription="Profile avatar"
+                    android:contentDescription="@string/profile_photo"
                     android:scaleType="centerCrop" />
             </LinearLayout>
 
@@ -116,7 +116,9 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:src="@android:drawable/ic_menu_search"
-                    app:tint="@color/gold_main" />
+                    app:tint="@color/gold_main"
+                    android:contentDescription="@string/search_salons"
+                    />
 
                 <EditText
                     android:id="@+id/et_home_search"
@@ -125,9 +127,12 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:hint="@string/search_hint"
-                    android:paddingStart="10dp"
+                    android:paddingHorizontal="10dp"
                     android:textColor="@color/text_dark"
-                    android:textColorHint="@color/text_light" />
+                    android:autofillHints="name"
+                    android:textColorHint="@color/text_light"
+                    android:inputType="text"
+                    />
 
                 <TextView
                     android:id="@+id/tv_home_filter"
@@ -181,7 +186,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="20% off First Visit"
+                        android:text="@string/first_voucher"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -190,7 +195,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Tap to view your code"
+                        android:text="@string/tap_to_code"
                         android:textColor="#CCFFFFFF"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -219,7 +224,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Refer and Earn $10"
+                        android:text="@string/refer_earn"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -228,7 +233,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Tap to share your code"
+                        android:text="@string/tap_to_code"
                         android:textColor="#CCFFFFFF"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -287,7 +292,7 @@
                         android:paddingTop="10dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="10dp"
-                        android:text="Haircut"
+                        android:text="@string/haircut"
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
@@ -301,7 +306,7 @@
                         android:paddingTop="10dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="10dp"
-                        android:text="Facial"
+                        android:text="@string/facial"
                         android:textColor="@color/text_medium" />
 
                     <TextView
@@ -314,7 +319,7 @@
                         android:paddingTop="10dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="10dp"
-                        android:text="Massage"
+                        android:text="@string/massage"
                         android:textColor="@color/text_medium" />
 
                     <TextView
@@ -327,7 +332,7 @@
                         android:paddingTop="10dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="10dp"
-                        android:text="Nails"
+                        android:text="@string/nails"
                         android:textColor="@color/text_medium" />
                 </LinearLayout>
             </HorizontalScrollView>

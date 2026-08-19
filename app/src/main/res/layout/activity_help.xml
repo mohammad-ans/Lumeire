@@ -66,6 +66,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_call"
+                            android:contentDescription="@string/call"
                             />
                         <TextView
                             android:layout_width="wrap_content"
@@ -92,6 +93,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_dialog_email"
+                            android:contentDescription="@string/email_address"
                             />
                         <TextView
                             android:layout_width="wrap_content"

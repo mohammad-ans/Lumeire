@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="#FDF6EE">
 
-    <!-- Skip button -->
     <TextView
         android:id="@+id/tv_skip"
         android:layout_width="wrap_content"
@@ -21,7 +20,6 @@
         android:letterSpacing="0.05"
         android:elevation="6dp" />
 
-    <!-- Illustration area -->
     <FrameLayout
         android:id="@+id/illustration_container"
         android:layout_width="match_parent"
@@ -32,7 +30,6 @@
         android:paddingStart="32dp"
         android:paddingEnd="32dp">
 
-        <!-- Background blob -->
         <View
             android:id="@+id/blob_bg"
             android:layout_width="300dp"
@@ -41,7 +38,6 @@
             android:background="@drawable/shape_circle_onboarding_blob"
             android:alpha="0.7" />
 
-        <!-- ViewFlipper holds 3 slide illustrations -->
         <ViewFlipper
             android:id="@+id/view_flipper"
             android:layout_width="match_parent"
@@ -49,7 +45,6 @@
             android:layout_gravity="center" />
     </FrameLayout>
 
-    <!-- Bottom content sheet -->
     <LinearLayout
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
@@ -63,7 +58,6 @@
         android:paddingBottom="48dp"
         android:elevation="8dp">
 
-        <!-- Title -->
         <TextView
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
@@ -75,7 +69,6 @@
             android:lineSpacingMultiplier="1.2"
             android:layout_marginBottom="12dp" />
 
-        <!-- Subtitle -->
         <TextView
             android:id="@+id/tv_subtitle"
             android:layout_width="match_parent"
@@ -86,14 +79,12 @@
             android:lineSpacingMultiplier="1.5"
             android:layout_marginBottom="32dp" />
 
-        <!-- Dots + Next button row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <!-- Progress dots -->
             <LinearLayout
                 android:id="@+id/dots_container"
                 android:layout_width="0dp"
@@ -102,7 +93,6 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical" />
 
-            <!-- Next / Get Started button -->
             <Button
                 android:id="@+id/btn_next"
                 android:layout_width="wrap_content"

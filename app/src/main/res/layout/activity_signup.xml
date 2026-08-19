@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="serif"
-        android:text="Create Account"
+        android:text="@string/create_account"
         android:textColor="@color/text_dark"
         android:textSize="32sp"
         android:textStyle="bold"/>
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
-        android:text="Sign up to start your beauty journey."
+        android:text="@string/sign_up_sub"
         android:textColor="@color/text_medium"
         android:textSize="16sp" />
 
@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:hint="Full Name"
+        android:hint="@string/name_hint"
         app:boxBackgroundColor="@color/white"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
@@ -110,7 +110,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Confirm Password"
+        android:hint="@string/confirm_new_password"
         app:boxBackgroundColor="@color/white"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
@@ -135,7 +135,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Referral Code (optional)"
+        android:hint="@string/referral_code"
         app:boxBackgroundColor="@color/white"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
@@ -162,7 +162,7 @@
         android:layout_marginTop="28dp"
         android:background="@drawable/bg_button_gold"
         android:fontFamily="sans-serif-medium"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="17sp"
@@ -187,7 +187,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:text="OR"
+            android:text="@string/OR"
             android:textColor="@color/text_light"
             android:textSize="12sp"
             android:textStyle="bold" />
@@ -230,7 +230,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Already have an account?"
+            android:text="@string/already_acc"
             android:textColor="@color/text_medium" />
 
         <TextView
@@ -239,7 +239,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Sign In"
+            android:text="@string/sign_in"
             android:textColor="@color/gold_main"
             android:textStyle="bold" />
     </LinearLayout>

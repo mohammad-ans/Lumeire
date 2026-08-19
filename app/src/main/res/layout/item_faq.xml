@@ -26,6 +26,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@android:drawable/arrow_down_float"
+            android:contentDescription="@string/arrow_down"
             />
     </LinearLayout>
     <TextView
