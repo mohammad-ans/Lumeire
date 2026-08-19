@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    >
 
     <TextView
         android:id="@+id/tv_bs_salon_name"
@@ -45,13 +46,13 @@
             />
 
     </LinearLayout>
-    <Button
+
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.Lustre.Button.Gold"
+        android:paddingVertical="16dp"
         android:id="@+id/btn_pick_datetime"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_button_green"
-        android:backgroundTint="@color/gold_dark"
-        android:textColor="@color/text_dark"
         android:text="@string/pick_date_time"
         android:layout_marginBottom="8dp"/>
 
@@ -71,12 +72,12 @@
         android:visibility="gone"
         android:layout_marginBottom="8dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.Lustre.Button.Gold"
+        android:paddingVertical="16dp"
         android:id="@+id/btn_confirm_booking"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:background="@color/text_dark"
         android:text="@string/confirm_booking"
         android:layout_marginBottom="16dp"/>
 

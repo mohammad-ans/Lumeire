@@ -13,7 +13,7 @@ import notifications
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(root_path="/lustre")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

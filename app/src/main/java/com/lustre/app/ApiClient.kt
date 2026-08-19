@@ -11,7 +11,7 @@ import retrofit2.Retrofit
 
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:8000/"
+    private const val BASE_URL = "https://yappyyap.xyz:443/lustre/"
 
     private lateinit var tokenManager: TokenManager
 
