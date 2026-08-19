@@ -1,6 +1,5 @@
 package com.lustre.app
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -104,7 +103,6 @@ class LoginActivity : AppCompatActivity() {
                         viewModel.googleAuth(idTok)
                     }
                 } catch (e: ApiException) {
-                    Log.e("Google Login", "Google sign-in failed", e)
                     Toast.makeText(this, "Google sign-in failed", Toast.LENGTH_LONG).show()
                 }
             }

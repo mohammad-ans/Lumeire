@@ -1,5 +1,6 @@
 package com.lustre.app.ui.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lustre.app.ApiClient
@@ -83,6 +84,7 @@ class LoginViewModel : ViewModel() {
                 _loginState.value = LoginState.Success
             }
             catch (e: Exception) {
+                Log.e("Log", "$e")
                 _loginState.value = LoginState.Error(parseError(e))
             }
         }
