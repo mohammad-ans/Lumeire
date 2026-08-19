@@ -14,14 +14,13 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 import secrets
 from email_send import send_otp
-from vouchers import onboard_new_user
 
 
 load_dotenv()
 SECRET_KEY = os.getenv("JWT_SECRET")
 EXPIRE_MINUTES = 10080
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-OTP_EXPIRE_MINUTES = 2
+OTP_EXPIRE_MINUTES = 10
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 router = APIRouter(prefix="/auth")
@@ -59,6 +58,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 def generate_otp(length: int = 6) -> str:
     return "".join(secrets.choice("0123456789") for _ in range(length))
 
+
+from vouchers import onboard_new_user
+
 @router.post("/signup", response_model=MessageResponse)
 async def signup(data: SignUp, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
@@ -68,6 +70,7 @@ async def signup(data: SignUp, db: Session = Depends(get_db)):
     expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
     try:
         response = await send_otp(data.email, otp_code)
+        print(response)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
@@ -134,7 +137,7 @@ async def resend_otp(data: ResendOtp, db: Session = Depends(get_db)):
     except:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")
     pending.otp_code = otp_code
-    pending.expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
+    pending.otp_expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
     db.commit()
 
     return MessageResponse(message="Verification code resent")

@@ -23,7 +23,7 @@
             android:textColor="@color/text_dark"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="Lumiere Salon &amp; Spa"
+            tools:text="Lustre Salon &amp; Spa"
             />
         <TextView
             android:id="@+id/tv_gift_amount"

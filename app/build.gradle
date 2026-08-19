@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.lumeire.app'
+    namespace 'com.lustre.app'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.lumeire.app"
+        applicationId "com.lustre.app"
         minSdk 26
         targetSdk 35
         versionCode 1
@@ -63,17 +63,14 @@ dependencies {
     implementation "io.ktor:ktor-client-okhttp:$ktor_version"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
 
-    // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:33.7.0')
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
-    
-    // Google Maps
-    implementation "com.google.android.gms:play-services-location:21.3.0"
-    implementation 'com.google.android.gms:play-services-maps:18.2.0'
-    implementation 'androidx.biometric:biometric:1.1.0'
 
+    implementation "com.google.android.gms:play-services-location:21.3.0"
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation("org.osmdroid:osmdroid-android:6.1.2")
     implementation ("com.squareup.retrofit2:retrofit:2.11.0")
     implementation ("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation ("com.squareup.okhttp3:okhttp:4.12.0")

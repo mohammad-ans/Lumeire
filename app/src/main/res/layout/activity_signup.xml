@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/cream_bg"
     android:padding="24dp">
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="64dp"
+    >
     <TextView
         android:id="@+id/tv_welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
         android:fontFamily="serif"
-        android:text="Create Account"
+        android:text="@string/create_account"
         android:textColor="@color/text_dark"
         android:textSize="32sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/tv_subtitle"
@@ -25,11 +27,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="sans-serif"
-        android:text="Sign up to start your beauty journey."
+        android:text="@string/sign_up_sub"
         android:textColor="@color/text_medium"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_welcome" />
+        android:textSize="16sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_fullname"
@@ -37,15 +37,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:hint="Full Name"
+        android:hint="@string/name_hint"
         app:boxBackgroundColor="@color/white"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/gold_main"
-        app:hintTextColor="@color/gold_main"
-        app:layout_constraintTop_toBottomOf="@id/tv_subtitle">
+        app:hintTextColor="@color/gold_main">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_fullname"
@@ -69,8 +68,7 @@
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/gold_main"
-        app:hintTextColor="@color/gold_main"
-        app:layout_constraintTop_toBottomOf="@id/til_fullname">
+        app:hintTextColor="@color/gold_main">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_email"
@@ -95,8 +93,7 @@
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/gold_main"
         app:endIconMode="password_toggle"
-        app:hintTextColor="@color/gold_main"
-        app:layout_constraintTop_toBottomOf="@id/til_email">
+        app:hintTextColor="@color/gold_main">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_password"
@@ -113,7 +110,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Confirm Password"
+        android:hint="@string/confirm_new_password"
         app:boxBackgroundColor="@color/white"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
@@ -121,8 +118,7 @@
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/gold_main"
         app:endIconMode="password_toggle"
-        app:hintTextColor="@color/gold_main"
-        app:layout_constraintTop_toBottomOf="@id/til_password">
+        app:hintTextColor="@color/gold_main">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_confirm_password"
@@ -139,15 +135,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="Referral Code (optional)"
+        android:hint="@string/referral_code"
         app:boxBackgroundColor="@color/white"
         app:boxCornerRadiusBottomEnd="16dp"
         app:boxCornerRadiusBottomStart="16dp"
         app:boxCornerRadiusTopEnd="16dp"
         app:boxCornerRadiusTopStart="16dp"
         app:boxStrokeColor="@color/gold_main"
-        app:hintTextColor="@color/gold_main"
-        app:layout_constraintTop_toBottomOf="@id/til_confirm_password">
+        app:hintTextColor="@color/gold_main">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_referral_code"
@@ -167,12 +162,11 @@
         android:layout_marginTop="28dp"
         android:background="@drawable/bg_button_gold"
         android:fontFamily="sans-serif-medium"
-        android:text="Sign Up"
+        android:text="@string/sign_up"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="17sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/til_referral_code"
         />
 
     <LinearLayout
@@ -182,31 +176,27 @@
         android:layout_marginTop="24dp"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/btn_signup">
-
+        >
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1"
             android:background="@color/divider" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:text="OR"
+            android:text="@string/OR"
             android:textColor="@color/text_light"
             android:textSize="12sp"
             android:textStyle="bold" />
-
         <View
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1"
             android:background="@color/divider" />
     </LinearLayout>
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_google_login"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -222,9 +212,9 @@
         app:iconGravity="textStart"
         app:iconPadding="12dp"
         app:iconTint="@null"
-        app:layout_constraintTop_toBottomOf="@id/ll_divider"
         app:strokeColor="@color/gold_border"
-        app:strokeWidth="1.5dp" />
+        app:strokeWidth="1.5dp"
+        />
 
     <LinearLayout
         android:id="@+id/ll_signup"
@@ -232,15 +222,15 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginTop="12dp"
+        android:layout_gravity="center_horizontal"
+        >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Already have an account?"
+            android:text="@string/already_acc"
             android:textColor="@color/text_medium" />
 
         <TextView
@@ -249,9 +239,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:fontFamily="sans-serif-medium"
-            android:text="Sign In"
+            android:text="@string/sign_in"
             android:textColor="@color/gold_main"
             android:textStyle="bold" />
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
+</androidx.core.widget.NestedScrollView>

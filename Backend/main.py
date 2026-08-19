@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import asyncio
 from database import engine, Base, SessionLocal
-import models
 import auth
 from profile import router
 import bookings
@@ -14,7 +13,7 @@ import notifications
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(root_path="/lustre")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -41,7 +40,7 @@ async def finalize_bookings_loop():
                 bookings.finalize_bookings(db)
             finally:
                 db.close()
-        except:
+        finally:
             await asyncio.sleep(600)
 
 @app.on_event("startup")

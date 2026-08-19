@@ -20,7 +20,7 @@ def send_gift(data: GiftCardCreateRequest, db: Session = Depends(get_db), user: 
         raise HTTPException(status_code=400, detail="You cannot send a gift to yourself")
     receiver = db.query(User).filter(func.lower(User.email) == data.receiver_email.strip().lower()).first()
     if not receiver:
-        raise HTTPException(status_code=404, detail="No Lumeire account found for that email")
+        raise HTTPException(status_code=404, detail="No Lustre account found for that email")
 
     salon = db.query(Salon).filter(Salon.id == data.salon_id).first()
     if not salon:

@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_splash">
 
-    <!-- Decorative top-right circle -->
     <View
         android:layout_width="240dp"
         android:layout_height="240dp"
@@ -14,7 +13,6 @@
         android:background="@drawable/shape_circle_cream_glow"
         android:alpha="0.2" />
 
-    <!-- Decorative bottom-left circle -->
     <View
         android:layout_width="280dp"
         android:layout_height="280dp"
@@ -24,7 +22,6 @@
         android:background="@drawable/shape_circle_gold_glow"
         android:alpha="0.15" />
 
-    <!-- Center content -->
     <LinearLayout
         android:id="@+id/splash_content"
         android:layout_width="wrap_content"
@@ -35,7 +32,6 @@
         android:alpha="0"
         android:translationY="30dp">
 
-        <!-- Logo icon container -->
         <FrameLayout
             android:id="@+id/logo_container"
             android:layout_width="90dp"
@@ -44,14 +40,12 @@
             android:scaleX="0.6"
             android:scaleY="0.6">
 
-            <!-- Glow ring (animated) -->
             <View
                 android:id="@+id/logo_glow_ring"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/shape_logo_ring" />
 
-            <!-- Main logo background -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -67,7 +61,6 @@
             </FrameLayout>
         </FrameLayout>
 
-        <!-- Brand name "Lumeire" -->
         <TextView
             android:id="@+id/tv_brand_name"
             android:layout_width="wrap_content"
@@ -80,7 +73,6 @@
             android:textStyle="bold"
             android:alpha="0" />
 
-        <!-- Gold divider with dot -->
         <LinearLayout
             android:id="@+id/divider_row"
             android:layout_width="wrap_content"
@@ -109,7 +101,6 @@
                 android:background="@drawable/bg_gradient_right_gold" />
         </LinearLayout>
 
-        <!-- Tagline -->
         <TextView
             android:id="@+id/tv_tagline"
             android:layout_width="wrap_content"
@@ -124,7 +115,6 @@
             android:translationY="10dp" />
     </LinearLayout>
 
-    <!-- Loading bar at bottom -->
     <LinearLayout
         android:id="@+id/loading_container"
         android:layout_width="160dp"
