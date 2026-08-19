@@ -245,7 +245,7 @@ class GiftingFragment : Fragment() {
                         salon_id = salon.id,
                         service_id =  service?.id,
                         amount = amount,
-                        occasion = message.ifBlank { null},
+                        occasion = occasionLabel?: message.ifBlank { null },
                         message = message.ifBlank { null })
                 )
                 binding.btnSendGift.text = "✓ Gift Sent!"

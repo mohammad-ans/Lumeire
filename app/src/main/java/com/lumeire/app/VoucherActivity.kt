@@ -30,6 +30,7 @@ class VoucherActivity: AppCompatActivity() {
         binding.tabUsed.setOnClickListener {
             select(true)
         }
+        loadVouchers()
     }
     private fun select(fUsed: Boolean) {
         used = fUsed

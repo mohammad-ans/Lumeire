@@ -144,7 +144,7 @@ def finalize_bookings(db: Session, id: Optional[str] = None) -> List[Booking]:
     query = db.query(Booking).filter(Booking.status == "Upcoming", Booking.appointment_time < datetime.utcnow())
 
     if id:
-        query = db.filter(Booking.user_id == id)
+        query = query.filter(Booking.user_id == id)
     stale_bookings = query.all()
 
     if not stale_bookings:

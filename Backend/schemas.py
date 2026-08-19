@@ -43,7 +43,7 @@ class UserResponse(BaseModel):
     email: str
     name: Optional[str]  = None
     auth_provider: str
-    is_verified: str
+    is_verified: bool
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -75,8 +75,8 @@ class SalonResponse(BaseModel):
     name: str
     category: str
     address: str
-    latitude: str
-    longitude: str
+    latitude: float
+    longitude: float
     rating: float = 0.0
     review_count: int = 0
     phone: Optional[str] = None

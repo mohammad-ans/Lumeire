@@ -78,13 +78,15 @@ async def signup(data: SignUp, db: Session = Depends(get_db)):
         pending.otp_code = otp_code
         pending.otp_expires_at = expires_at
         pending.created_at = datetime.utcnow()
+        pending.referred_by_code = data.referral_code
     else:
         pending = PendingUser(
         email = data.email,
         name = data.full_name,
         hashed_password = hash_password(data.password),
         otp_code = otp_code,
-        otp_expires_at = expires_at
+        otp_expires_at = expires_at,
+        referred_by_code = data.referral_code
         )
         db.add(pending)
     db.commit()
@@ -178,7 +180,7 @@ def g_auth(data: GoogleAuth, db : Session = Depends(get_db)):
             db.add(user)
             db.flush()
             db.add(Profile(id=user.id, full_name=name))
-            onboard_new_user(db, user, pending.referred_by_code)
+            onboard_new_user(db, user, data.referral_code)
         db.commit()
 
     return TokenResponse(access_token=create_access_token(user.id))

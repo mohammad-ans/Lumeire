@@ -39,6 +39,7 @@ class ForgotPasswordViewModel: ViewModel() {
             _resetState.value = ResetPasswordState.Loading
             try{
                 val response = ApiClient.authService.resetPassword(ResetPassword(email, otp, newPsd))
+                _resetState.value = ResetPasswordState.Success("Password resetted")
             }
             catch (e: Exception) {
                 _resetState.value = ResetPasswordState.Error(parseError(e))
