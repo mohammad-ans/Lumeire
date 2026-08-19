@@ -41,8 +41,8 @@ class TicketsAdapter(private var items: List<SupportTicket>): RecyclerView.Adapt
     }
     inner class TicketViewHolder(private val binding: ItemTicketBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(ticket: SupportTicket) {
-            binding.tvTicketSbj.text = ticket.sbj
-            binding.tvTicketMessage.text = ticket.msg
+            binding.tvTicketSbj.text = ticket.subject
+            binding.tvTicketMessage.text = ticket.message
             binding.tvTicketDate.text = formatDate(ticket.created_at)
             binding.tvTicketStatus.text = ticket.status.replace("_", " ").uppercase()
             binding.tvTicketStatus.setTextColor(

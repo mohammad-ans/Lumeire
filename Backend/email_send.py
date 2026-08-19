@@ -8,6 +8,7 @@ API_KEY = os.getenv("RESEND_API_KEY")
 RESEND_EMAIL = os.getenv("RESEND_EMAIL")
 
 async def send_otp(email: str, otp: str):
+    print(email, otp)
     url = "https://api.resend.com/emails"
     header = {
         "Authorization" : f"Bearer {API_KEY}",
@@ -22,6 +23,7 @@ async def send_otp(email: str, otp: str):
         f"<p>It expires in 10 minutes.</p>"
     )
     }
+    print(header, body)
     async with httpx.AsyncClient() as client:
         response = await client.post(url, json=body, headers = header)
         return response.status_code

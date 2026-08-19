@@ -82,7 +82,8 @@ class HelpSupportActivity: AppCompatActivity() {
                     binding.tvNoTickets.visibility = View.GONE
                 }
             }
-            catch (_: Exception) {
+            catch (e: Exception) {
+                Log.e("Ticket", "${e.message} $e")
                 Toast.makeText(this@HelpSupportActivity, "Could not load tickets", Toast.LENGTH_SHORT).show()
             }
         }

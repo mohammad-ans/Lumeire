@@ -174,8 +174,8 @@ data class SupportTicketCreateReq(
 @Serializable
 data class SupportTicket(
     val id: String,
-    val sbj: String,
-    val msg: String,
+    val subject: String,
+    val message: String,
     val status: String,
     val created_at: String
 )

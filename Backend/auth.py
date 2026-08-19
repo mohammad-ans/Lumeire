@@ -70,6 +70,7 @@ async def signup(data: SignUp, db: Session = Depends(get_db)):
     expires_at = datetime.utcnow() + timedelta(minutes=OTP_EXPIRE_MINUTES)
     try:
         response = await send_otp(data.email, otp_code)
+        print(response)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service not available")

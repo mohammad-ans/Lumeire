@@ -46,7 +46,7 @@ class ResetPasswordActivity : AppCompatActivity() {
                     Toast.makeText(this, getString(R.string.login_missing_fields), Toast.LENGTH_SHORT).show()
                 }
                 newPassword.length < 8 -> {
-                    Toast.makeText(this, getString(R.string.passwords_mis_match), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.password_short), Toast.LENGTH_SHORT).show()
                 }
                 newPassword != confirmPassword -> {
                     Toast.makeText(this, getString(R.string.passwords_mis_match), Toast.LENGTH_SHORT).show()
