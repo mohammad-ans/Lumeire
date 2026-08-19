@@ -52,3 +52,16 @@ When I first imported my figma project, I had no information about android devel
 ![Profile Page](./images/profile.jpeg)
 ![Rewards Page](./images/rewards.jpeg)
 ![Bookings Page](./images/bookings.jpeg)
+
+## Videos
+I forgot to record the go to maps in maps page, and rewards page.
+
+https://github.com/user-attachments/assets/19eb0c95-5d56-4687-8d24-f5bfe2be74c9
+
+https://github.com/user-attachments/assets/e8c2e46f-efbe-4b01-9752-0e19d68ab20d
+
+https://github.com/user-attachments/assets/563f3a3c-2b56-416e-bbda-6ec0e34a89ca
+
+
+
+
